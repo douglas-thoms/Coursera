@@ -36,7 +36,7 @@ Quiz3Question5 <- function(){
   
   combined.df <- merge(GDP.df,educational.df)
   
-  combined.df <- arrange(combined.df,desc(Ranking))
+  #combined.df <- arrange(combined.df,desc(Ranking))
   print(combined.df)
   combined.df <- combined.df[c("CountryCode", "Ranking","GDP","Income.Group")]
 

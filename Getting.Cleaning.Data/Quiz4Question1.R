@@ -10,7 +10,7 @@ quiz4question1 <- function(){
   }
   
   fileURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
-  download.file(fileURL, destfile = "./data/quiz4question4data.csv")
+  download.file(fileURL, destfile = "./data/quiz4question1data.csv")
   
   quiz4question1df<- read.csv("./data/quiz4question4data.csv")
   
