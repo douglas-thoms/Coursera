@@ -29,9 +29,9 @@ quiz4question4 <- function(){
   
   combinedDF <- merge(economicData, educationalData)
   
-  fiscal <-(grep("[F-f][I-i][S-s][C-c][A-a][L-l]",combinedDF, value = TRUE))
+  fiscal <-(grep("fiscal.*june",combinedDF$Special.Notes, value = TRUE, ignore.case = TRUE))
   
-  
-  return(fiscal)
+  print(fiscal)
+  return(length(fiscal))
   
 }
