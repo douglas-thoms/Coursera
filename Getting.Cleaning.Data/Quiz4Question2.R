@@ -12,10 +12,6 @@ quiz4question2 <- function(){
   fileURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv"
   download.file(fileURL, destfile = "./data/quiz4question2data.csv")
   
-  quiz4question1df<- read.csv("./data/quiz4question2data.csv")
-  
-
-  
   economicData <- read.csv("./data/quiz4question2data.csv", header = FALSE, 
                      skip = 5, as.is = TRUE)
   

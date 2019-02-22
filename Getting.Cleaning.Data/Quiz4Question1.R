@@ -17,3 +17,7 @@ quiz4question1 <- function(){
   print(strsplit(names(quiz4question1df), 'wgtp'))
   
 }
+
+question 3 
+
+grep("^United",countryNames), 3
