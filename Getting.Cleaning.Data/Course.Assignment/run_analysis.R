@@ -141,25 +141,43 @@ merged_dataset <- rbind(X_test, X_train)
                 
         }
         
-        regex1 = "mean"
-        regex2 = "std"
-        
-        
         #select final columns to show
         merged_dataset <- merged_dataset %>%
                                 #rename y to activity
                                 rename(activity = y) %>%
                                 #select columns with means or std
-                                select(activity, subject,dataType, matches("(mean\\(\\)|std\\(\\))"))
+                                select(subject, activity, dataType, matches("(mean\\(\\)| std\\(\\))"))
                                 
         
         #select out columns only with std and mean
         #a second, independent tidy data set with the average of each variable for each activity and each subject
         #use mutate and create an extra column - name it tidyset
+
+        outputDf <- data.frame()
+        
+        #create a loop 
+        #1 - first filters according to subject
+        input_matrix <- merged_dataset[merged_dataset$subject == 1, ]
+        
+        #3 select column to choose
+        #4 - create a loop through all the different columns
+        #5 - do tapply on all activities
+        output_vector <- tapply(input_matrix[,4], input_matrix$activity, mean)
+        
+        #need to add in column name, take chance to rename mean properly
+        outputDf <- data.frame(activity = names(output_vector), mean = output_vector)
+        
+        #after loop add subject
+        rownames(outputDf) <- c()
+        outputDf$subject <- 1
+        col_idx <- grep("subject", names(outputDf))
+        outputDf <- outputDf[, c(col_idx, (1:ncol(outputDf))[-col_idx])]
         
         
+        
+        #then use tapply to break it down to activities        
                
-        return(merged_dataset)
+        return(outputDf)
 
   
 }
