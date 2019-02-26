@@ -164,20 +164,29 @@ merged_dataset <- rbind(X_test, X_train)
         #5 - do tapply on all activities
         output_vector <- tapply(input_matrix[,4], input_matrix$activity, mean)
         
+        
+        
+        print(variable_name)
+        print(output_vector)
+        
         #need to add in column name, take chance to rename mean properly
-        outputDf <- data.frame(activity = names(output_vector), mean = output_vector)
+        tempDf <- data.frame(activity = names(output_vector), mean = output_vector)
+        #rename column with proper value
+        # t=time domain    f=frequency domain   Acc=accelerometer  Gyro= gyroscope Mag= magnitude Jerk = jerk
+        variable_name <- paste(names(input_matrix[4]),"Average", sep = "")
+        colnames(tempDf)[2] <- variable_name
         
         #after loop add subject
-        rownames(outputDf) <- c()
-        outputDf$subject <- 1
-        col_idx <- grep("subject", names(outputDf))
-        outputDf <- outputDf[, c(col_idx, (1:ncol(outputDf))[-col_idx])]
+        #ownames(outputDf) <- c()
+        #outputDf$subject <- 1
+        #col_idx <- grep("subject", names(outputDf))
+        #outputDf <- outputDf[, c(col_idx, (1:ncol(outputDf))[-col_idx])]
         
         
         
         #then use tapply to break it down to activities        
                
-        return(outputDf)
+        return(merged_dataset)
 
   
 }
