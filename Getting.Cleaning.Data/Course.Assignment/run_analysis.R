@@ -176,6 +176,7 @@ cols_to_average = ncol(input_matrix)
                 tempDf <- data.frame(activity = names(output_vector), mean = output_vector)                
                 tempDf <- arrange(tempDf,activity)
                 
+                #need to move this outside earlier in code
                 #rename column with proper value
                 # t=time domain    f=frequency domain   Acc=accelerometer  Gyro= gyroscope Mag= magnitude Jerk = jerk
                 variable_name <- names(input_matrix[i])
