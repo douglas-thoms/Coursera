@@ -135,95 +135,103 @@ merged_dataset <- rbind(X_test, X_train)
         for (i in 1:length(activity_number)) {
                 
                 
-                merged_dataset$y <- sapply(merged_dataset$y, str_replace_all, activity_number[i], activity_name[i])
+          merged_dataset$y <- sapply(merged_dataset$y, str_replace_all, activity_number[i], activity_name[i])
                 
         }
 
 #select final columns to show
 merged_dataset <- merged_dataset %>%
-                        #rename y to activity
-                        rename(activity = y) %>%
-                        #select columns with means or std
-                        select(subject, activity, dataType, matches("mean\\(\\)"),
-                                matches ("std\\(\\)"))
-                                
-#need to write merged data set
+                #rename y to activity
+                rename(activity = y) %>%
+                #select columns with means or std
+                select(subject, activity, dataType, matches("mean\\(\\)"),
+                        matches ("std\\(\\)"))
+
+#rename column with proper value
+# t=time domain    f=frequency domain   Acc=accelerometer  Gyro= gyroscope Mag= magnitude Jerk = jerk
+
+colnames(merged_dataset) <- sapply(colnames(merged_dataset), 
+                                   str_replace_all,
+                                   c("^t" = "Time Domain ", 
+                                       "^f"= "Frequency Domain ", 
+                                       "Acc"="Accelerometer ",
+                                       "Gyro" = "Gryroscope ", 
+                                       "Mag" = "Magnitude ", 
+                                       "-" = " ", 
+                                       "X" = "Vector X ",
+                                       "Y" = "Vector Y ",
+                                       "Z" = "Vector Z ", 
+                                       "mean\\(\\)" = "Mean",
+                                       "std\\(\\)" = "Standard Deviation",
+                                       "mad\\(\\)" = "Median Absolute Deviation",
+                                       "max\\(\\)" = "Maximum",
+                                       "min\\(\\)" = "Minimum",
+                                       "sma\\(\\)" = "Signal Magnitude area",
+                                       "energy\\(\\)" = "Energy Measure",
+                                       "iqr\\(\\)" = "Inerquartile entropy",
+                                       "entropy\\(\\)" = "Signal entropy",
+                                       "arCoeff\\(\\)" = "Autoregression",
+                                       "correlation\\(\\)" = "Correlation",
+                                       "maxInds\\(\\)" = "Index of Frequency Component",
+                                       "meanFreq\\(\\)" = "Weighted average of frequency components",
+                                       "skewness\\(\\)" = "skewness of frequency domain",
+                                       "kurtosis\\(\\)" = "kurtosis of frequency interval",
+                                       "bandsEnergy\\(\\)" = "Energy of frequency interval",
+                                       "angle\\(\\)" = "Angle Between Vectors"))
+
+print(head(merged_dataset))
 
 #create empty dataset to add different subjects
 tidyDataFrame <- data.frame(colnames(c("subject","activity","dataType", features)))
 
-for(h in 1:30){
-        
-#create 1st loop 
-#1 - first filters according to subject
-input_matrix <- merged_dataset[merged_dataset$subject == 1, ]
-
-#create columnboundDf
-columnboundDf <- data.frame(activity_name)
-columnboundDf <- arrange(columnboundDf,activity_name)
-
-#get number of columns for for loop later
-cols_to_average = ncol(input_matrix)
-
-#3 select column to choose
-#4 - create a loop through all the different columns
-        for(i in 4:cols_to_average){
+        for(h in 1:30){
                 
-                #5 - do tapply on all activities
-                output_vector <- tapply(input_matrix[,i], input_matrix$activity, mean)
+                #create 1st loop 
+                #1 - first filters according to subject
+                input_matrix <- merged_dataset[merged_dataset$subject == 1, ]
                 
-                #need to add in column name, take chance to rename mean properly
-                tempDf <- data.frame(activity = names(output_vector), mean = output_vector)                
-                tempDf <- arrange(tempDf,activity)
+                #create columnboundDf
+                columnboundDf <- data.frame(activity_name)
+                columnboundDf <- arrange(columnboundDf,activity_name)
                 
-                #need to move this outside earlier in code
-                #rename column with proper value
-                # t=time domain    f=frequency domain   Acc=accelerometer  Gyro= gyroscope Mag= magnitude Jerk = jerk
-                variable_name <- names(input_matrix[i])
-        
-                variable_name <- str_replace_all(variable_name,c("^t" = "Time Domain ", "^f"= "Frequency Domain ", "Acc"="Accelerometer ",
-                                                                 "Gyro" = "Gryroscope ", "Mag" = "Magnitude ", "-" = " ", "X" = "Vector X ",
-                                                                 "Y" = "Vector Y ",  "Z" = "Vector Z ", "mean\\(\\)" = "Mean Average ",
-                                                                 "std\\(\\)" = "Standard Deviation Average"))
+                #get number of columns for for loop later
+                cols_to_average = ncol(input_matrix)
                 
-                print(tempDf)
+                #3 select column to choose
+                #4 - create a loop through all the different columns
+                for(i in 4:cols_to_average){
                 
-                colnames(tempDf)[2] <- variable_name
+                        #5 - do tapply on all activities
+                        output_vector <- tapply(input_matrix[,i], input_matrix$activity, mean)
+                        
+                        #need to add in column name, take chance to rename mean properly
+                        tempDf <- data.frame(activity = names(output_vector), mean = output_vector)                
+                        tempDf <- arrange(tempDf,activity)
+                        
+                        #rename column with proper value
+                        # t=time domain    f=frequency domain   Acc=accelerometer  Gyro= gyroscope Mag= magnitude Jerk = jerk
+                        variable_name <- names(input_matrix[i])
+                        
+                        variable_name <- str_replace_all(variable_name,c("Vector X " = "Vector X Average",
+                                                                         "Vector Y " = "Vector Y Average",
+                                                                         "Vector Z " = "Vector Z Average"))
+                        
+                        colnames(tempDf)[2] <- variable_name
+                        
+                        columnboundDf <- cbind(columnboundDf, tempDf[2])
                 
-                columnboundDf <- cbind(columnboundDf, tempDf[2])
-                
-                
-                
-        }
+                }
         
         columnboundDf$subject <- h
         
         col_idx <- grep("subject", names(columnboundDf))
         columnboundDf <- columnboundDf[, c(col_idx, (1:ncol(columnboundDf))[-col_idx])]
-
+        
         tidyDataFrame <- rbind(tidyDataFrame, columnboundDf)
+        
+        }        
 
-}        
-
-        
-        
-        
-
-        
-        
-        
-        #after loop add subject
-        #ownames(outputDf) <- c()
-        #outputDf$subject <- 1
-        #col_idx <- grep("subject", names(outputDf))
-        #outputDf <- outputDf[, c(col_idx, (1:ncol(outputDf))[-col_idx])]
-        
-        
-        
-        
-        #then use tapply to break it down to activities        
-               
-        return(tidyDataFrame)
+return(tidyDataFrame)
 
   
 }
