@@ -24,55 +24,44 @@ cleaning.data.assignment <- function(){
 library(plyr)
 library(dplyr)
 library(stringr)
-        
-  #see if data directory exists, if not create it
-  if(!file.exists("data")){
-    
-    dir.create("data")
-    
-  }
   
-  #check if zip file has been downloaded - if not download and unzip file
-  if(!file.exists("./data/cleaning.data.assignment.zip")){
-        
-        dir.create("./data/cleaning.data.assignment.zip")
+  #download and unzip file
+
       
         file.URL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
-        download.file(file.URL, destfile = "./data/cleaning.data.assignment.zip")
+        download.file(file.URL, destfile = "cleaning.data.assignment.zip")
 
-        out.path <- "C:\\Users\\Douglas\\Documents\\Coursera\\Coursera\\Getting.Cleaning.Data\\Course.Assignment\\data"
-        local.file = "./data/cleaning.data.assignment.zip"
+        out.path <- "C:\\Users\\Douglas\\Documents\\Coursera\\Coursera\\Getting.Cleaning.Data\\Course.Assignment"
+        local.file = ".//cleaning.data.assignment.zip"
         unzip(local.file,exdir = out.path)
-        
-        print(list.files("./data/"))
 
-  }
+ 
         
 #use readtable to create data frames of following unzipped files below
 
 #data set of measurements, defined by column names in X-train
-x.train <- read.table("./data/UCI HAR Dataset/train/X_train.txt")
+x.train <- read.table("UCI HAR Dataset/train/X_train.txt")
 
 #subject data that corresponds to measurements in subject_train
-subject.train <- read.table("./data/UCI HAR Dataset/train/subject_train.txt")
+subject.train <- read.table("UCI HAR Dataset/train/subject_train.txt")
 
 #activity data classified as numbers corresponds to y_train
-y.train <- read.table("./data/UCI HAR Dataset/train/y_train.txt")
+y.train <- read.table("UCI HAR Dataset/train/y_train.txt")
 
 #data set of measurements, defined by column names in X_test
-x.test <- read.table("./data/UCI HAR Dataset/test/X_test.txt")
+x.test <- read.table("UCI HAR Dataset/test/X_test.txt")
 
 #subject data that corresponds to measurements in subject_test
-subject.test <- read.table("./data/UCI HAR Dataset/test/subject_test.txt")
+subject.test <- read.table("UCI HAR Dataset/test/subject_test.txt")
 
 #activity data classified as numbers corresponds to y_test
-y.test <- read.table("./data/UCI HAR Dataset/test/y_test.txt")
+y.test <- read.table("UCI HAR Dataset/test/y_test.txt")
 
 #vector of column names defining feature
-features <- read.table("./data/UCI HAR Dataset/features.txt")
+features <- read.table("UCI HAR Dataset/features.txt")
 
 #activity data classified as numbers corresponds to activity_labels
-activity.labels <- read.table("./data/UCI HAR Dataset/activity_labels.txt")
+activity.labels <- read.table("UCI HAR Dataset/activity_labels.txt")
 
 #make features the column names of x.test
 colnames(x.test) <- features[,2]
@@ -261,6 +250,9 @@ tidy.df <- data.frame(colnames(c("subject","activity","data.type", features)))
         tidy.df <- rbind(tidy.df, column.bound.df)
         
         }        
+
+
+write.table(tidy.df, file = "tidyDataset.txt",row.name = FALSE)
 
 return(tidy.df)
 
