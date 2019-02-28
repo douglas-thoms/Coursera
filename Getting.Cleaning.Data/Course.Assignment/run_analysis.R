@@ -1,24 +1,32 @@
-cleaning.data.assignment <- function(){
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
+##
+##  File name:  run_analysis.R
+##  Date:       28Feb2019
+##
+##Computes:
+## 1) unzips an archive and combines the following files into a dataset,
+## renaming variables to more understandable names
+## X_train.txt
+## subject_train.txt
+## y_train.txt
+## X_test.txt
+## subject_test.txt
+## y_test.txt
+## features.txt
+## activity_labels.txt
+##
+## 2) creates a tidy dataset of all the variables containing "mean()"
+## or "std()" and averages them according to subject and activity
+## 
+## Args: None
+##         
+## Returns tidy dataset mentioned above       
+##
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
 
-# Computes:
-# 1) unzips an archive and combines the following files into a dataset,
-# renaming variables to more understandable names
-# X_train.txt
-# subject_train.txt
-# y_train.txt
-# X_test.txt
-# subject_test.txt
-# y_test.txt
-# features.txt
-# activity_labels.txt
-# 
-# 2) creates a tidy dataset of all the variables containing "mean()"
-# or "std()" and averages them according to subject and activity
-# 
-# Args: None
-#         
-# Returns tidy dataset mentioned above       
-#         
+        
               
         
 library(plyr)
@@ -26,58 +34,41 @@ library(dplyr)
 library(stringr)
   
   #download and unzip file
+#check if zip file has been downloaded - if not download and unzip file
 
-      
-        file.URL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
-        download.file(file.URL, destfile = "cleaning.data.assignment.zip")
-
+if(!file.exists("UCI HAR Dataset/train/X_train.txt")){
+        
+        file.url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+        download.file(file.url, destfile = "cleaning.data.assignment.zip")
+        
         out.path <- "C:\\Users\\Douglas\\Documents\\Coursera\\Coursera\\Getting.Cleaning.Data\\Course.Assignment"
-        local.file = ".//cleaning.data.assignment.zip"
+        local.file = "cleaning.data.assignment.zip"
         unzip(local.file,exdir = out.path)
-
- 
+        
+}
         
 #use readtable to create data frames of following unzipped files below
-
-#data set of measurements, defined by column names in X-train
 x.train <- read.table("UCI HAR Dataset/train/X_train.txt")
-
-#subject data that corresponds to measurements in subject_train
 subject.train <- read.table("UCI HAR Dataset/train/subject_train.txt")
-
-#activity data classified as numbers corresponds to y_train
 y.train <- read.table("UCI HAR Dataset/train/y_train.txt")
-
-#data set of measurements, defined by column names in X_test
 x.test <- read.table("UCI HAR Dataset/test/X_test.txt")
-
-#subject data that corresponds to measurements in subject_test
 subject.test <- read.table("UCI HAR Dataset/test/subject_test.txt")
-
-#activity data classified as numbers corresponds to y_test
 y.test <- read.table("UCI HAR Dataset/test/y_test.txt")
-
-#vector of column names defining feature
 features <- read.table("UCI HAR Dataset/features.txt")
-
-#activity data classified as numbers corresponds to activity_labels
 activity.labels <- read.table("UCI HAR Dataset/activity_labels.txt")
 
 #make features the column names of x.test
 colnames(x.test) <- features[,2]
 
-#add test data type as variable
+#add test data type as variable and put variable at front
 x.test$data.type <- "test"
-
-#put column at front
 col.idx <- grep("data.type", names(x.test))
 x.test <- x.test[, c(col.idx, (1:ncol(x.test))[-col.idx])]
 
 #add dummy sequence vector to document original order of data sets for future reference
+#put column at front
 x.test.order.reference <- seq(1:nrow(x.test))
 x.test$order.reference <- x.test.order.reference
-
-#put column at front
 col.idx <- grep("order.reference", names(x.test))
 x.test <- x.test[, c(col.idx, (1:ncol(x.test))[-col.idx])]
 
@@ -255,6 +246,3 @@ tidy.df <- data.frame(colnames(c("subject","activity","data.type", features)))
 write.table(tidy.df, file = "tidyDataset.txt",row.name = FALSE)
 
 return(tidy.df)
-
-  
-}
