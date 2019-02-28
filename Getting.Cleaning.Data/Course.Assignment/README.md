@@ -4,7 +4,7 @@
 * run_analysis.R
 
 ## Computations
-1) Unzips an archive and combines the following files into a dataset:
+1) Unzips UCI HAR dataset archive and combines the following files into a dataset:
 * X_train.txt
 * subject_train.txt
 * y_train.txt
@@ -23,7 +23,7 @@ or "std()" broken down by subject and activity
 * None
        
 ## Returns
-* a wide tidy dataset consisting of variable averages along the column and subject and activity along the rows
+* a wide tidy dataset consisting of variable names as column names, subject, activity and variable averages as observation
 
 ## Pseudocode
 1) Downloads and unzips UCI HAR dataset
