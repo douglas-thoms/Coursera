@@ -50,118 +50,49 @@ if(!file.exists("UCI HAR Dataset/train/X_train.txt")){
 #use readtable to create data frames of following unzipped files below
 x.train <- read.table("UCI HAR Dataset/train/X_train.txt")
 subject.train <- read.table("UCI HAR Dataset/train/subject_train.txt")
+
+
 y.train <- read.table("UCI HAR Dataset/train/y_train.txt")
 x.test <- read.table("UCI HAR Dataset/test/X_test.txt")
 subject.test <- read.table("UCI HAR Dataset/test/subject_test.txt")
+
+
 y.test <- read.table("UCI HAR Dataset/test/y_test.txt")
-features <- read.table("UCI HAR Dataset/features.txt")
+features <- read.table("UCI HAR Dataset/features.txt", as.is = TRUE)
 activity.labels <- read.table("UCI HAR Dataset/activity_labels.txt")
 
-#make features the column names of x.test
-colnames(x.test) <- features[,2]
-
-#add test data type as variable and put variable at front
-x.test$data.type <- "test"
-col.idx <- grep("data.type", names(x.test))
-x.test <- x.test[, c(col.idx, (1:ncol(x.test))[-col.idx])]
-
-#add dummy sequence vector to document original order of data sets for future reference
-#put column at front
-x.test.order.reference <- seq(1:nrow(x.test))
-x.test$order.reference <- x.test.order.reference
-col.idx <- grep("order.reference", names(x.test))
-x.test <- x.test[, c(col.idx, (1:ncol(x.test))[-col.idx])]
-
-#add name to subject.test
-names(subject.test) <- "subject"
-
-#add dummy sequence vector to document original order of data sets for future reference
-subject.order.reference <- seq(1:nrow(subject.test))
-subject.test <- cbind(subject.test, subject.order.reference)
-
-#combine subject.test and x.test
-x.test <- cbind(subject.test, x.test)
-
-#add name to y.test
-names(y.test) <- "y"
-
-#add dummy sequence vector to document original order of data sets for future reference
-y.order.reference <- seq(1:nrow(y.test))
-y.test <- cbind(y.test, y.order.reference)
-
-#combine y.test and x.test
-x.test <- cbind(y.test, x.test)
-
-#coerce y into character to replace with activity labels
-x.test$y <- sapply(x.test$y, as.character)
-
-#make features the column names of x.train
-colnames(x.train) <- features[,2]
-
-#add training data type as variable
-x.train$data.type <- "train"
-
-#put column at front
-col.idx <- grep("data.type", names(x.train))
-x.train <- x.train[, c(col.idx, (1:ncol(x.train))[-col.idx])]
-
-#add dummy sequence vector to document original order of data sets for future reference
-x.train.order.reference <- seq(1:nrow(x.train))
-x.train$order.reference <- x.train.order.reference
-
-#put column at front
-col.idx <- grep("order.reference", names(x.train))
-x.train <- x.train[, c(col.idx, (1:ncol(x.train))[-col.idx])]
-
-#add name to subject.train
-names(subject.train) <- "subject"
-#add dummy sequence vector to document original order of data sets for future reference
-subject.order.reference <- seq(1:nrow(subject.train))
-subject.train <- cbind(subject.train, subject.order.reference)
-
-#combine subject.train and x.train
-x.train <- cbind(subject.train, x.train)
-
-#add name to y.train
-names(y.train) <- "y"
-
-#add dummy sequence vector to document original order of data sets for future reference
-y.order.reference <- seq(1:nrow(y.train))
-y.train <- cbind(y.train, y.order.reference)
-
-#combine y.train and x.train
-x.train <- cbind(y.train, x.train)
-
-#coerce y into character to replace with activity labels
-x.train$y <- sapply(x.train$y, as.character)
 
 
-#set inputs for sapply str_replace_all
-activity.name <- as.character(activity.labels[,2])
-activity.number <- as.character(activity.labels[,1])
+#ceate column names
+features <- features$V2
+features <- c("subject","activity",features)
 
-        
-#combine test and train dat
-merged.dataset.df <- rbind(x.test, x.train)
+#combine files into merged dataset
+dataset.test <- cbind(subject.test, y.test, x.test)
+dataset.train <- cbind(subject.train, y.train, x.train)
+dataset <- rbind(dataset.test,dataset.train)
+
+colnames(dataset) <- features
+
+#subset only columns with mean() or std()
+dataset <- dataset[c("subject","activity", grep("mean\\(\\)|std\\(\\)", names(dataset), value = TRUE))]
+
+#update features variable
+features <- colnames(dataset)
+
 
         #set up for loop to replace activity number with activity names
-        for (i in 1:length(activity.number)) {
-                
-                
-          merged.dataset.df$y <- sapply(merged.dataset.df$y, str_replace_all, activity.number[i], activity.name[i])
-                
+        for (i in 1:length(activity.labels[,2])) {
+
+
+          dataset$activity <- sapply(dataset$activity, str_replace_all, as.character(activity.labels[i,1]),
+                                               as.character(activity.labels[i,2]))
+
         }
 
-#select final columns to show
-merged.dataset.df <- merged.dataset.df %>%
-                #rename y to activity
-                rename(activity = y) %>%
-                #select columns with means or std
-                select(subject, activity, data.type, matches("mean\\(\\)"),
-                        matches ("std\\(\\)"))
 
 #rename columns with more clear variable names
-colnames(merged.dataset.df) <- sapply(colnames(merged.dataset.df), 
+colnames(dataset) <- sapply(colnames(dataset), 
                                    str_replace_all,
                                    c("^t" = "Time Domain ", 
                                        "^f"= "Frequency Domain ", 
@@ -190,18 +121,20 @@ colnames(merged.dataset.df) <- sapply(colnames(merged.dataset.df),
                                        "bandsEnergy\\(\\)" = "Energy of frequency interval",
                                        "angle\\(\\)" = "Angle Between Vectors"))
 
+
+
 #create empty dataset to add averaged variables later on
-tidy.df <- data.frame(colnames(c("subject","activity","data.type", features)))
+tidy.df <- data.frame(colnames(features))
 
         #loop through subjects to average activities
         for(h in 1:30){
                 
                 #filters according to subject
-                input.df <- merged.dataset.df[merged.dataset.df$subject == 1, ]
+                input.df <- dataset[dataset$subject == 1, ]
                 
                 #create column.bound.df and sort according to activity
-                column.bound.df <- data.frame(activity.name)
-                column.bound.df <- arrange(column.bound.df,activity.name)
+                column.bound.df <- data.frame("activity" = activity.labels[,2])
+                column.bound.df <- arrange(column.bound.df,activity.labels[,2])
                 
                 #get number of columns for for loop later
                 cols_to_average = ncol(input.df)
