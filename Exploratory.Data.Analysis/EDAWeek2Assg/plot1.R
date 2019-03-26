@@ -26,7 +26,7 @@ df <- as.data.frame(df)
 
 graph_data <- df %>%
                group_by(year) %>%
-               summarise(total.emission = sum(Emissions))
+               summarise(total.emission = sum(Emissions,na.rm = TRUE))
 
 y <- graph_data$total.emission
 x <- graph_data$year

@@ -27,10 +27,10 @@ df <- as.data.frame(df)
 graph_data <- df %>%
                group_by(year) %>%
                filter(fips =="24510") %>%
-               summarise(total.emission = sum(Emissions))
+               summarise(total.emission = sum(Emissions,na.rm = TRUE))
 
 y <- graph_data$total.emission
 x <- graph_data$year
 
 barplot(y, names.arg=x, xlab = "Year", ylab = "Baltimore Total PM2.5 Emissions (ton)")
-
+abline(h = min(graph_data$total.emission))
