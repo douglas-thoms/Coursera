@@ -24,21 +24,23 @@ require(gridExtra)
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-df <- lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor)
+df <- as.data.frame(lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor))
 df$Emissions <- NEI$Emissions
-df <- as.data.frame(df)
 
 #need to find list of coal-related SCC to filter NEI
 #do grep search for coal (upper and lower), take vector and take the relevant SCC
+
+#UPDATE TO FUEL Comb * COAL
 
 coal.logical <- apply(SCC,1,function(row) length(grep("[cC][oO][aA][lL]",row))>0)
 coal.SCC <- SCC[coal.logical,]$SCC
 
 
-graph_data <- df %>%
-               group_by(type,year) %>% 
-               summarise(total.emission = sum(Emissions,na.rm = TRUE)) %>%
-               spread(type,total.emission)
+bar_graph_data <- df %>%
+               filter(SCC %in% coal.SCC) %>%
+               group_by(year) %>% 
+               summarise(total.emission = sum(Emissions,na.rm = TRUE))
+               
 
 
 
