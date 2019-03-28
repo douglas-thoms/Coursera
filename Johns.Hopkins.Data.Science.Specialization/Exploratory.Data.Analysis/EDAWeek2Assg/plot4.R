@@ -32,7 +32,7 @@ df$Emissions <- NEI$Emissions
 
 #UPDATE TO FUEL Comb * COAL
 
-coal.logical <- apply(SCC,1,function(row) length(grep("[cC][oO][aA][lL]",row))>0)
+coal.logical <- apply(SCC,1,function(row) length(grep("([cC][oO][mM][bB]).*([cC][oO][aA][lL])",row))>0)
 coal.SCC <- SCC[coal.logical,]$SCC
 
 
