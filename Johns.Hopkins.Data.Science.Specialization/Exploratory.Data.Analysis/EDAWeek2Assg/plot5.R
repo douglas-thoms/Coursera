@@ -1,8 +1,8 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 ##
-##  File name:  plot4.R
-##  Date:       27Mar2019
+##  File name:  plot5.R
+##  Date:       28Mar2019
 ##
 ##  Part of Course Project 2 for Exploratory data course
 ##      
@@ -32,15 +32,15 @@ df$Emissions <- NEI$Emissions
 
 #UPDATE TO FUEL Comb * COAL
 
-coal.logical <- apply(SCC,1,function(row) length(grep("comb.*coal",row, ignore.case = TRUE))>0)
-coal.SCC <- SCC[coal.logical,]$SCC
+vehicle.logical <- apply(SCC,1,function(row) length(grep("motor vehicle",row, ignore.case = TRUE))>0)
+vehicle.SCC <- SCC[vehicle.logical,]$SCC
 
 
 scatter.graph.data <- df %>%
-               filter(SCC %in% coal.SCC)
+               filter(SCC %in% vehicle.SCC,fips =="24510")
 
 bar.graph.data <- df %>%
-               filter(SCC %in% coal.SCC) %>%
+               filter(SCC %in% vehicle.SCC,fips =="24510") %>%
                group_by(year) %>% 
                summarise(total.emission = sum(Emissions, na.rm = TRUE),
                median.emission = median(Emissions, na.rm = TRUE),
