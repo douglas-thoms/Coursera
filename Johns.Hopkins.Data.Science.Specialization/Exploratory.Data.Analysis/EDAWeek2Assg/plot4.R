@@ -36,11 +36,30 @@ coal.logical <- apply(SCC,1,function(row) length(grep("([cC][oO][mM][bB]).*([cC]
 coal.SCC <- SCC[coal.logical,]$SCC
 
 
-bar_graph_data <- df %>%
+scatter.graph.data <- df %>%
                filter(SCC %in% coal.SCC) %>%
-               group_by(year) %>% 
-               summarise(total.emission = sum(Emissions,na.rm = TRUE))
-               
+               filter(Emissions > 0)
 
+bar.graph.data <- df %>%
+               filter(SCC %in% coal.SCC) %>%
+               filter(Emissions > 0) %>%
+               group_by(year) %>% 
+               summarise(total.emission = sum(Emissions, na.rm = TRUE),
+               median.emission = median(Emissions, na.rm = TRUE))
+
+
+
+#set 4 charts
+par(mfcol = c(1,2))
+
+#create bar graph
+               
+y <- bar.graph.data$total.emission
+x <- bar.graph.data$year
+
+barplot(y, names.arg=x, xlab = "Year", ylab = "Total PM2.5 Emissions (ton)")
+abline(h = min(bar.graph.data$total.emission))
+
+boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, log = "y")
 
 

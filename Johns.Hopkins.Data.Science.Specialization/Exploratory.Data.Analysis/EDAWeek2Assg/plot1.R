@@ -32,4 +32,4 @@ y <- graph_data$total.emission
 x <- graph_data$year
 
 barplot(y, names.arg=x, xlab = "Year", ylab = "Total PM2.5 Emissions (ton)")
-
+abline(h = min(graph_data$total.emission))
