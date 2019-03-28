@@ -37,7 +37,7 @@ coal.SCC <- SCC[coal.logical,]$SCC
 
 
 scatter.graph.data <- df %>%
-               filter(SCC %in% coal.SCC) #%>%
+               filter(SCC %in% coal.SCC)
 
 bar.graph.data <- df %>%
                filter(SCC %in% coal.SCC) %>%
@@ -47,25 +47,33 @@ bar.graph.data <- df %>%
                mean.emission = mean(Emissions, na.rm = TRUE),
                percent.zero = mean(Emissions == 0))
 
-#do a chart of percentage of zero values
+
 
 
 #set 4 charts
-par(mfcol = c(1,2))
+par(mfrow = c(2,3))
 
-#create bar graph
-               
-y <- bar.graph.data$total.emission
-x <- bar.graph.data$year
-
-barplot(y, names.arg=x, xlab = "Year", ylab = "Total PM2.5 Emissions (ton)")
+#bar graph - total
+barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year, 
+        ylab = "Total PM2.5 Emissions (ton)")
+title("Total Emissions")
 abline(h = min(bar.graph.data$total.emission))
 
-# do full box plot
-boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylim = c(0,6))
-abline(h = 0)
-
-#do chart of median
+# scatter plot
+plot(y = scatter.graph.data$Emissions, x = scatter.graph.data$year, pch = 1)
+title("Spread of readings")
 
 #do chart of mean
+barplot(bar.graph.data$mean.emission, names.arg=bar.graph.data$year, 
+        ylab = "Mean PM2.5 Emissions (ton)")
+title("Mean of Emissions")
 
+#do chart of median
+barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year, 
+        ylab = "Median PM2.5 Emissions (ton)")
+title("Median of Emissions")
+
+#do a bar chart of percentage of zero values
+barplot(bar.graph.data$percent.zero, names.arg=bar.graph.data$year, 
+        ylab = "%")
+title("Percentage of Zero readings")
