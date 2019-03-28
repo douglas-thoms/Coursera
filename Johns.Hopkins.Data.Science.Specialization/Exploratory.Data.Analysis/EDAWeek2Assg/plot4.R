@@ -37,16 +37,17 @@ coal.SCC <- SCC[coal.logical,]$SCC
 
 
 scatter.graph.data <- df %>%
-               filter(SCC %in% coal.SCC) %>%
-               filter(Emissions > 0)
+               filter(SCC %in% coal.SCC) #%>%
 
 bar.graph.data <- df %>%
                filter(SCC %in% coal.SCC) %>%
-               filter(Emissions > 0) %>%
                group_by(year) %>% 
                summarise(total.emission = sum(Emissions, na.rm = TRUE),
-               median.emission = median(Emissions, na.rm = TRUE))
+               median.emission = median(Emissions, na.rm = TRUE),
+               mean.emission = mean(Emissions, na.rm = TRUE),
+               percent.zero = mean(Emissions == 0))
 
+#do a chart of percentage of zero values
 
 
 #set 4 charts
@@ -60,6 +61,11 @@ x <- bar.graph.data$year
 barplot(y, names.arg=x, xlab = "Year", ylab = "Total PM2.5 Emissions (ton)")
 abline(h = min(bar.graph.data$total.emission))
 
-boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, log = "y")
+# do full box plot
+boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylim = c(0,6))
+abline(h = 0)
 
+#do chart of median
+
+#do chart of mean
 
