@@ -30,34 +30,39 @@ df$Emissions <- NEI$Emissions
 #need to find list of coal-related SCC to filter NEI
 #do grep search for coal (upper and lower), take vector and take the relevant SCC
 
-#UPDATE TO FUEL Comb * COAL
+#create vector to see what SCC codes apply to these areas
+LA.Baltimore.logical <- (subset(df, (df$fips == "06037") | (df$fips == "24510")))$SCC
+LA.Baltimore.SCC <- SCC[LA.Baltimore.logical,]
 
-vehicle.logical <- apply(SCC,1,function(row) length(grep("motor vehicle",row, ignore.case = TRUE))>0)
-vehicle.SCC <- SCC[vehicle.logical,]$SCC
+vehicle.SCC <- filter(SCC, Data.Category == "Onroad")
+vehicle.logical <- apply(vehicle.SCC,1,function(row) 
+                          length(grep("vehicle|vehicles|trucks|buses",
+                          row, ignore.case = TRUE))>0)
 
+
+vehicle.SCC <- vehicle.SCC[vehicle.logical,]$SCC
+
+#level2 vehicle
+#level3 vehicle truck
 
 scatter.graph.data <- df %>%
-               filter(SCC %in% vehicle.SCC,fips =="24510")
+               filter(SCC %in% vehicle.SCC, fips == "24510")
 
 bar.graph.data <- df %>%
-               filter(SCC %in% vehicle.SCC,fips =="24510") %>%
+               filter(SCC %in% vehicle.SCC, fips == "24510") %>%
                group_by(year) %>% 
                summarise(total.emission = sum(Emissions, na.rm = TRUE),
                median.emission = median(Emissions, na.rm = TRUE),
                mean.emission = mean(Emissions, na.rm = TRUE),
                percent.zero = mean(Emissions == 0))
 
-
-
-
 #set 4 charts
-par(mfrow = c(2,3))
+par(mfrow = c(2,2))
 
 #bar graph - total
 barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year, 
         ylab = "Total PM2.5 Emissions (ton)")
 title("Total Emissions")
-abline(h = min(bar.graph.data$total.emission))
 
 # scatter plot
 plot(y = scatter.graph.data$Emissions, x = scatter.graph.data$year, pch = 1)
@@ -73,7 +78,3 @@ barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year,
         ylab = "Median PM2.5 Emissions (ton)")
 title("Median of Emissions")
 
-#do a bar chart of percentage of zero values
-barplot(bar.graph.data$percent.zero, names.arg=bar.graph.data$year, 
-        ylab = "%")
-title("Percentage of Zero readings")
