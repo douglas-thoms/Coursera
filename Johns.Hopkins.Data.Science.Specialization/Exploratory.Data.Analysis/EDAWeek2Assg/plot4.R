@@ -16,9 +16,7 @@
 #Use the ggplot2 plotting system to make a plot answer this question.
 
 require(tidyr)
-require(ggplot2)
 require(dplyr)
-require(gridExtra)
 
 ## This first line will likely take a few seconds. Be patient!
 NEI <- readRDS("summarySCC_PM25.rds")
@@ -47,11 +45,15 @@ bar.graph.data <- df %>%
                mean.emission = mean(Emissions, na.rm = TRUE),
                percent.zero = mean(Emissions == 0))
 
+#save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
+#open device
+#Name each of the plot files as \color{red}{\verb|plot1.png|}plot1.png, \color{red}{\verb|plot2.png|}plot2.png, etc.
+png(filename = "plot4.png", width = 480, height = 480)
 
-
+print(dev.cur())
 
 #set 4 charts
-par(mfrow = c(2,3))
+par(mfrow = c(2,3), oma = c(0,0,2,0))
 
 #bar graph - total
 barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year, 
@@ -60,7 +62,8 @@ title("Total Emissions")
 abline(h = min(bar.graph.data$total.emission))
 
 # scatter plot
-plot(y = scatter.graph.data$Emissions, x = scatter.graph.data$year, pch = 1)
+plot(y = scatter.graph.data$Emissions, x = scatter.graph.data$year, pch = 1,
+     ylab = "ton")
 title("Spread of readings")
 
 #do chart of mean
@@ -77,3 +80,9 @@ title("Median of Emissions")
 barplot(bar.graph.data$percent.zero, names.arg=bar.graph.data$year, 
         ylab = "%")
 title("Percentage of Zero readings")
+
+mtext("Baltimore Vehicle-related PM2.5 Emissions", outer = TRUE, cex = 1.5)
+
+#close device
+dev.off()
+print(dev.cur())

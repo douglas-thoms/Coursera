@@ -14,9 +14,7 @@
 #in Baltimore City?
 
 require(tidyr)
-require(ggplot2)
 require(dplyr)
-require(gridExtra)
 
 ## This first line will likely take a few seconds. Be patient!
 NEI <- readRDS("summarySCC_PM25.rds")
@@ -54,20 +52,28 @@ bar.graph.data <- df %>%
                mean.emission = mean(Emissions, na.rm = TRUE),
                percent.zero = mean(Emissions == 0))
 
+#save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
+#open device
+#Name each of the plot files as \color{red}{\verb|plot1.png|}plot1.png, \color{red}{\verb|plot2.png|}plot2.png, etc.
+png(filename = "plot5.png", width = 600, height = 600)
+
+print(dev.cur())
+
 #set 4 charts
 par(mfrow = c(2,3), oma = c(0,0,2,0))
 
 #bar graph - total
 barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year, 
-        ylab = "Total PM2.5 Emissions (ton)")
+        ylab = "ton")
 title("Total Emissions")
 
 # scatter plot
-boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylim = c(-0,5))
+boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylim = c(-0,5),
+        ylab = "ton")
 title("Spread of readings")
 
 # scatter plot
-boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year)
+boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylab = "ton")
 title("Spread of readings")
 
 #do chart of mean
@@ -82,3 +88,6 @@ title("Median Emissions")
 
 mtext("Baltimore Vehicle-related PM2.5 Emissions", outer = TRUE, cex = 1.5)
 
+#close device
+dev.off()
+print(dev.cur())

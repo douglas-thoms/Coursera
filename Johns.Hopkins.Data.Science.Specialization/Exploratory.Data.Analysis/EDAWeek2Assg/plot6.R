@@ -54,7 +54,12 @@ bar.graph.data <- df %>%
                summarise(total.emission = sum(Emissions, na.rm = TRUE),
                median.emission = median(Emissions, na.rm = TRUE),
                mean.emission = mean(Emissions, na.rm = TRUE),
-               percent.zero = mean(Emissions == 0))
+               percent.zero = mean(Emissions == 0)) 
+               
+#need to get difference in total, mean and median
+
+bar.graph.data$fips <- gsub("24510","Baltimore",bar.graph.data$fips)
+bar.graph.data$fips <- gsub("06037","LA",bar.graph.data$fips)
 
 #set 4 charts
 par(mfrow = c(2,3), oma = c(0,0,2,0))

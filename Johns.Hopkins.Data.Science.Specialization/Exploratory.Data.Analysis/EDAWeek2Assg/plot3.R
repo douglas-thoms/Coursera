@@ -28,39 +28,51 @@ df <- lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor)
 df$Emissions <- NEI$Emissions
 df <- as.data.frame(df)
 
-graph_data <- df %>%
+graph.data <- df %>%
                filter(fips =="24510") %>%
                group_by(type,year) %>% 
                summarise(total.emission = sum(Emissions,na.rm = TRUE)) %>%
                spread(type,total.emission)
 
-names(graph_data) <- make.names(names(graph_data))
+names(graph.data) <- make.names(names(graph.data))
 
-NON.ROAD <- ggplot(graph_data,aes(x = graph_data$year, y = graph_data$NON.ROAD)) +
-                  geom_bar(stat = "identity") +
-                  xlab("") + ylab("Baltimore Total PM2.5 Emissions (ton)") + 
-                  ggtitle("NON-ROAD") +
-                  geom_hline(yintercept = min(graph_data$NON.ROAD))
+#save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
+#open device
+#Name each of the plot files as \color{red}{\verb|plot1.png|}plot1.png, \color{red}{\verb|plot2.png|}plot2.png, etc.
+png(filename = "plot3.png", width = 480, height = 480)
 
-NONPOINT <- ggplot(graph_data,aes(x = graph_data$year, y = graph_data$NONPOINT)) +
-                  geom_bar(stat = "identity") +
-                  xlab("") + ylab("Baltimore Total PM2.5 Emissions (ton)") + 
-                  ggtitle("NONPOINT") +
-                  geom_hline(yintercept = min(graph_data$NONPOINT))
+print(dev.cur())
 
-ON.ROAD <- ggplot(graph_data,aes(x = graph_data$year, y = graph_data$ON.ROAD)) +
+NON.ROAD <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$NON.ROAD)) +
                   geom_bar(stat = "identity") +
-                  xlab("") + ylab("Baltimore Total PM2.5 Emissions (ton)") + 
-                  ggtitle("ON.ROAD") +
-                  geom_hline(yintercept = min(graph_data$ON.ROAD))
+                  xlab("") + ylab("ton") + 
+                  ggtitle("Non.road") +
+                  geom_hline(yintercept = min(graph.data$NON.ROAD))
 
-POINT <- ggplot(graph_data,aes(x = graph_data$year, y = graph_data$POINT)) +
+NONPOINT <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$NONPOINT)) +
                   geom_bar(stat = "identity") +
-                  xlab("") + ylab("Baltimore Total PM2.5 Emissions (ton)") + 
-                  ggtitle("POINT") +
-                  geom_hline(yintercept = min(graph_data$POINT))
+                  xlab("") + ylab("ton") + 
+                  ggtitle("Nonpoint") +
+                  geom_hline(yintercept = min(graph.data$NONPOINT))
+
+ON.ROAD <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$ON.ROAD)) +
+                  geom_bar(stat = "identity") +
+                  xlab("") + ylab("ton") + 
+                  ggtitle("On.road") +
+                  geom_hline(yintercept = min(graph.data$ON.ROAD))
+
+POINT <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$POINT)) +
+                  geom_bar(stat = "identity") +
+                  xlab("") + ylab("ton") + 
+                  ggtitle("Point") +
+                  geom_hline(yintercept = min(graph.data$POINT))
 
 grid.arrange(NON.ROAD, NONPOINT, ON.ROAD, POINT,
-             layout_matrix = rbind(c(1,2),c(3,4)))
+             layout_matrix = rbind(c(1,2),c(3,4)), top = "Baltimore Total PM2.5 Emissions")
 
+
+
+#close device
+dev.off()
+print(dev.cur())
 
