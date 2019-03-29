@@ -10,10 +10,8 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 
-#Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, 
-#which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? 
-#Which have seen increases in emissions from 1999–2008? 
-#Use the ggplot2 plotting system to make a plot answer this question.
+#How have emissions from motor vehicle sources changed from 1999–2008 
+#in Baltimore City?
 
 require(tidyr)
 require(ggplot2)
@@ -30,20 +28,20 @@ df$Emissions <- NEI$Emissions
 #need to find list of coal-related SCC to filter NEI
 #do grep search for coal (upper and lower), take vector and take the relevant SCC
 
-#create vector to see what SCC codes apply to these areas
+#create vector to see what SCC codes apply to these areas - not related to actual data output
 LA.Baltimore.logical <- (subset(df, (df$fips == "06037") | (df$fips == "24510")))$SCC
 LA.Baltimore.SCC <- SCC[LA.Baltimore.logical,]
 
+#select SCC numbers relevant to vehicles operation
 vehicle.SCC <- filter(SCC, Data.Category == "Onroad")
 vehicle.logical <- apply(vehicle.SCC,1,function(row) 
                           length(grep("vehicle|vehicles|trucks|buses",
                           row, ignore.case = TRUE))>0)
 
-
+#subset vehicle related SCC number in SCC file
 vehicle.SCC <- vehicle.SCC[vehicle.logical,]$SCC
 
-#level2 vehicle
-#level3 vehicle truck
+
 
 scatter.graph.data <- df %>%
                filter(SCC %in% vehicle.SCC, fips == "24510")
@@ -57,7 +55,7 @@ bar.graph.data <- df %>%
                percent.zero = mean(Emissions == 0))
 
 #set 4 charts
-par(mfrow = c(2,2))
+par(mfrow = c(2,3), oma = c(0,0,2,0))
 
 #bar graph - total
 barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year, 
@@ -65,16 +63,22 @@ barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
 title("Total Emissions")
 
 # scatter plot
-plot(y = scatter.graph.data$Emissions, x = scatter.graph.data$year, pch = 1)
+boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylim = c(-0,5))
+title("Spread of readings")
+
+# scatter plot
+boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year)
 title("Spread of readings")
 
 #do chart of mean
 barplot(bar.graph.data$mean.emission, names.arg=bar.graph.data$year, 
-        ylab = "Mean PM2.5 Emissions (ton)")
-title("Mean of Emissions")
+        ylab = "Mean (ton)")
+title("Mean Emissions")
 
 #do chart of median
 barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year, 
-        ylab = "Median PM2.5 Emissions (ton)")
-title("Median of Emissions")
+        ylab = "Median (ton)")
+title("Median Emissions")
+
+mtext("Baltimore Vehicle-related PM2.5 Emissions", outer = TRUE, cex = 1.5)
 
