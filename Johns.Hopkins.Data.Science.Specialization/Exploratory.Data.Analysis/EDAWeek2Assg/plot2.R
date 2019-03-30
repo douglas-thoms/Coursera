@@ -24,11 +24,13 @@ df <- lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor)
 df$Emissions <- NEI$Emissions
 df <- as.data.frame(df)
 
+#summarize values and filter for Baltimore
 graph_data <- df %>%
                group_by(year) %>%
                filter(fips =="24510") %>%
                summarise(total.emission = sum(Emissions,na.rm = TRUE))
 
+#make graph
 y <- graph_data$total.emission
 x <- graph_data$year
 

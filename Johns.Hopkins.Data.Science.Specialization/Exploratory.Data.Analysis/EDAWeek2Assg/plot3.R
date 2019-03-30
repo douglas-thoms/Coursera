@@ -28,11 +28,12 @@ df <- lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor)
 df$Emissions <- NEI$Emissions
 df <- as.data.frame(df)
 
+#summarize data
 graph.data <- df %>%
                filter(fips =="24510") %>%
                group_by(type,year) %>% 
-               summarise(total.emission = sum(Emissions,na.rm = TRUE)) %>%
-               spread(type,total.emission)
+               summarise(total.emission = sum(Emissions,na.rm = TRUE))
+               ungroup()
 
 names(graph.data) <- make.names(names(graph.data))
 
@@ -43,33 +44,12 @@ png(filename = "plot3.png", width = 480, height = 480)
 
 print(dev.cur())
 
-NON.ROAD <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$NON.ROAD)) +
-                  geom_bar(stat = "identity") +
+#create and plot graph
+graph <- ggplot(graph.data,aes(fill = type, x = year, y = total.emission)) +
+                  geom_bar(position = "dodge", stat = "identity") +
                   xlab("") + ylab("ton") + 
-                  ggtitle("Non.road") +
-                  geom_hline(yintercept = min(graph.data$NON.ROAD))
-
-NONPOINT <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$NONPOINT)) +
-                  geom_bar(stat = "identity") +
-                  xlab("") + ylab("ton") + 
-                  ggtitle("Nonpoint") +
-                  geom_hline(yintercept = min(graph.data$NONPOINT))
-
-ON.ROAD <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$ON.ROAD)) +
-                  geom_bar(stat = "identity") +
-                  xlab("") + ylab("ton") + 
-                  ggtitle("On.road") +
-                  geom_hline(yintercept = min(graph.data$ON.ROAD))
-
-POINT <- ggplot(graph.data,aes(x = graph.data$year, y = graph.data$POINT)) +
-                  geom_bar(stat = "identity") +
-                  xlab("") + ylab("ton") + 
-                  ggtitle("Point") +
-                  geom_hline(yintercept = min(graph.data$POINT))
-
-grid.arrange(NON.ROAD, NONPOINT, ON.ROAD, POINT,
-             layout_matrix = rbind(c(1,2),c(3,4)), top = "Baltimore Total PM2.5 Emissions")
-
+                  ggtitle("Baltimore PM2.5 Emissions")
+plot(graph)
 
 
 #close device

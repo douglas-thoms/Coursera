@@ -39,18 +39,12 @@ vehicle.logical <- apply(vehicle.SCC,1,function(row)
 #subset vehicle related SCC number in SCC file
 vehicle.SCC <- vehicle.SCC[vehicle.logical,]$SCC
 
-
-
-scatter.graph.data <- df %>%
-               filter(SCC %in% vehicle.SCC, fips == "24510")
-
 bar.graph.data <- df %>%
                filter(SCC %in% vehicle.SCC, fips == "24510") %>%
                group_by(year) %>% 
                summarise(total.emission = sum(Emissions, na.rm = TRUE),
-               median.emission = median(Emissions, na.rm = TRUE),
-               mean.emission = mean(Emissions, na.rm = TRUE),
-               percent.zero = mean(Emissions == 0))
+               median.emission = median(Emissions, na.rm = TRUE)) %>%
+               ungroup()
 
 #save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
 #open device
@@ -60,33 +54,23 @@ png(filename = "plot5.png", width = 600, height = 600)
 print(dev.cur())
 
 #set 4 charts
-par(mfrow = c(2,3), oma = c(0,0,2,0))
+par(mar = c(5, 5, 3, 5))
 
-#bar graph - total
-barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year, 
-        ylab = "ton")
-title("Total Emissions")
+barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
+        ylab = "Total (ton)", col = "red", 
+        main = "Motor Vehicle PM2.5 Emissions in Baltimore")
 
-# scatter plot
-boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylim = c(-0,5),
-        ylab = "ton")
-title("Spread of readings")
+#create 2nd part of graph
+par(new = TRUE)
 
-# scatter plot
-boxplot(scatter.graph.data$Emissions ~ scatter.graph.data$year, ylab = "ton")
-title("Spread of readings")
+barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year,
+        ylab = "", xaxt = "n", yaxt = "n", col = "blue", ylim =c(0,0.35))
+axis(side = 4)
 
-#do chart of mean
-barplot(bar.graph.data$mean.emission, names.arg=bar.graph.data$year, 
-        ylab = "Mean (ton)")
-title("Mean Emissions")
+mtext("Median (ton)", side = 4, line = 3)
 
-#do chart of median
-barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year, 
-        ylab = "Median (ton)")
-title("Median Emissions")
-
-mtext("Baltimore Vehicle-related PM2.5 Emissions", outer = TRUE, cex = 1.5)
+legend("topright", c("Total", "Median"),
+       col = c("red", "blue"), lty = c(1, 1))
 
 #close device
 dev.off()

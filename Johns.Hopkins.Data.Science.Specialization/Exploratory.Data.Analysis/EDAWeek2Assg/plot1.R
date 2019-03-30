@@ -24,10 +24,12 @@ df <- lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor)
 df$Emissions <- NEI$Emissions
 df <- as.data.frame(df)
 
+#summarize total values
 graph_data <- df %>%
                group_by(year) %>%
                summarise(total.emission = sum(Emissions,na.rm = TRUE))
 
+#make graph
 y <- graph_data$total.emission
 x <- graph_data$year
 
