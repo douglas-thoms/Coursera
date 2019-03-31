@@ -40,15 +40,16 @@ names(graph.data) <- make.names(names(graph.data))
 #save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
 #open device
 #Name each of the plot files as \color{red}{\verb|plot1.png|}plot1.png, \color{red}{\verb|plot2.png|}plot2.png, etc.
-png(filename = "plot3.png", width = 480, height = 480)
+png(filename = "plot3.png", width = 600, height = 600)
 
 print(dev.cur())
 
 #create and plot graph
 graph <- ggplot(graph.data,aes(fill = type, x = year, y = total.emission)) +
                   geom_bar(stat = "identity") +
-                  xlab("") + ylab("ton") + facet_grid( . ~ type)
-                  ggtitle("Baltimore PM2.5 Emissions")
+                  xlab("") + ylab("ton") + facet_grid( . ~ type) +
+                  ggtitle("Baltimore PM2.5 Emissions") +
+                  theme(axis.text.x= element_text(size = 8))
 plot(graph)
 
 

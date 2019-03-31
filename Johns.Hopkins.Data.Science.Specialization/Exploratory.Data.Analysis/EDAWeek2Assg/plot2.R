@@ -34,6 +34,8 @@ graph_data <- df %>%
 y <- graph_data$total.emission
 x <- graph_data$year
 
+options(scipen = 999)
+
 #save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
 #open device
 #Name each of the plot files as \color{red}{\verb|plot1.png|}plot1.png, \color{red}{\verb|plot2.png|}plot2.png, etc.
@@ -41,7 +43,7 @@ png(filename = "plot2.png", width = 480, height = 480)
 
 print(dev.cur())
 
-barplot(y, names.arg=x, xlab = "Year", ylab = "ton",
+barplot(y/1000, names.arg=x, xlab = "Year", ylab = "kiloton",
         main = "Baltimore Total PM2.5 Emissions")
 abline(h = min(graph_data$total.emission))
 

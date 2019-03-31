@@ -33,6 +33,9 @@ graph_data <- df %>%
 y <- graph_data$total.emission
 x <- graph_data$year
 
+#get rid of scientific notification
+
+options(scipen = 999)
 
 #save it to a PNG file with a width of 480 pixels and a height of 480 pixels.
 #open device
@@ -41,7 +44,7 @@ png(filename = "plot1.png", width = 480, height = 480)
 
 print(dev.cur())
 
-barplot(y, names.arg=x, xlab = "Year", ylab = "ton",
+barplot(y/1000, names.arg=x, xlab = "Year", ylab = "kiloton",
         main = "Total PM2.5 Emissions")
 abline(h = min(graph_data$total.emission))
 

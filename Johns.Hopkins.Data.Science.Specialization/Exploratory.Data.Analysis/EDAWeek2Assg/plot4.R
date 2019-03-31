@@ -20,7 +20,7 @@ require(dplyr)
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-df <- as.data.frame(lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor))
+df <- NEI
 df$Emissions <- NEI$Emissions
 
 #need to find list of coal-related SCC to filter NEI
@@ -46,22 +46,20 @@ png(filename = "plot4.png", width = 480, height = 480)
 print(dev.cur())
 
 #create chart
-par(mar = c(5, 5, 3, 5))
+par(mar = c(5,5,5,5), mfrow = c(1,1))
 
-barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
+q <- barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
         ylab = "Total (ton)", col = "green", main = "Coal Combustion-related PM2.5 Emissions")
 
-#create 2nd part of graph
-par(new = TRUE)
+par(new = T, mar = c(5,5,5,5), mfrow = c(1,1))
 
-barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year,
-        ylab = "", xaxt = "n", yaxt = "n", col = "blue", ylim =c(0,0.35))
+with(bar.graph.data, plot(year, median.emission, type = "l", col = "red",
+                          axes=F, xlab=NA, ylab=NA))
 axis(side = 4)
-
-mtext("Median (ton)", side = 4, line = 3)
+mtext(side = 4, line = 3, 'Number genes selected')
 
 legend("topright", c("Total", "Median"),
-       col = c("green", "blue"), lty = c(1, 1))
+       col = c("green", "red"), lty = c(1, 1))
 
 #close device
 dev.off()

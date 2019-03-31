@@ -20,7 +20,7 @@ require(dplyr)
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 
-df <- as.data.frame(lapply(NEI[,c("fips","SCC","Pollutant","type","year")], as.factor))
+df <- NEI
 df$Emissions <- NEI$Emissions
 
 #need to find list of coal-related SCC to filter NEI
@@ -63,8 +63,8 @@ barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
 #create 2nd part of graph
 par(new = TRUE)
 
-barplot(bar.graph.data$median.emission, names.arg=bar.graph.data$year,
-        ylab = "", xaxt = "n", yaxt = "n", col = "blue", ylim =c(0,0.35))
+plot(bar.graph.data$year, bar.graph.data$median.emission, type = "l", col = "blue",
+        ylab = "", xaxt = "n", yaxt = "n", ylim =c(0,0.35))
 axis(side = 4)
 
 mtext("Median (ton)", side = 4, line = 3)
