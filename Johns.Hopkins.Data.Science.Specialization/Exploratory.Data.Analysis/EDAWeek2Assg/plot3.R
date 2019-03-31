@@ -32,7 +32,7 @@ df <- as.data.frame(df)
 graph.data <- df %>%
                filter(fips =="24510") %>%
                group_by(type,year) %>% 
-               summarise(total.emission = sum(Emissions,na.rm = TRUE))
+               summarise(total.emission = sum(Emissions,na.rm = TRUE)) %>%
                ungroup()
 
 names(graph.data) <- make.names(names(graph.data))
@@ -46,8 +46,8 @@ print(dev.cur())
 
 #create and plot graph
 graph <- ggplot(graph.data,aes(fill = type, x = year, y = total.emission)) +
-                  geom_bar(position = "dodge", stat = "identity") +
-                  xlab("") + ylab("ton") + 
+                  geom_bar(stat = "identity") +
+                  xlab("") + ylab("ton") + facet_grid( . ~ type)
                   ggtitle("Baltimore PM2.5 Emissions")
 plot(graph)
 
