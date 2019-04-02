@@ -43,7 +43,7 @@ png(filename = "plot2.png", width = 480, height = 480)
 
 print(dev.cur())
 
-barplot(y/1000, names.arg=x, xlab = "Year", ylab = "kiloton",
+barplot(y/1000, names.arg=x, xlab = "", ylab = "kiloton",
         main = "Baltimore Total PM2.5 Emissions")
 abline(h = min(graph_data$total.emission))
 

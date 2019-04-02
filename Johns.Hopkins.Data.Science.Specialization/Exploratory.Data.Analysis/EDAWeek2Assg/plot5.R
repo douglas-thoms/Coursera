@@ -57,20 +57,20 @@ print(dev.cur())
 par(mar = c(5, 5, 3, 5))
 
 barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
-        ylab = "Total (ton)", col = "red", 
+        ylab = "Total (ton)", col = "red", xlab = "",
         main = "Motor Vehicle PM2.5 Emissions in Baltimore")
 
 #create 2nd part of graph
 par(new = TRUE)
 
 plot(bar.graph.data$year, bar.graph.data$median.emission, type = "l", col = "blue",
-        ylab = "", xaxt = "n", yaxt = "n", ylim =c(0,0.35))
+        xlab = "", ylab = "", xaxt = "n", yaxt = "n", ylim =c(0,0.35), lwd = 3)
 axis(side = 4)
 
 mtext("Median (ton)", side = 4, line = 3)
 
 legend("topright", c("Total", "Median"),
-       col = c("red", "blue"), lty = c(1, 1))
+       col = c("red", "blue"), lty = c(1, 1), lwd = 3)
 
 #close device
 dev.off()

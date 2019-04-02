@@ -49,17 +49,18 @@ print(dev.cur())
 par(mar = c(5,5,5,5), mfrow = c(1,1))
 
 q <- barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
-        ylab = "Total (ton)", col = "green", main = "Coal Combustion-related PM2.5 Emissions")
+        ylab = "Total (ton)", col = "green", 
+        main = "Coal Combustion-related PM2.5 Emissions")
 
 par(new = T, mar = c(5,5,5,5), mfrow = c(1,1))
 
 with(bar.graph.data, plot(year, median.emission, type = "l", col = "red",
-                          axes=F, xlab=NA, ylab=NA))
+                          axes=F, xlab=NA, ylab=NA, lwd = 3))
 axis(side = 4)
-mtext(side = 4, line = 3, 'Number genes selected')
+mtext(side = 4, line = 3, 'Median (Ton)')
 
 legend("topright", c("Total", "Median"),
-       col = c("green", "red"), lty = c(1, 1))
+       col = c("green", "red"), lty = c(1, 1), lwd = 3)
 
 #close device
 dev.off()
