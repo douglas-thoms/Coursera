@@ -30,11 +30,11 @@ coal.SCC <- SCC[coal.logical,]$SCC
 
 #filter and summarise data into median and mean
 bar.graph.data <- df %>%
-               filter(SCC %in% coal.SCC) %>%
-               group_by(year) %>% 
-               summarise(total.emission = sum(Emissions, na.rm = TRUE),
-               median.emission = median(Emissions, na.rm = TRUE)) %>%
-               ungroup()
+  filter(SCC %in% coal.SCC) %>%
+  group_by(year) %>% 
+  summarise(total.emission = sum(Emissions, na.rm = TRUE),
+            median.emission = median(Emissions, na.rm = TRUE)) %>%
+  ungroup()
 
 
 
@@ -49,13 +49,14 @@ print(dev.cur())
 par(mar = c(5,5,5,5), mfrow = c(1,1))
 
 q <- barplot(bar.graph.data$total.emission, names.arg=bar.graph.data$year,
-        ylab = "Total (ton)", col = "green", 
-        main = "Coal Combustion-related PM2.5 Emissions")
+             ylab = "Total (ton)", col = "green", 
+             main = "Coal Combustion-related PM2.5 Emissions")
 
 par(new = T, mar = c(5,5,5,5), mfrow = c(1,1))
 
 with(bar.graph.data, plot(year, median.emission, type = "l", col = "red",
-                          axes=F, xlab=NA, ylab=NA, lwd = 3))
+                          axes=F, xlab=NA, ylab=NA, lwd = 3
+))
 axis(side = 4)
 mtext(side = 4, line = 3, 'Median (Ton)')
 
