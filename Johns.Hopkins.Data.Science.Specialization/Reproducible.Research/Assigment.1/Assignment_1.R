@@ -27,14 +27,26 @@ rawData <- read.csv("activity.csv")
 
 stepsPerDay <- aggregate(x = rawData$steps,
                            by = list(rawData$date), sum)
-colnames(stepsPerDay) <- c("date","steps")
+colnames(stepsPerDay) <- c("date","steps.per.day")
 
-hist(stepsPerDay$steps, breaks = seq(from = 0, to = 25000, by = 1250), 
+hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250), 
      xlab = "", main = "Steps per day")
 
-medianSteps <- median(stepsPerDay$steps, na.rm = TRUE)
-meanSteps <- round(mean(stepsPerDay$steps, na.rm = TRUE),1)
+medianSteps <- median(stepsPerDay$steps.per.day, na.rm = TRUE)
+meanSteps <- round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
 
 ##----------------------------------------------------------------------------
 ## What is the average daily activity pattern?
 ##----------------------------------------------------------------------------
+
+meanSteps <- aggregate(x = rawData$steps,
+                         by = list(rawData$interval), mean, na.rm = TRUE)
+colnames(meanSteps) <- c("interval","mean.steps.per.interval")
+
+plot(meanSteps$mean.steps, type = "l", 
+     xlab = "5-minute Interval", ylab = "Average Steps", main = "Mean.Steps")
+
+MaxMeanSteps = match(max(meanSteps$mean.steps),
+                                meanSteps$mean.steps)
+
+maxInterval = meanSteps$interval[MaxMeanSteps]
