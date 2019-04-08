@@ -13,6 +13,7 @@
 require('plyr')
 require('dplyr')
 require('zoo')
+require('lubridate')
 
 ##----------------------------------------------------------------------------
 ## Loading and preprocessing the data
@@ -93,4 +94,13 @@ meanStepsNAremoved <- round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
 ##----------------------------------------------------------------------------
 ##Are there differences in activity patterns between weekdays and weekends?
 ##----------------------------------------------------------------------------
+
+weekend <- c("Saturday", "Sunday")
+
+replacedNA$date <- ymd(replacedNA$date)
+replacedNA <- replacedNA %>%
+                 mutate(day.of.week = weekdays(date)) %>%
+                 mutate(weekday.weekend = if(day.of.week %in% weekend){"weekend"}
+                        else{"weekday"})
+                 
 
