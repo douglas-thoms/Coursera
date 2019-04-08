@@ -46,16 +46,10 @@ meanSteps <- aggregate(x = rawData$steps,
                          by = list(rawData$interval), mean, na.rm = TRUE)
 colnames(meanSteps) <- c("interval","mean.steps.per.interval")
 
-<<<<<<< HEAD
-plot(y = meanSteps$mean.steps, x = meanSteps$interval, type = "l", 
-     xlab = "5-minute Interval", ylab = "Average Steps", main = "Mean.Steps"
-=======
 plot(y = meanSteps$mean.steps, x= meanSteps$interval, type = "l", 
      xaxt = "n", xlab = "5-min Interval", ylab = "Average Steps", main = "Mean.Steps")
 
 axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
-
->>>>>>> b7b2e2b006a0020c7f6236e2a3675a834e1884ef
 
 MaxMeanSteps = match(max(meanSteps$mean.steps),
                                 meanSteps$mean.steps)
