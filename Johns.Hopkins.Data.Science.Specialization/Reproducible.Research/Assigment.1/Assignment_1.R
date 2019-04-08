@@ -11,6 +11,7 @@
 ##----------------------------------------------------------------------------
 
 require('plyr')
+require('dplyr')
 require('zoo')
 
 ##----------------------------------------------------------------------------
@@ -69,4 +70,27 @@ replacedNA <- rawData
 replacedNA$steps[1:288] <- meanSteps$mean.steps.per.interval 
 
 #try this 
-replacedNA <- ddply(replacedNA, .(interval), na.locf)
+#replacedNA <- ddply(replacedNA, .(interval), na.locf)
+replacedNA <- ddply(replacedNA, .(interval), transform, steps=na.approx(steps, rule=2))
+replacedNA <- replacedNA[order(replacedNA$date,replacedNA$interval), ]
+
+stepsPerDayNAremoved <- aggregate(x = replacedNA$steps,
+                         by = list(replacedNA$date), sum)
+colnames(stepsPerDayNAremoved) <- c("date","steps.per.day")
+
+par(mfrow= c(1,2))
+
+hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250), 
+     xlab = "", main = "Steps per day", ylim = c(0,14))
+
+hist(stepsPerDayNAremoved$steps.per.day, 
+     breaks = seq(from = 0, to = 25000, by = 1250), xlab = "", 
+     main = "Steps per day NA removed", ylim = c(0,14))
+
+medianStepsNAremoved <- median(stepsPerDay$steps.per.day, na.rm = TRUE)
+meanStepsNAremoved <- round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
+
+##----------------------------------------------------------------------------
+##Are there differences in activity patterns between weekdays and weekends?
+##----------------------------------------------------------------------------
+
