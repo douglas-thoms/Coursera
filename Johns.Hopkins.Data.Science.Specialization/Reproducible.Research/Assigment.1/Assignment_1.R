@@ -10,7 +10,8 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 
-require('dplyr')
+require('plyr')
+require('zoo')
 
 ##----------------------------------------------------------------------------
 ## Loading and preprocessing the data
@@ -43,10 +44,29 @@ meanSteps <- aggregate(x = rawData$steps,
                          by = list(rawData$interval), mean, na.rm = TRUE)
 colnames(meanSteps) <- c("interval","mean.steps.per.interval")
 
-plot(meanSteps$mean.steps, type = "l", 
-     xlab = "5-minute Interval", ylab = "Average Steps", main = "Mean.Steps")
+plot(y = meanSteps$mean.steps, x= meanSteps$interval, type = "l", 
+     xaxt = "n", xlab = "5-min Interval", ylab = "Average Steps", main = "Mean.Steps")
+
+axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
+
 
 MaxMeanSteps = match(max(meanSteps$mean.steps),
                                 meanSteps$mean.steps)
 
 maxInterval = meanSteps$interval[MaxMeanSteps]
+
+##----------------------------------------------------------------------------
+## Imputing missing values
+##----------------------------------------------------------------------------
+
+NAdataPoints <- length(rawData$steps[is.na(rawData$steps)])
+
+#replacement value will be the 5 minute average of that interval
+
+#first, replace first day with average value
+
+replacedNA <- rawData
+replacedNA$steps[1:288] <- meanSteps$mean.steps.per.interval 
+
+#try this 
+replacedNA <- ddply(replacedNA, .(interval), na.locf)
