@@ -43,8 +43,8 @@ meanSteps <- aggregate(x = rawData$steps,
                          by = list(rawData$interval), mean, na.rm = TRUE)
 colnames(meanSteps) <- c("interval","mean.steps.per.interval")
 
-plot(meanSteps$mean.steps, type = "l", 
-     xlab = "5-minute Interval", ylab = "Average Steps", main = "Mean.Steps")
+plot(y = meanSteps$mean.steps, x = meanSteps$interval, type = "l", 
+     xlab = "5-minute Interval", ylab = "Average Steps", main = "Mean.Steps"
 
 MaxMeanSteps = match(max(meanSteps$mean.steps),
                                 meanSteps$mean.steps)
