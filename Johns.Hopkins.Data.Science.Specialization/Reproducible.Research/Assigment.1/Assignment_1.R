@@ -14,6 +14,7 @@ require('plyr')
 require('dplyr')
 require('zoo')
 require('lubridate')
+require('lattice')
 
 ##----------------------------------------------------------------------------
 ## Loading and preprocessing the data
@@ -94,12 +95,22 @@ meanStepsNAremoved <- round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
 ##Are there differences in activity patterns between weekdays and weekends?
 ##----------------------------------------------------------------------------
 
-weekend <- c("Saturday", "Sunday")
 
 replacedNA$date <- ymd(replacedNA$date)
-replacedNA <- replacedNA %>%
-                 mutate(day.of.week = weekdays(date)) %>%
-                 mutate(weekday.weekend = if(day.of.week %in% weekend){"weekend"}
-                        else{"weekday"})
-                 
 
+
+weekday.weekend.data <- replacedNA %>%
+        mutate(weekday.weekend = ifelse((weekdays(date) == "Saturday")
+                                        | (weekdays(date) == "Sunday"),
+                                        "weekend", "weekday"))
+
+weekday.weekend.data <- aggregate(x = weekday.weekend.data$steps,
+                                  by = list(weekday.weekend.data$interval, 
+                                            weekday.weekend.data$weekday.weekend), 
+                                  mean, na.rm = TRUE)
+colnames(weekday.weekend.data) <- c("interval", "weekday.weekend",
+                                      "mean.steps.per.interval")
+
+
+xyplot(mean.steps.per.interval ~ interval | factor(weekday.weekend), 
+       data=weekday.weekend.data, type = 'l')
