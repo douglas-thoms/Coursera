@@ -9,6 +9,19 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
 ```
 
+##Packages Installed
+
+```{r echo = FALSE}
+##Packages used
+require('plyr')
+require('dplyr')
+require('zoo')
+require('lubridate')
+require('lattice')
+```
+
+
+
 ## Loading and preprocessing the data
 
 ```{r}
@@ -16,9 +29,10 @@ rawData <- read.csv("activity.csv")
 ```
 
 
+
 ## What is mean total number of steps taken per day?
 
-Steps per day was calculated using
+Steps per day was calculated using the following code:
 
 ```{r}
 
@@ -44,6 +58,7 @@ The mean steps per day was `r as.character(round(mean(stepsPerDay$steps.per.day,
 median(stepsPerDay$steps.per.day, na.rm = TRUE)
 mean(stepsPerDay$steps.per.day, na.rm = TRUE)
 ```
+
 
 
 ## What is the average daily activity pattern?
@@ -72,3 +87,53 @@ meanStepsInterval$interval[MaxmeanStepsInterval]
 ```
 
 The interval with the highest average steps was `r meanStepsInterval$interval[MaxmeanStepsInterval]`
+
+
+
+## Imputing missing values
+
+```{r eval= TRUE}
+length(rawData$steps[is.na(rawData$steps)])
+```
+
+There are `r length(rawData$steps[is.na(rawData$steps)])` NA intervals.
+
+A new dataset was created by replacing the first day of NA values with the average steps per interval.
+The other NAs are replaced by interpolating values from the same interval of the prior and following day using zoo::na.approx.
+Here is the code:
+
+```{r}
+replacedNA <- rawData
+replacedNA$steps[1:288] <- meanStepsInterval $mean.steps.per.interval 
+
+replacedNA <- ddply(replacedNA, .(interval), transform, steps=na.approx(steps, rule=2))
+replacedNA <- replacedNA[order(replacedNA$date,replacedNA$interval), ]
+
+stepsPerDayNAremoved <- aggregate(x = replacedNA$steps,
+                         by = list(replacedNA$date), sum)
+colnames(stepsPerDayNAremoved) <- c("date","steps.per.day")
+```
+
+The following code was used to create the plots below:
+```{r eval = TRUE}
+par(mfrow= c(1,2))
+
+hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250), 
+     xlab = "", main = "Steps per day", ylim = c(0,14))
+
+hist(stepsPerDayNAremoved$steps.per.day, 
+     breaks = seq(from = 0, to = 25000, by = 1250), xlab = "", 
+     main = "Steps per day NA removed", ylim = c(0,14))
+```
+
+The plots are very similar in distribution and the NA-replaced dataset has mainly increased values in the middle of the distribution.
+
+The follow code was used to recalculate the median and mean with the NAs substitued with interpolated values:
+
+```{r eval = TRUE}
+median(stepsPerDay$steps.per.day, na.rm = TRUE)
+round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
+```
+
+The median for the NA subsituted dataset is `r median(stepsPerDay$steps.per.day, na.rm = TRUE)`.
+The mean for the NA subsituted dataset is `r as.character(round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1))`.  This mean and median is nearly identical to the original dataset with NA values.

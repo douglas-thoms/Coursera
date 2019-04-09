@@ -67,8 +67,6 @@ NAdataPoints <- length(rawData$steps[is.na(rawData$steps)])
 replacedNA <- rawData
 replacedNA$steps[1:288] <- meanStepsInterval $mean.steps.per.interval 
 
-#try this 
-#replacedNA <- ddply(replacedNA, .(interval), na.locf)
 replacedNA <- ddply(replacedNA, .(interval), transform, steps=na.approx(steps, rule=2))
 replacedNA <- replacedNA[order(replacedNA$date,replacedNA$interval), ]
 
