@@ -49,10 +49,10 @@ plot(y = meanStepsInterval $mean.steps, x= meanStepsInterval $interval, type = "
 
 axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
 
-MaxmeanStepsInterval  = match(max(meanStepsInterval $mean.steps),
+MaxmeanStepsInterval <- match(max(meanStepsInterval $mean.steps),
                                 meanStepsInterval $mean.steps)
 
-maxInterval = meanStepsInterval $interval[MaxmeanStepsInterval ]
+maxInterval <- meanStepsInterval$interval[MaxmeanStepsInterval ]
 
 ##----------------------------------------------------------------------------
 ## Imputing missing values

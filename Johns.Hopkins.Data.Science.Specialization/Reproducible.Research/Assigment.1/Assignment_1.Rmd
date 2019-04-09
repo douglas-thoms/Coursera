@@ -38,9 +38,37 @@ hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250),
 
 The median steps per day was `r median(stepsPerDay$steps.per.day, na.rm = TRUE)`.
 
-The mean steps per day was `r as.character(mean(stepsPerDay$steps.per.day, na.rm = TRUE))`
+The mean steps per day was `r as.character(round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1))`
 
 ```{r eval = TRUE}
 median(stepsPerDay$steps.per.day, na.rm = TRUE)
 mean(stepsPerDay$steps.per.day, na.rm = TRUE)
 ```
+
+
+## What is the average daily activity pattern?
+
+The following code was used  to find the average steps per interval.
+
+```{r eval = TRUE}
+
+meanStepsInterval <- aggregate(x = rawData$steps,
+                         by = list(rawData$interval), mean, na.rm = TRUE)
+colnames(meanStepsInterval ) <- c("interval","mean.steps.per.interval")
+
+plot(y = meanStepsInterval $mean.steps, x= meanStepsInterval $interval, type = "l", 
+     xaxt = "n", xlab = "5-min Interval", ylab = "Average Steps", main = "Mean.Steps")
+
+axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
+```
+
+The following code was used to find the interval with the maximum steps per interval.
+
+```{r eval = TRUE}
+MaxmeanStepsInterval <- match(max(meanStepsInterval $mean.steps),
+                                meanStepsInterval $mean.steps)
+
+meanStepsInterval$interval[MaxmeanStepsInterval]
+```
+
+The interval with the highest average steps was `r meanStepsInterval$interval[MaxmeanStepsInterval]`
