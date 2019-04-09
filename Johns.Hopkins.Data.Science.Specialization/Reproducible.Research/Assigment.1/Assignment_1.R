@@ -22,9 +22,6 @@ require('lattice')
 
 rawData <- read.csv("activity.csv")
 
-#rawDataNAremoved <- rawData[!is.na(rawData$steps),]
-#rawDataNAremoved$date <- droplevels(rawDataNAremoved$date)
-
 ##----------------------------------------------------------------------------
 ## What is mean total number of steps taken per day?
 ##----------------------------------------------------------------------------
@@ -43,19 +40,19 @@ meanSteps <- round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
 ## What is the average daily activity pattern?
 ##----------------------------------------------------------------------------
 
-meanSteps <- aggregate(x = rawData$steps,
+meanStepsInterval <- aggregate(x = rawData$steps,
                          by = list(rawData$interval), mean, na.rm = TRUE)
-colnames(meanSteps) <- c("interval","mean.steps.per.interval")
+colnames(meanStepsInterval ) <- c("interval","mean.steps.per.interval")
 
-plot(y = meanSteps$mean.steps, x= meanSteps$interval, type = "l", 
+plot(y = meanStepsInterval $mean.steps, x= meanStepsInterval $interval, type = "l", 
      xaxt = "n", xlab = "5-min Interval", ylab = "Average Steps", main = "Mean.Steps")
 
 axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
 
-MaxMeanSteps = match(max(meanSteps$mean.steps),
-                                meanSteps$mean.steps)
+MaxmeanStepsInterval  = match(max(meanStepsInterval $mean.steps),
+                                meanStepsInterval $mean.steps)
 
-maxInterval = meanSteps$interval[MaxMeanSteps]
+maxInterval = meanStepsInterval $interval[MaxmeanStepsInterval ]
 
 ##----------------------------------------------------------------------------
 ## Imputing missing values
@@ -68,7 +65,7 @@ NAdataPoints <- length(rawData$steps[is.na(rawData$steps)])
 #first, replace first day with average value
 
 replacedNA <- rawData
-replacedNA$steps[1:288] <- meanSteps$mean.steps.per.interval 
+replacedNA$steps[1:288] <- meanStepsInterval $mean.steps.per.interval 
 
 #try this 
 #replacedNA <- ddply(replacedNA, .(interval), na.locf)
@@ -112,5 +109,8 @@ colnames(weekday.weekend.data) <- c("interval", "weekday.weekend",
                                       "mean.steps.per.interval")
 
 
-xyplot(mean.steps.per.interval ~ interval | factor(weekday.weekend), 
-       data=weekday.weekend.data, type = 'l')
+print(xyplot(mean.steps.per.interval ~ interval | factor(weekday.weekend), 
+       data=weekday.weekend.data, type = 'l', layout = c(1,2),
+       xlab = '5-min Interval', ylab = 'Mean Steps', 
+       main = "Mean Steps per 5-min interval"))
+

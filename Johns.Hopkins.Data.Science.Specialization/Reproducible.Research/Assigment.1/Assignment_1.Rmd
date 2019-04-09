@@ -1,0 +1,46 @@
+---
+title: "Reproducible Research - Assignment 1"
+author: "Douglas Thoms"
+date: "April 9, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
+```
+
+## Loading and preprocessing the data
+
+```{r}
+rawData <- read.csv("activity.csv")
+```
+
+
+## What is mean total number of steps taken per day?
+
+Steps per day was calculated using
+
+```{r}
+
+stepsPerDay <- aggregate(x = rawData$steps,
+                           by = list(rawData$date), sum)
+colnames(stepsPerDay) <- c("date","steps.per.day")
+
+```
+
+The historgram below shows the distribution:
+
+```{r eval = TRUE}
+hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250), 
+     xlab = "", main = "Steps per day")
+
+```
+
+The median steps per day was `r median(stepsPerDay$steps.per.day, na.rm = TRUE)`.
+
+The mean steps per day was `r as.character(mean(stepsPerDay$steps.per.day, na.rm = TRUE))`
+
+```{r eval = TRUE}
+median(stepsPerDay$steps.per.day, na.rm = TRUE)
+mean(stepsPerDay$steps.per.day, na.rm = TRUE)
+```
