@@ -2,7 +2,9 @@
 title: "Reproducible Research - Assignment 1"
 author: "Douglas Thoms"
 date: "April 9, 2019"
-output: html_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 
@@ -43,7 +45,7 @@ hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250),
      xlab = "", main = "Steps per day")
 ```
 
-<img src="PA1_template_files/figure-html/unnamed-chunk-4-1.png" width="768" />
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 The median steps per day was 10765.
 
@@ -84,7 +86,7 @@ plot(y = meanStepsInterval $mean.steps, x= meanStepsInterval $interval, type = "
 axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
 ```
 
-<img src="PA1_template_files/figure-html/unnamed-chunk-6-1.png" width="768" />
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 The following code was used to find the interval with the maximum steps per interval.
 
@@ -147,7 +149,7 @@ hist(stepsPerDayNAremoved$steps.per.day,
      main = "Steps per day NA removed", ylim = c(0,14))
 ```
 
-<img src="PA1_template_files/figure-html/unnamed-chunk-10-1.png" width="768" />
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 The plots are very similar in distribution and the NA-replaced dataset has mainly increased values in the middle of the distribution.
 
@@ -209,4 +211,4 @@ print(xyplot(mean.steps.per.interval ~ interval | factor(weekday.weekend),
        main = "Mean Steps per 5-min interval"))
 ```
 
-<img src="PA1_template_files/figure-html/unnamed-chunk-13-1.png" width="768" />
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
