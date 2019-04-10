@@ -133,15 +133,15 @@ The plots are very similar in distribution and the NA-replaced dataset has mainl
 The follow code was used to recalculate the median and mean with the NAs substitued with interpolated values:
 
 ```{r eval = TRUE}
-median(stepsPerDay$steps.per.day, na.rm = TRUE)
-round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
+median(stepsPerDayNAremoved$steps.per.day, na.rm = TRUE)
+round(mean(stepsPerDayNAremoved$steps.per.day, na.rm = TRUE),1)
 ```
 
-The median for the NA subsituted dataset is `r median(stepsPerDay$steps.per.day, na.rm = TRUE)`.
+The median for the NA subsituted dataset is `r as.character(median(stepsPerDayNAremoved$steps.per.day, na.rm = TRUE))`.
 
-The mean for the NA subsituted dataset is `r as.character(round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1))`.  
+The mean for the NA subsituted dataset is `r as.character(round(mean(stepsPerDayNAremoved$steps.per.day, na.rm = TRUE),1))`.  
 
-This mean and median is nearly identical to the original dataset with NA values.
+This mean and median are slightly smaller than the original dataset with NA values.
 
 
 

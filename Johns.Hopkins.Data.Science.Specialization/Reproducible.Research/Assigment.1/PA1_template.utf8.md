@@ -1,45 +1,79 @@
-##----------------------------------------------------------------------------
-##----------------------------------------------------------------------------
-##
-##  File name:  plot1.R
-##  Date:       07Apr2019
-##
-##  Assginment 1 for Reproducible Research course
-##  
-##
-##----------------------------------------------------------------------------
-##----------------------------------------------------------------------------
+---
+title: "Reproducible Research - Assignment 1"
+author: "Douglas Thoms"
+date: "April 9, 2019"
+output: html_document
+---
 
-require('plyr')
-require('dplyr')
-require('zoo')
-require('lubridate')
-require('lattice')
 
-##----------------------------------------------------------------------------
+
+##Packages Installed
+
+
+
+
+
 ## Loading and preprocessing the data
-##----------------------------------------------------------------------------
 
+Data was loaded using following code.
+
+
+```r
 rawData <- read.csv("activity.csv")
+```
 
-##----------------------------------------------------------------------------
+
+
 ## What is mean total number of steps taken per day?
-##----------------------------------------------------------------------------
 
+Steps per day was calculated using the following code:
+
+
+```r
 stepsPerDay <- aggregate(x = rawData$steps,
                            by = list(rawData$date), sum)
 colnames(stepsPerDay) <- c("date","steps.per.day")
+```
 
+The historgram below shows the distribution:
+
+
+```r
 hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250), 
      xlab = "", main = "Steps per day")
+```
 
-medianSteps <- median(stepsPerDay$steps.per.day, na.rm = TRUE)
-meanSteps <- round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
+<img src="PA1_template_files/figure-html/unnamed-chunk-4-1.png" width="768" />
 
-##----------------------------------------------------------------------------
+The median steps per day was 10765.
+
+The mean steps per day was 10766.2
+
+
+```r
+median(stepsPerDay$steps.per.day, na.rm = TRUE)
+```
+
+```
+## [1] 10765
+```
+
+```r
+mean(stepsPerDay$steps.per.day, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+
+
 ## What is the average daily activity pattern?
-##----------------------------------------------------------------------------
 
+The following code was used  to find the average steps per interval.
+
+
+```r
 meanStepsInterval <- aggregate(x = rawData$steps,
                          by = list(rawData$interval), mean, na.rm = TRUE)
 colnames(meanStepsInterval ) <- c("interval","mean.steps.per.interval")
@@ -48,22 +82,47 @@ plot(y = meanStepsInterval $mean.steps, x= meanStepsInterval $interval, type = "
      xaxt = "n", xlab = "5-min Interval", ylab = "Average Steps", main = "Mean.Steps")
 
 axis(side = 1, at = c(seq(from = 0, to = 2355, by = 60)))
+```
 
+<img src="PA1_template_files/figure-html/unnamed-chunk-6-1.png" width="768" />
+
+The following code was used to find the interval with the maximum steps per interval.
+
+
+```r
 MaxmeanStepsInterval <- match(max(meanStepsInterval $mean.steps),
                                 meanStepsInterval $mean.steps)
 
-maxInterval <- meanStepsInterval$interval[MaxmeanStepsInterval ]
+meanStepsInterval$interval[MaxmeanStepsInterval]
+```
 
-##----------------------------------------------------------------------------
+```
+## [1] 835
+```
+
+The interval with the highest average steps was 835.
+
+
+
 ## Imputing missing values
-##----------------------------------------------------------------------------
 
-NAdataPoints <- length(rawData$steps[is.na(rawData$steps)])
 
-#replacement value will be the 5 minute average of that interval
+```r
+length(rawData$steps[is.na(rawData$steps)])
+```
 
-#first, replace first day with average value
+```
+## [1] 2304
+```
 
+There are 2304 NA intervals.
+
+A new dataset was created by replacing the first day of NA values with the average steps per interval.
+The other NAs are replaced by interpolating values from the same interval of the prior and following day using zoo::na.approx.
+Here is the code:
+
+
+```r
 replacedNA <- rawData
 replacedNA$steps[1:288] <- meanStepsInterval $mean.steps.per.interval 
 
@@ -73,7 +132,11 @@ replacedNA <- replacedNA[order(replacedNA$date,replacedNA$interval), ]
 stepsPerDayNAremoved <- aggregate(x = replacedNA$steps,
                          by = list(replacedNA$date), sum)
 colnames(stepsPerDayNAremoved) <- c("date","steps.per.day")
+```
 
+The following code was used to create the plots below:
+
+```r
 par(mfrow= c(1,2))
 
 hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250), 
@@ -82,17 +145,45 @@ hist(stepsPerDay$steps.per.day, breaks = seq(from = 0, to = 25000, by = 1250),
 hist(stepsPerDayNAremoved$steps.per.day, 
      breaks = seq(from = 0, to = 25000, by = 1250), xlab = "", 
      main = "Steps per day NA removed", ylim = c(0,14))
+```
 
-medianStepsNAremoved <- median(stepsPerDayNAremoved$steps.per.day, 
-                               na.rm = TRUE)
-meanStepsNAremoved <- round(mean(stepsPerDayNAremoved$steps.per.day, 
-                                 na.rm = TRUE),1)
+<img src="PA1_template_files/figure-html/unnamed-chunk-10-1.png" width="768" />
 
-##----------------------------------------------------------------------------
+The plots are very similar in distribution and the NA-replaced dataset has mainly increased values in the middle of the distribution.
+
+The follow code was used to recalculate the median and mean with the NAs substitued with interpolated values:
+
+
+```r
+median(stepsPerDayNAremoved$steps.per.day, na.rm = TRUE)
+```
+
+```
+## [1] 10600
+```
+
+```r
+round(mean(stepsPerDayNAremoved$steps.per.day, na.rm = TRUE),1)
+```
+
+```
+## [1] 10546.9
+```
+
+The median for the NA subsituted dataset is 10600.
+
+The mean for the NA subsituted dataset is 10546.9.  
+
+This mean and median are slightly smaller than the original dataset with NA values.
+
+
+
 ##Are there differences in activity patterns between weekdays and weekends?
-##----------------------------------------------------------------------------
+
+Using the following code I created a new factor variable with two factors ("weekdays" and "weekends") in the NA-replaced dataset.
 
 
+```r
 replacedNA$date <- ymd(replacedNA$date)
 
 
@@ -107,10 +198,15 @@ weekday.weekend.data <- aggregate(x = weekday.weekend.data$steps,
                                   mean, na.rm = TRUE)
 colnames(weekday.weekend.data) <- c("interval", "weekday.weekend",
                                       "mean.steps.per.interval")
+```
+The panel plot below shows the difference between the average steps per interval for weekdays and weekends.
 
 
+```r
 print(xyplot(mean.steps.per.interval ~ interval | factor(weekday.weekend), 
        data=weekday.weekend.data, type = 'l', layout = c(1,2),
        xlab = '5-min Interval', ylab = 'Mean Steps', 
        main = "Mean Steps per 5-min interval"))
+```
 
+<img src="PA1_template_files/figure-html/unnamed-chunk-13-1.png" width="768" />
