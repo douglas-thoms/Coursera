@@ -24,6 +24,8 @@ require('lattice')
 
 ## Loading and preprocessing the data
 
+Data was loaded using following code.
+
 ```{r}
 rawData <- read.csv("activity.csv")
 ```
@@ -86,7 +88,7 @@ MaxmeanStepsInterval <- match(max(meanStepsInterval $mean.steps),
 meanStepsInterval$interval[MaxmeanStepsInterval]
 ```
 
-The interval with the highest average steps was `r meanStepsInterval$interval[MaxmeanStepsInterval]`
+The interval with the highest average steps was `r meanStepsInterval$interval[MaxmeanStepsInterval]`.
 
 
 
@@ -136,4 +138,38 @@ round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1)
 ```
 
 The median for the NA subsituted dataset is `r median(stepsPerDay$steps.per.day, na.rm = TRUE)`.
-The mean for the NA subsituted dataset is `r as.character(round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1))`.  This mean and median is nearly identical to the original dataset with NA values.
+
+The mean for the NA subsituted dataset is `r as.character(round(mean(stepsPerDay$steps.per.day, na.rm = TRUE),1))`.  
+
+This mean and median is nearly identical to the original dataset with NA values.
+
+
+
+##Are there differences in activity patterns between weekdays and weekends?
+
+Using the following code I created a new factor variable with two factors ("weekdays" and "weekends") in the NA-replaced dataset.
+
+```{r}
+replacedNA$date <- ymd(replacedNA$date)
+
+
+weekday.weekend.data <- replacedNA %>%
+        mutate(weekday.weekend = ifelse((weekdays(date) == "Saturday")
+                                        | (weekdays(date) == "Sunday"),
+                                        "weekend", "weekday"))
+
+weekday.weekend.data <- aggregate(x = weekday.weekend.data$steps,
+                                  by = list(weekday.weekend.data$interval, 
+                                            weekday.weekend.data$weekday.weekend), 
+                                  mean, na.rm = TRUE)
+colnames(weekday.weekend.data) <- c("interval", "weekday.weekend",
+                                      "mean.steps.per.interval")
+```
+The panel plot below shows the difference between the average steps per interval for weekdays and weekends.
+
+```{r eval = TRUE}
+print(xyplot(mean.steps.per.interval ~ interval | factor(weekday.weekend), 
+       data=weekday.weekend.data, type = 'l', layout = c(1,2),
+       xlab = '5-min Interval', ylab = 'Mean Steps', 
+       main = "Mean Steps per 5-min interval"))
+```
