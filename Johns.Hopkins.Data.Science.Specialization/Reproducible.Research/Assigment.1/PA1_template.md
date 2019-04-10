@@ -12,6 +12,14 @@ output:
 ##Packages Installed
 
 
+```r
+##Packages used
+require('plyr')
+require('dplyr')
+require('zoo')
+require('lubridate')
+require('lattice')
+```
 
 
 

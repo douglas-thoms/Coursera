@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.width = 8)
 
 ##Packages Installed
 
-```{r echo = FALSE}
+```{r}
 ##Packages used
 require('plyr')
 require('dplyr')
