@@ -14,21 +14,52 @@
 #Does the document have a title that briefly summarizes the data analysis?
 #1 -3 figures
 #Does the analysis start from the raw data file (i.e. the original .csv.bz2 file)?
-#Does the analysis address the question of which types of events are most harmful to population health?
-#Does the analysis address the question of which types of events have the greatest economic consequences?
-#Do all the results of the analysis (i.e. figures, tables, numerical summaries) appear to be reproducible?
-#Do the figure(s) have descriptive captions (i.e. there is a description near the figure of what is happening in the figure)?
+#Does the analysis address the question of which types of events are most harmful 
+#to population health?
+#Does the analysis address the question of which types of events have 
+#the greatest economic consequences?
+#Do all the results of the analysis (i.e. figures, tables, numerical summaries) 
+#appear to be reproducible?
+#Do the figure(s) have descriptive captions (i.e. there is a description near 
+#the figure of what is happening in the figure)?
 
 #QUESTIONS
 
-#Across the United States, which types of events (as indicated in the \color{red}{\verb|EVTYPE|}EVTYPE variable) are most harmful with respect to population health?
+#Across the United States, which types of events (as indicated in the EVTYPE variable) 
+#are most harmful with respect to population health?
 #Across the United States, which types of events have the greatest economic consequences?
 
-#You must show all your code for the work in your analysis document. This may make the document a bit verbose, but that is okay. 
-#In general, you should ensure that \color{red}{\verb|echo = TRUE|}echo=TRUE for every code chunk (this is the default setting in knitr).
+#You must show all your code for the work in your analysis document. This may 
+#make the document a bit verbose, but that is okay. 
+#In general, you should ensure that echo=TRUE for every code chunk 
+#(this is the default setting in knitr).
 
 #DOCUMENT TITLE
 
 #DATA PROCESSING
 
+raw.data <- read.csv("repdata_data_StormData.csv.bz2")
+
+#remove unnecessary columns
+# need to use exp to determine multiple
+#determine five num distribution, anything strange?
+#need to see how many NA - none
+#need to clean up EVTYPE
+#weird symbols in propdmgexp
+#weird symbols in cropdmg exp
+
+
+
 #RESULTS
+
+#Across the United States, which types of events (as indicated in the EVTYPE variable) 
+#are most harmful with respect to population health?
+
+#What columns are relevant to population health? - injuries, fatalities
+
+
+#Across the United States, which types of events have the greatest economic consequences?
+
+#What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
+
+
