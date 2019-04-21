@@ -10,6 +10,12 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 
+##----------------------------------------------------------------------------
+## Library
+##----------------------------------------------------------------------------
+
+library(dplyr)
+library(stringr)
 
 #Does the document have a title that briefly summarizes the data analysis?
 #1 -3 figures
@@ -38,14 +44,50 @@
 
 #DATA PROCESSING
 
-raw.data <- read.csv("repdata_data_StormData.csv.bz2")
+if(!exists("raw.data"))
+raw.data <- read.csv("repdata_data_StormData.csv.bz2", na.strings = c("",NA))
+#remove columns that will not be needed
+intermediate.data <- raw.data %>%
+        select(EVTYPE,FATALITIES,INJURIES,PROPDMG,PROPDMGEXP,
+               CROPDMG,CROPDMGEXP)
 
-#remove unnecessary columns
+#change EXP values to exponents according to vaue system
+
+#H,h,K,k,M,m,B,b,+,-,?,0,1,2,3,4,5,6,7,8, and blank-character
+#H,h = hundreds = 100
+#K,k = kilos = thousands = 1,000
+#M,m = millions = 1,000,000
+#B,b = billions = 1,000,000,000
+#(+) = 1
+#(-) = 0
+#(?) = 0
+#black/empty character = 0
+#numeric 0..8 = 10
+
+intermediate.data$PROPDMGEXP <- intermediate.data$PROPDMGEXP %>% 
+        str_replace_na(replacement = "0") %>%         
+         str_replace_all(c("\\+" = "1", "\\-" = "0", "\\?" = "0",
+                         "[1-8]" = "10", "[hH]" = "100", "[kK]" = "1e+03", "[mM]" = "1e+06",
+                         "[bB]" = "1e+09"))
+
+intermediate.data$CROPDMGEXP <- intermediate.data$CROPDMGEXP %>% 
+        str_replace_na(replacement = "0") %>%         
+        str_replace_all(c("\\+" = "1", "\\-" = "0", "\\?" = "0",
+                          "[1-8]" = "10", "[hH]" = "100", "[kK]" = "1e+03", "[mM]" = "1e+06",
+                          "[bB]" = "1e+09"))
+
+#multiply column with EXP
+
 # need to use exp to determine multiple
 #determine five num distribution, anything strange?
 #need to see how many NA - none
 #need to clean up EVTYPE
 #weird symbols in propdmgexp
+
+
+
+propdmgexp.range <- unique(raw.data$PROPDMGEXP)
+
 #weird symbols in cropdmg exp
 
 
