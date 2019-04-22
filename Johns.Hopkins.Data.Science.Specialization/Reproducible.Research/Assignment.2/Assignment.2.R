@@ -65,18 +65,31 @@ intermediate.data <- raw.data %>%
 #numeric 0..8 = 10
 
 intermediate.data$PROPDMGEXP <- intermediate.data$PROPDMGEXP %>% 
-        str_replace_na(replacement = "0") %>%         
-         str_replace_all(c("\\+" = "1", "\\-" = "0", "\\?" = "0",
+        str_replace_all(c("\\+" = "1", "\\-" = "0", "\\?" = "0",
                          "[1-8]" = "10", "[hH]" = "100", "[kK]" = "1e+03", "[mM]" = "1e+06",
-                         "[bB]" = "1e+09"))
+                         "[bB]" = "1e+09")) %>%
+        as.numeric()
+
+intermediate.data$PROPDMGEXP[is.na(intermediate.data$PROPDMGEXP)] <- 0
 
 intermediate.data$CROPDMGEXP <- intermediate.data$CROPDMGEXP %>% 
-        str_replace_na(replacement = "0") %>%         
         str_replace_all(c("\\+" = "1", "\\-" = "0", "\\?" = "0",
                           "[1-8]" = "10", "[hH]" = "100", "[kK]" = "1e+03", "[mM]" = "1e+06",
-                          "[bB]" = "1e+09"))
+                          "[bB]" = "1e+09")) %>%
+        as.numeric()
+
+intermediate.data$CROPDMGEXP[is.na(intermediate.data$CROPDMGEXP)] <- 0
 
 #multiply column with EXP
+
+intermediate.data <- intermediate.data %>%
+        transform(PROPDMG = PROPDMG * PROPDMGEXP) %>%
+        transform(CROPDMG = CROPDMG * CROPDMGEXP) %>%
+        select(-PROPDMGEXP,-CROPDMGEXP)
+
+#clean up EVTYPE entries
+#subset summary enties, values not useful - REMOVE
+summary <- raw.data[grep("summary.*", raw.data$EVTYPE, ignore.case = TRUE),]
 
 # need to use exp to determine multiple
 #determine five num distribution, anything strange?
