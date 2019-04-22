@@ -85,21 +85,55 @@ intermediate.data$CROPDMGEXP[is.na(intermediate.data$CROPDMGEXP)] <- 0
 intermediate.data <- intermediate.data %>%
         transform(PROPDMG = PROPDMG * PROPDMGEXP) %>%
         transform(CROPDMG = CROPDMG * CROPDMGEXP) %>%
+        mutate(TOTALDMG = CROPDMG + PROPDMG) %>%
         select(-PROPDMGEXP,-CROPDMGEXP)
 
 #clean up EVTYPE entries
-#subset summary enties, values not useful - REMOVE
+#subset EVTYPE =  summary entries, propdmg cropdmg values are zero - REMOVE
 summary <- raw.data[grep("summary.*", raw.data$EVTYPE, ignore.case = TRUE),]
 
+#rename all hurricane to hurrican, stripping names
+
+hurricane <- raw.data[grep("hurricane.*", raw.data$EVTYPE, ignore.case = TRUE),]
+
+
+#get count of each factor
+#need to set up priority in naming to consolidate names
+#first, standardize same name
+#1 hurricane (involves storms and flooding)
+#2 flood
+#3 thunderstorms
+#4 winds
+
+distribution_EVTYPE <- aggregate(x = raw.data, by = list(raw.data$EVTYPE), FUN = length)
+
+intermediate.data <- intermediate.data %>%
+        filter(!grepl("summary.*", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub("hurricane.*", "HURRICANE", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*flood.*", "FLOOD", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*TSTM.*", "THUNDERSTORM", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*THUNDERSTORM.*", "THUNDERSTORM", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*funnel cloud.*", "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*cyclone.*", "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*tornado.*", "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, ignore.case = TRUE))
+        #add ice snow and frost
+        
 # need to use exp to determine multiple
 #determine five num distribution, anything strange?
 #need to see how many NA - none
 #need to clean up EVTYPE
 #weird symbols in propdmgexp
 
+# partyid2 <- fct_collapse(intermediate.data$EVTYPE,
+#                          missing = c("No answer", "Don't know"),
+#                          other = "Other party",
+#                          rep = c("Strong republican", "Not str republican"),
+#                          ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+#                          dem = c("Not str democrat", "Strong democrat")
+# )
 
 
-propdmgexp.range <- unique(raw.data$PROPDMGEXP)
+EVTYPE.range <- unique(intermediate.data$EVTYPE)
 
 #weird symbols in cropdmg exp
 
