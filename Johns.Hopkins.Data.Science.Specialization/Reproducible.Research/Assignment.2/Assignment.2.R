@@ -86,7 +86,8 @@ intermediate.data <- intermediate.data %>%
         transform(PROPDMG = PROPDMG * PROPDMGEXP) %>%
         transform(CROPDMG = CROPDMG * CROPDMGEXP) %>%
         mutate(TOTALDMG = CROPDMG + PROPDMG) %>%
-        select(-PROPDMGEXP,-CROPDMGEXP)
+        select(-PROPDMGEXP,-CROPDMGEXP) %>%
+        filter(TOTALDMG >0)
 
 #clean up EVTYPE entries
 #subset EVTYPE =  summary entries, propdmg cropdmg values are zero - REMOVE
@@ -108,15 +109,42 @@ hurricane <- raw.data[grep("hurricane.*", raw.data$EVTYPE, ignore.case = TRUE),]
 distribution_EVTYPE <- aggregate(x = raw.data, by = list(raw.data$EVTYPE), FUN = length)
 
 intermediate.data <- intermediate.data %>%
-        filter(!grepl("summary.*", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub("hurricane.*", "HURRICANE", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*flood.*", "FLOOD", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*TSTM.*", "THUNDERSTORM", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*THUNDERSTORM.*", "THUNDERSTORM", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*funnel cloud.*", "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*cyclone.*", "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*tornado.*", "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, ignore.case = TRUE))
-        #add ice snow and frost
+        filter(!grepl("summary.*|\\?|.*apache.*", EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*hurricane.*|.*storm surge.*|.*tropical.*", 
+                                "HURRICANE/STORM SURGE/TROPICAL STORM", 
+                                EVTYPE, ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*flood.*", "FLOOD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*TSTM.*|.*THUNDERSTORM.*", "THUNDERSTORM", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*cyclone.*|.*tornado.*|.*funnel cloud.*|torndao", 
+                                "TORNADO/CYCLONE/FUNNEL CLOUD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*wind.*", "WIND", EVTYPE, ignore.case = TRUE)) %>%        
+        transform(EVTYPE = gsub(".*blizzard.*", "BLIZZARD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*microburst.*", "MICROBURST", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*freez.*|.*frost.*", "FREEZE/FROST", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*hail.*", "HAIL", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*snow.*", "SNOW", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*light.*", "LIGHTNING", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*wint.*", "WINTER WEATHER", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*rain.*", "RAIN", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*cold.*", "COLD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*wild.*fire.*", "WILD FIRE", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*flood.*", "FLOOD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*mud.*|.*land.*", "FLOOD", EVTYPE, 
+                                ignore.case = TRUE))
         
 # need to use exp to determine multiple
 #determine five num distribution, anything strange?
