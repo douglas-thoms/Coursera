@@ -31,9 +31,8 @@ library(stringr)
 
 #QUESTIONS
 
-#Across the United States, which types of events (as indicated in the EVTYPE variable) 
-#are most harmful with respect to population health?
-#Across the United States, which types of events have the greatest economic consequences?
+
+
 
 #You must show all your code for the work in your analysis document. This may 
 #make the document a bit verbose, but that is okay. 
@@ -86,8 +85,8 @@ intermediate.data <- intermediate.data %>%
         transform(PROPDMG = PROPDMG * PROPDMGEXP) %>%
         transform(CROPDMG = CROPDMG * CROPDMGEXP) %>%
         mutate(TOTALDMG = CROPDMG + PROPDMG) %>%
-        select(-PROPDMGEXP,-CROPDMGEXP) %>%
-        filter(TOTALDMG >0)
+        select(-PROPDMGEXP,-CROPDMGEXP)
+        
 
 #clean up EVTYPE entries
 #subset EVTYPE =  summary entries, propdmg cropdmg values are zero - REMOVE
@@ -106,7 +105,8 @@ hurricane <- raw.data[grep("hurricane.*", raw.data$EVTYPE, ignore.case = TRUE),]
 #3 thunderstorms
 #4 winds
 
-distribution_EVTYPE <- aggregate(x = raw.data, by = list(raw.data$EVTYPE), FUN = length)
+distribution.EVTYPE <- aggregate(x = raw.data, by = list(raw.data$EVTYPE), FUN = length)
+
 
 intermediate.data <- intermediate.data %>%
         filter(!grepl("summary.*|\\?|.*apache.*", EVTYPE, ignore.case = TRUE)) %>%
@@ -135,7 +135,7 @@ intermediate.data <- intermediate.data %>%
                                 ignore.case = TRUE)) %>%
         transform(EVTYPE = gsub(".*wint.*", "WINTER WEATHER", EVTYPE, 
                                 ignore.case = TRUE)) %>%
-        transform(EVTYPE = gsub(".*rain.*", "RAIN", EVTYPE, 
+        transform(EVTYPE = gsub(".*rain.*|.*shower.*|.*precipitation.*", "RAIN", EVTYPE, 
                                 ignore.case = TRUE)) %>%
         transform(EVTYPE = gsub(".*cold.*", "COLD", EVTYPE, 
                                 ignore.case = TRUE)) %>%
@@ -144,7 +144,34 @@ intermediate.data <- intermediate.data %>%
         transform(EVTYPE = gsub(".*flood.*", "FLOOD", EVTYPE, 
                                 ignore.case = TRUE)) %>%
         transform(EVTYPE = gsub(".*mud.*|.*land.*", "FLOOD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*heat.*", "FLOOD", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*surf.*|.*current.*|.*swell.*", "CURRENT/SURF", EVTYPE, 
+                                ignore.case = TRUE)) %>%
+        transform(EVTYPE = gsub(".*fire.*", "FIRE", EVTYPE, 
                                 ignore.case = TRUE))
+
+#Across the United States, which types of events (as indicated in the EVTYPE variable) 
+#are most harmful with respect to population health?
+
+health.harm.EVTYPE <- aggregate(cbind(FATALITIES,INJURIES)~EVTYPE, intermediate.data, sum)
+
+health.harm.EVTYPE.cond <- health.harm.EVTYPE %>%
+        mutate(fatalities.percent = round(FATALITIES/sum(FATALITIES),3)) %>%
+        mutate(inuries.percent = round(INJURIES/sum(INJURIES),3)) %>%
+        filter(FATALITIES >0) %>%
+        filter(fatalities.percent >= 0.01)
+
+#Across the United States, which types of events have the greatest economic consequences?
+
+economic.EVTYPE <- aggregate(cbind(PROPDMG,CROPDMG,TOTALDMG)~EVTYPE, intermediate.data, sum)
+
+economic.EVTYPE.cond <- economic.EVTYPE %>%
+        mutate(percent = round(TOTALDMG/sum(TOTALDMG),3)) %>%
+        filter(TOTALDMG >0) %>%
+        filter(percent >= 0.01)
+
         
 # need to use exp to determine multiple
 #determine five num distribution, anything strange?
