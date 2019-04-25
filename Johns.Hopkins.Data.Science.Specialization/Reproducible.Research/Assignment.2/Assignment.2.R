@@ -16,6 +16,7 @@
 
 library(dplyr)
 library(stringr)
+library(ggplot2)
 
 #Does the document have a title that briefly summarizes the data analysis?
 #1 -3 figures
@@ -41,7 +42,9 @@ library(stringr)
 
 #DOCUMENT TITLE
 
-#DATA PROCESSING
+##-----------------------------------------------------------------------------
+## DATA PROCESSING
+##-----------------------------------------------------------------------------
 
 if(!exists("raw.data"))
 raw.data <- read.csv("repdata_data_StormData.csv.bz2", na.strings = c("",NA))
@@ -152,8 +155,12 @@ intermediate.data <- intermediate.data %>%
         transform(EVTYPE = gsub(".*fire.*", "FIRE", EVTYPE, 
                                 ignore.case = TRUE))
 
+EVTYPE.range <- unique(intermediate.data$EVTYPE)
+
 #Across the United States, which types of events (as indicated in the EVTYPE variable) 
 #are most harmful with respect to population health?
+
+#What columns are relevant to population health? - injuries, fatalities
 
 health.harm.EVTYPE <- aggregate(cbind(FATALITIES,INJURIES)~EVTYPE, intermediate.data, sum)
 
@@ -161,9 +168,11 @@ health.harm.EVTYPE.cond <- health.harm.EVTYPE %>%
         mutate(fatalities.percent = round(FATALITIES/sum(FATALITIES),3)) %>%
         mutate(inuries.percent = round(INJURIES/sum(INJURIES),3)) %>%
         filter(FATALITIES >0) %>%
-        filter(fatalities.percent >= 0.01)
+        arrange(desc(FATALITIES)) %>%
+        slice(1:10)
+        
 
-#Across the United States, which types of events have the greatest economic consequences?
+#What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
 
 economic.EVTYPE <- aggregate(cbind(PROPDMG,CROPDMG,TOTALDMG)~EVTYPE, intermediate.data, sum)
 
@@ -172,38 +181,25 @@ economic.EVTYPE.cond <- economic.EVTYPE %>%
         filter(TOTALDMG >0) %>%
         filter(percent >= 0.01)
 
-        
-# need to use exp to determine multiple
-#determine five num distribution, anything strange?
-#need to see how many NA - none
-#need to clean up EVTYPE
-#weird symbols in propdmgexp
 
-# partyid2 <- fct_collapse(intermediate.data$EVTYPE,
-#                          missing = c("No answer", "Don't know"),
-#                          other = "Other party",
-#                          rep = c("Strong republican", "Not str republican"),
-#                          ind = c("Ind,near rep", "Independent", "Ind,near dem"),
-#                          dem = c("Not str democrat", "Strong democrat")
-# )
-
-
-EVTYPE.range <- unique(intermediate.data$EVTYPE)
-
-#weird symbols in cropdmg exp
-
-
-
-#RESULTS
+##-----------------------------------------------------------------------------
+## RESULTS
+##-----------------------------------------------------------------------------
 
 #Across the United States, which types of events (as indicated in the EVTYPE variable) 
 #are most harmful with respect to population health?
 
-#What columns are relevant to population health? - injuries, fatalities
 
+a <- ggplot(data = health.harm.EVTYPE.cond, aes(x = EVTYPE, y = FATALITIES)) +
+        geom_bar(stat = "identity")
+
+plot(a)
+
+#bar
 
 #Across the United States, which types of events have the greatest economic consequences?
 
-#What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
+#final
+#bar
 
 
