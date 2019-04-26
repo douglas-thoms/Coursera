@@ -17,6 +17,8 @@
 library(dplyr)
 library(stringr)
 library(ggplot2)
+library(forcats)
+library(reshape2)
 
 #Does the document have a title that briefly summarizes the data analysis?
 #1 -3 figures
@@ -163,24 +165,57 @@ EVTYPE.range <- unique(intermediate.data$EVTYPE)
 #What columns are relevant to population health? - injuries, fatalities
 
 health.harm.EVTYPE <- aggregate(cbind(FATALITIES,INJURIES)~EVTYPE, intermediate.data, sum)
+health.harm.EVTYPE.freq <- aggregate(FATALITIES~EVTYPE, 
+                                     intermediate.data, length)
 
-health.harm.EVTYPE.cond <- health.harm.EVTYPE %>%
+health.harm.EVTYPE.freq <- health.harm.EVTYPE.freq %>%
+        rename(EVENT.FREQUENCY = FATALITIES)
+        
+health.harm.EVTYPE <- inner_join(health.harm.EVTYPE, health.harm.EVTYPE.freq, 
+                                 by = "EVTYPE")
+
+
+
+health.harm.EVTYPE <- health.harm.EVTYPE %>%
         mutate(fatalities.percent = round(FATALITIES/sum(FATALITIES),3)) %>%
         mutate(inuries.percent = round(INJURIES/sum(INJURIES),3)) %>%
-        filter(FATALITIES >0) %>%
-        arrange(desc(FATALITIES)) %>%
-        slice(1:10)
-        
+        arrange(desc(FATALITIES))
+ 
+health.harm.EVTYPE$EVTYPE <- fct_other(health.harm.EVTYPE$EVTYPE,
+                                       keep = health.harm.EVTYPE$EVTYPE[1:6],
+                                       other_level = "OTHER")
+
+health.harm.EVTYPE <- aggregate(.~EVTYPE, health.harm.EVTYPE, sum)
+
+health.harm.EVTYPE <- health.harm.EVTYPE %>%
+        mutate(fatalities.per.event = round(FATALITIES/EVENT.FREQUENCY,2)) %>%
+        mutate(inuries.per.event = round(INJURIES/EVENT.FREQUENCY,2))
 
 #What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
 
 economic.EVTYPE <- aggregate(cbind(PROPDMG,CROPDMG,TOTALDMG)~EVTYPE, intermediate.data, sum)
+economic.EVTYPE.freq <- aggregate(PROPDMG~EVTYPE, 
+                                     intermediate.data, length)
 
-economic.EVTYPE.cond <- economic.EVTYPE %>%
+economic.EVTYPE.freq <- economic.EVTYPE.freq %>%
+        rename(EVENT.FREQUENCY = PROPDMG)
+
+economic.EVTYPE <- inner_join(economic.EVTYPE, economic.EVTYPE.freq, 
+                                 by = "EVTYPE")
+
+economic.EVTYPE <- economic.EVTYPE %>%
         mutate(percent = round(TOTALDMG/sum(TOTALDMG),3)) %>%
-        filter(TOTALDMG >0) %>%
-        filter(percent >= 0.01)
+        arrange(desc(TOTALDMG))
 
+economic.EVTYPE$EVTYPE <- fct_other(economic.EVTYPE$EVTYPE,
+                                       keep = economic.EVTYPE$EVTYPE[1:6],
+                                       other_level = "OTHER")
+
+economic.EVTYPE <- aggregate(.~EVTYPE, economic.EVTYPE, sum)
+
+economic.EVTYPE <- economic.EVTYPE %>%
+        mutate(TOTALDMG.per.event = round(TOTALDMG/EVENT.FREQUENCY,0))
+        
 
 ##-----------------------------------------------------------------------------
 ## RESULTS
@@ -189,11 +224,14 @@ economic.EVTYPE.cond <- economic.EVTYPE %>%
 #Across the United States, which types of events (as indicated in the EVTYPE variable) 
 #are most harmful with respect to population health?
 
+health.risk <- melt(economic.EVTYPE, id.vars = economic.EVTYPE$EVTYPE)
 
-a <- ggplot(data = health.harm.EVTYPE.cond, aes(x = EVTYPE, y = FATALITIES)) +
-        geom_bar(stat = "identity")
 
-plot(a)
+
+
+
+
+
 
 #bar
 
