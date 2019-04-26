@@ -19,6 +19,7 @@ library(stringr)
 library(ggplot2)
 library(forcats)
 library(reshape2)
+library(gridExtra)
 
 #Does the document have a title that briefly summarizes the data analysis?
 #1 -3 figures
@@ -178,7 +179,7 @@ health.harm.EVTYPE <- inner_join(health.harm.EVTYPE, health.harm.EVTYPE.freq,
 
 health.harm.EVTYPE <- health.harm.EVTYPE %>%
         mutate(fatalities.percent = round(FATALITIES/sum(FATALITIES),3)) %>%
-        mutate(inuries.percent = round(INJURIES/sum(INJURIES),3)) %>%
+        mutate(injuries.percent = round(INJURIES/sum(INJURIES),3)) %>%
         arrange(desc(FATALITIES))
  
 health.harm.EVTYPE$EVTYPE <- fct_other(health.harm.EVTYPE$EVTYPE,
@@ -189,7 +190,7 @@ health.harm.EVTYPE <- aggregate(.~EVTYPE, health.harm.EVTYPE, sum)
 
 health.harm.EVTYPE <- health.harm.EVTYPE %>%
         mutate(fatalities.per.event = round(FATALITIES/EVENT.FREQUENCY,2)) %>%
-        mutate(inuries.per.event = round(INJURIES/EVENT.FREQUENCY,2))
+        mutate(injuries.per.event = round(INJURIES/EVENT.FREQUENCY,2))
 
 #What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
 
@@ -224,12 +225,39 @@ economic.EVTYPE <- economic.EVTYPE %>%
 #Across the United States, which types of events (as indicated in the EVTYPE variable) 
 #are most harmful with respect to population health?
 
-health.risk <- melt(economic.EVTYPE, id.vars = economic.EVTYPE$EVTYPE)
+#extra grid
+
+health.risk.total <- health.harm.EVTYPE %>%
+        select(EVTYPE,FATALITIES,INJURIES) %>%
+        melt(id.vars = "EVTYPE", measure.vars = c("FATALITIES","INJURIES"))
+
+g <- ggplot(data=health.risk.total, aes(x=EVTYPE, y=value, fill=factor(variable))) +
+        geom_bar(colour="black", stat="identity",
+                 position=position_dodge(),
+                 size=.3) +                       
+        scale_fill_hue(name="Harm") + xlab("") + ylab("") 
+        ggtitle("Total Fatalities and Injuries") +    
+        theme_bw() +
+
+plot(g)
+
+        health.risk.per.event <- health.harm.EVTYPE %>%
+                select(EVTYPE,fatalities.per.event,injuries.per.event) %>%
+                melt(id.vars = "EVTYPE", measure.vars = c("fatalities.per.event",
+                                                          "injuries.per.event"))
+        
+        h <- ggplot(data=health.risk.per.event, aes(x=EVTYPE, y=value, fill=factor(variable))) +
+                geom_bar(colour="black", stat="identity",
+                         position=position_dodge(),
+                         size=.3) +                       
+                scale_fill_hue(name="Harm") + xlab("") + ylab("") 
+        ggtitle("Fatalities and Injuries Per Event") +    
+                theme_bw() +
+                
+plot(h)
 
 
-
-
-
+        grid.arrange(g,h, ncol=2)
 
 
 
