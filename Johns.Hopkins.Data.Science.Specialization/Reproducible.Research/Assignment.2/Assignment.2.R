@@ -192,6 +192,7 @@ health.harm.EVTYPE <- health.harm.EVTYPE %>%
         mutate(fatalities.per.event = round(FATALITIES/EVENT.FREQUENCY,2)) %>%
         mutate(injuries.per.event = round(INJURIES/EVENT.FREQUENCY,2))
 
+
 #What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP
 
 economic.EVTYPE <- aggregate(cbind(PROPDMG,CROPDMG,TOTALDMG)~EVTYPE, intermediate.data, sum)
@@ -229,51 +230,79 @@ economic.EVTYPE <- economic.EVTYPE %>%
 
 health.harm.total <- health.harm.EVTYPE %>%
         select(EVTYPE,FATALITIES,INJURIES) %>%
-        melt(id.vars = "EVTYPE", measure.vars = c("FATALITIES","INJURIES"))
+        melt(id.vars = "EVTYPE", measure.vars = c("FATALITIES","INJURIES")) 
+
+health.harm.total <- health.harm.total[order(health.harm.total$variable, -health.harm.total$value),] 
+
+EVTYPE.ORDER <- health.harm.total %>%
+        filter(variable == "FATALITIES") %>%
+        select(-variable,-value)
+        
+health.harm.total$EVTYPE <- factor(health.harm.total$EVTYPE, levels = EVTYPE.ORDER$EVTYPE)
+health.harm.total$variable <- factor(health.harm.total$variable, levels = c("INJURIES","FATALITIES"))
 
 g <- ggplot(data=health.harm.total, aes(x=EVTYPE, y=value, fill=factor(variable))) +
         geom_bar(colour="black", stat="identity",
                  position=position_dodge(),
-                 size=.3) +                       
-        scale_fill_hue(name="Harm") + xlab("") + ylab("") +
-        ggtitle("Total Fatalities and Injuries") +    
-        theme_bw()
+                 size=.3) + theme_bw() +scale_fill_hue(name="Harm") + xlab("") + ylab("") +
+                 ggtitle("Total Fatalities and Injuries")
 
 
-        health.harm.per.event <- health.harm.EVTYPE %>%
+health.harm.per.event <- health.harm.EVTYPE %>%
                 select(EVTYPE,fatalities.per.event,injuries.per.event) %>%
                 melt(id.vars = "EVTYPE", measure.vars = c("fatalities.per.event",
                                                           "injuries.per.event"))
+
+health.harm.per.event$EVTYPE <- factor(health.harm.per.event$EVTYPE, levels = EVTYPE.ORDER$EVTYPE)
+health.harm.per.event$variable <- factor(health.harm.per.event$variable, levels = c("injuries.per.event",
+                                                                                    "fatalities.per.event"))
+
         
 h <- ggplot(data=health.harm.per.event, aes(x=EVTYPE, y=value, fill=factor(variable))) +
                 geom_bar(colour="black", stat="identity",
                          position=position_dodge(),
                          size=.3) +                       
                 scale_fill_hue(name="Harm") + xlab("") + ylab("") +
-        ggtitle("Fatalities and Injuries Per Event") +    
-                theme_bw()
-
+        ggtitle("Fatalities and Injuries Per Event") + theme_bw()
 
 
         grid.arrange(g,h, ncol=2)
 
 
-        economic.total <- economic.EVTYPE %>%
-                select(EVTYPE,PROPDMG,CROPDMG) %>%
-                melt(id.vars = "EVTYPE", measure.vars = c("PROPDMG","CROPDMG"))
-        
+economic.total <- economic.EVTYPE %>%
+                select(EVTYPE,PROPDMG,CROPDMG,TOTALDMG) %>%
+                melt(id.vars = "EVTYPE", measure.vars = c("PROPDMG","CROPDMG","TOTALDMG"))
+
+economic.total <- economic.total[order(economic.total$variable, -economic.total$value),] 
+
+EVTYPE.ORDER <- economic.total %>%
+        filter(variable == "TOTALDMG") %>%
+        select(-variable,-value)
+
+economic.total <- filter(economic.total, variable != "TOTALDMG")
+
+economic.total$EVTYPE <- factor(economic.total$EVTYPE, levels = EVTYPE.ORDER$EVTYPE)       
+economic.total$variable <- factor(economic.total$variable, levels = c("CROPDMG",
+                                                                      "PROPDMG"))
+      
 i <- ggplot(data=economic.total, aes(x=EVTYPE, y=value, fill=factor(variable))) +
                 geom_bar(colour="black", stat="identity",
                          position="stack",
                          size=.3) +                       
                 scale_fill_hue(name="Damage") + xlab("") + ylab("") +
         ggtitle("Total Crop and Property Damage") + theme_bw()
+    
         
-        
-        economic.per.event <- economic.EVTYPE %>%
+economic.per.event <- economic.EVTYPE %>%
                 select(EVTYPE,PROPDMG.per.event,CROPDMG.per.event) %>%
                 melt(id.vars = "EVTYPE", measure.vars = c("PROPDMG.per.event",
                                                           "CROPDMG.per.event"))
+        
+economic.per.event <- economic.per.event[order(economic.per.event$variable, -economic.per.event$value),] 
+
+economic.per.event$EVTYPE <- factor(economic.per.event$EVTYPE, levels = EVTYPE.ORDER$EVTYPE)       
+economic.per.event$variable <- factor(economic.per.event$variable, levels = c("CROPDMG.per.event",
+                                                                              "PROPDMG.per.event"))
         
 j <- ggplot(data=economic.per.event, aes(x=EVTYPE, y=value, fill=factor(variable))) +
                 geom_bar(colour="black", stat="identity",
@@ -281,7 +310,7 @@ j <- ggplot(data=economic.per.event, aes(x=EVTYPE, y=value, fill=factor(variable
                          size=.3) +                       
                 scale_fill_hue(name="Damage") + xlab("") + ylab("") +
         ggtitle("Total Crop and Property Damage Per Event") +    
-                theme_bw() + scale_y_log10()
+                theme_bw()
 
         
         
