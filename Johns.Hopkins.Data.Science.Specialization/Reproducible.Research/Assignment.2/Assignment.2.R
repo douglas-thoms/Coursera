@@ -215,9 +215,9 @@ economic.EVTYPE$EVTYPE <- fct_other(economic.EVTYPE$EVTYPE,
 economic.EVTYPE <- aggregate(.~EVTYPE, economic.EVTYPE, sum)
 
 economic.EVTYPE <- economic.EVTYPE %>%
-        mutate(TOTALDMG.per.event = round(TOTALDMG/EVENT.FREQUENCY,0))
-        
-
+        mutate(TOTALDMG.per.event = round(TOTALDMG/EVENT.FREQUENCY,0)) %>%
+        mutate(PROPDMG.per.event = round(PROPDMG/EVENT.FREQUENCY,0)) %>%
+        mutate(CROPDMG.per.event = round(CROPDMG/EVENT.FREQUENCY,0))
 ##-----------------------------------------------------------------------------
 ## RESULTS
 ##-----------------------------------------------------------------------------
@@ -227,40 +227,66 @@ economic.EVTYPE <- economic.EVTYPE %>%
 
 #extra grid
 
-health.risk.total <- health.harm.EVTYPE %>%
+health.harm.total <- health.harm.EVTYPE %>%
         select(EVTYPE,FATALITIES,INJURIES) %>%
         melt(id.vars = "EVTYPE", measure.vars = c("FATALITIES","INJURIES"))
 
-g <- ggplot(data=health.risk.total, aes(x=EVTYPE, y=value, fill=factor(variable))) +
+g <- ggplot(data=health.harm.total, aes(x=EVTYPE, y=value, fill=factor(variable))) +
         geom_bar(colour="black", stat="identity",
                  position=position_dodge(),
                  size=.3) +                       
-        scale_fill_hue(name="Harm") + xlab("") + ylab("") 
+        scale_fill_hue(name="Harm") + xlab("") + ylab("") +
         ggtitle("Total Fatalities and Injuries") +    
-        theme_bw() +
+        theme_bw()
 
-plot(g)
 
-        health.risk.per.event <- health.harm.EVTYPE %>%
+        health.harm.per.event <- health.harm.EVTYPE %>%
                 select(EVTYPE,fatalities.per.event,injuries.per.event) %>%
                 melt(id.vars = "EVTYPE", measure.vars = c("fatalities.per.event",
                                                           "injuries.per.event"))
         
-        h <- ggplot(data=health.risk.per.event, aes(x=EVTYPE, y=value, fill=factor(variable))) +
+h <- ggplot(data=health.harm.per.event, aes(x=EVTYPE, y=value, fill=factor(variable))) +
                 geom_bar(colour="black", stat="identity",
                          position=position_dodge(),
                          size=.3) +                       
-                scale_fill_hue(name="Harm") + xlab("") + ylab("") 
+                scale_fill_hue(name="Harm") + xlab("") + ylab("") +
         ggtitle("Fatalities and Injuries Per Event") +    
-                theme_bw() +
-                
-plot(h)
+                theme_bw()
+
 
 
         grid.arrange(g,h, ncol=2)
 
 
+        economic.total <- economic.EVTYPE %>%
+                select(EVTYPE,PROPDMG,CROPDMG) %>%
+                melt(id.vars = "EVTYPE", measure.vars = c("PROPDMG","CROPDMG"))
+        
+i <- ggplot(data=economic.total, aes(x=EVTYPE, y=value, fill=factor(variable))) +
+                geom_bar(colour="black", stat="identity",
+                         position="stack",
+                         size=.3) +                       
+                scale_fill_hue(name="Damage") + xlab("") + ylab("") +
+        ggtitle("Total Crop and Property Damage") + theme_bw()
+        
+        
+        economic.per.event <- economic.EVTYPE %>%
+                select(EVTYPE,PROPDMG.per.event,CROPDMG.per.event) %>%
+                melt(id.vars = "EVTYPE", measure.vars = c("PROPDMG.per.event",
+                                                          "CROPDMG.per.event"))
+        
+j <- ggplot(data=economic.per.event, aes(x=EVTYPE, y=value, fill=factor(variable))) +
+                geom_bar(colour="black", stat="identity",
+                         position="stack",
+                         size=.3) +                       
+                scale_fill_hue(name="Damage") + xlab("") + ylab("") +
+        ggtitle("Total Crop and Property Damage Per Event") +    
+                theme_bw() + scale_y_log10()
 
+        
+        
+        
+        grid.arrange(i,j, ncol=2)
 #bar
 
 #Across the United States, which types of events have the greatest economic consequences?
