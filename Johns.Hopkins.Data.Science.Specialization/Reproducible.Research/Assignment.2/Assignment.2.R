@@ -176,7 +176,8 @@ exploratory <- aggregate(TOTALDMG~BGN_DATE+EVTYPE, exploratory, length)
 
 f <- ggplot(data = exploratory, aes(x = BGN_DATE, y = TOTALDMG)) +
         geom_point(aes(colour = factor(EVTYPE)), size = 2) +
-        ylab("Number of Data Points") + xlab("")
+        ylab("Number of Data Points") + xlab("") +
+        geom_vline(xintercept=c(1993), linetype="dotted")
 
 plot(f)
 

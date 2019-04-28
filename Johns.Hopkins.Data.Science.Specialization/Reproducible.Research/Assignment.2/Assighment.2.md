@@ -7,9 +7,7 @@ output:
     keep_md: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 # Synopsis
 
@@ -28,20 +26,91 @@ variable) are most harmful with respect to population health?
     
 # Session Info
 
-```{r eval = TRUE}
+
+```r
 sessionInfo()
+```
+
+```
+## R version 3.4.4 (2018-03-15)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 17134)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## loaded via a namespace (and not attached):
+##  [1] compiler_3.4.4  magrittr_1.5    tools_3.4.4     htmltools_0.3.6
+##  [5] yaml_2.2.0      Rcpp_1.0.0      stringi_1.3.1   rmarkdown_1.11 
+##  [9] knitr_1.22      stringr_1.4.0   xfun_0.4        digest_0.6.18  
+## [13] evaluate_0.13
 ```
 
 # Packages Installed
 
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(stringr)
 library(ggplot2)
 library(forcats)
 library(reshape2)
 library(gridExtra)
+```
+
+```
+## 
+## Attaching package: 'gridExtra'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
+```
+
+```r
 library(lubridate)
+```
+
+```
+## 
+## Attaching package: 'lubridate'
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     date
 ```
 
 
@@ -63,7 +132,8 @@ library(lubridate)
 
 * Two summations of health harm and economics were created - total amount of health harm and economic damage, and average health harm per event and average economic damage per event  
 
-```{r eval=TRUE, cache=TRUE}
+
+```r
 if(!exists("raw.data")){
         raw.data <- read.csv("repdata_data_StormData.csv.bz2", 
                              na.strings = c("",NA))
@@ -71,7 +141,47 @@ if(!exists("raw.data")){
 raw.data$BGN_DATE <- year(as.Date(raw.data$BGN_DATE,"%m/%d/%Y"))}
 
 head(raw.data)
+```
 
+```
+##   STATE__ BGN_DATE BGN_TIME TIME_ZONE COUNTY COUNTYNAME STATE  EVTYPE
+## 1       1     1950     0130       CST     97     MOBILE    AL TORNADO
+## 2       1     1950     0145       CST      3    BALDWIN    AL TORNADO
+## 3       1     1951     1600       CST     57    FAYETTE    AL TORNADO
+## 4       1     1951     0900       CST     89    MADISON    AL TORNADO
+## 5       1     1951     1500       CST     43    CULLMAN    AL TORNADO
+## 6       1     1951     2000       CST     77 LAUDERDALE    AL TORNADO
+##   BGN_RANGE BGN_AZI BGN_LOCATI END_DATE END_TIME COUNTY_END COUNTYENDN
+## 1         0    <NA>       <NA>     <NA>     <NA>          0         NA
+## 2         0    <NA>       <NA>     <NA>     <NA>          0         NA
+## 3         0    <NA>       <NA>     <NA>     <NA>          0         NA
+## 4         0    <NA>       <NA>     <NA>     <NA>          0         NA
+## 5         0    <NA>       <NA>     <NA>     <NA>          0         NA
+## 6         0    <NA>       <NA>     <NA>     <NA>          0         NA
+##   END_RANGE END_AZI END_LOCATI LENGTH WIDTH F MAG FATALITIES INJURIES
+## 1         0    <NA>       <NA>   14.0   100 3   0          0       15
+## 2         0    <NA>       <NA>    2.0   150 2   0          0        0
+## 3         0    <NA>       <NA>    0.1   123 2   0          0        2
+## 4         0    <NA>       <NA>    0.0   100 2   0          0        2
+## 5         0    <NA>       <NA>    0.0   150 2   0          0        2
+## 6         0    <NA>       <NA>    1.5   177 2   0          0        6
+##   PROPDMG PROPDMGEXP CROPDMG CROPDMGEXP  WFO STATEOFFIC ZONENAMES LATITUDE
+## 1    25.0          K       0       <NA> <NA>       <NA>      <NA>     3040
+## 2     2.5          K       0       <NA> <NA>       <NA>      <NA>     3042
+## 3    25.0          K       0       <NA> <NA>       <NA>      <NA>     3340
+## 4     2.5          K       0       <NA> <NA>       <NA>      <NA>     3458
+## 5     2.5          K       0       <NA> <NA>       <NA>      <NA>     3412
+## 6     2.5          K       0       <NA> <NA>       <NA>      <NA>     3450
+##   LONGITUDE LATITUDE_E LONGITUDE_ REMARKS REFNUM
+## 1      8812       3051       8806    <NA>      1
+## 2      8755          0          0    <NA>      2
+## 3      8742          0          0    <NA>      3
+## 4      8626          0          0    <NA>      4
+## 5      8642          0          0    <NA>      5
+## 6      8748          0          0    <NA>      6
+```
+
+```r
 #remove columns that will not be needed
 intermediate.data <- raw.data %>%
         select(EVTYPE,BGN_DATE, FATALITIES,INJURIES,PROPDMG,PROPDMGEXP,
@@ -195,14 +305,30 @@ f <- ggplot(data = exploratory, aes(x = BGN_DATE, y = TOTALDMG)) +
 
 Ran an exploratory graph and noticed that many types of event were not recorded till 1993.  Therefore only data from 1993 was used in analysis
 
-```{r cache = TRUE}
-plot(f)
 
+```r
+plot(f)
+```
+
+![](Assighment.2_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
 intermediate.data <- filter(intermediate.data,BGN_DATE >1992)
 
 head(intermediate.data)
 ```
-```{r}
+
+```
+##           EVTYPE BGN_DATE FATALITIES INJURIES PROPDMG CROPDMG TOTALDMG
+## 1  FREEZE\nFROST     1995          0        0   0e+00       0    0e+00
+## 2           SNOW     1995          0        0   0e+00       0    0e+00
+## 3          FLOOD     1994          0        2   0e+00       0    0e+00
+## 4           SNOW     1995          0        0   0e+00       0    0e+00
+## 5 WINTER WEATHER     1993          4        0   5e+09       0    5e+09
+## 6           SNOW     1995          0        0   0e+00       0    0e+00
+```
+
+```r
 #check how many factors left
 EVTYPE.range <- unique(intermediate.data$EVTYPE)
 
@@ -244,7 +370,33 @@ health.harm.EVTYPE <- health.harm.EVTYPE %>%
         mutate(injuries.per.event = round(INJURIES/EVENT.FREQUENCY,2))
 
 head(health.harm.EVTYPE)
+```
 
+```
+##                           EVTYPE FATALITIES INJURIES EVENT.FREQUENCY
+## 1                  CURRENT\nSURF        736      775            1844
+## 2                          FLOOD       1525     8604           82731
+## 3                           HEAT       3178     9243            2993
+## 4                      LIGHTNING        817     5231           15767
+## 5 TORNADO\nCYCLONE\nFUNNEL CLOUD       1624    23374           32871
+## 6                           WIND        696     1994           28180
+##   fatalities.percent injuries.percent fatalities.per.event
+## 1              0.068            0.011                 0.40
+## 2              0.140            0.125                 0.02
+## 3              0.292            0.134                 1.06
+## 4              0.075            0.076                 0.05
+## 5              0.149            0.340                 0.05
+## 6              0.064            0.029                 0.02
+##   injuries.per.event
+## 1               0.42
+## 2               0.10
+## 3               3.09
+## 4               0.33
+## 5               0.71
+## 6               0.07
+```
+
+```r
 #What columns are revelant to economic consequence? - PROPDMG, PROPDMGEXP, 
 #CROPDMG, CROPDMGEXP
 
@@ -282,8 +434,33 @@ economic.EVTYPE <- economic.EVTYPE %>%
 head(economic.EVTYPE)
 ```
 
+```
+##                                   EVTYPE      PROPDMG     CROPDMG
+## 1                                DROUGHT   1046106000 13972566000
+## 2                                  FLOOD 167529741508 12380109100
+## 3                                   HAIL  15974043520  3046837450
+## 4 HURRICANE\nSTORM SURGE\nTROPICAL STORM 140437031560  6211043800
+## 5                           THUNDERSTORM  12575592791  1274178900
+## 6         TORNADO\nCYCLONE\nFUNNEL CLOUD  26395095882   414961360
+##       TOTALDMG EVENT.FREQUENCY percent TOTALDMG.per.event
+## 1  15018672000            2488   0.034            6036444
+## 2 179909850608           82731   0.404            2174636
+## 3  19020880970          227442   0.043              83630
+## 4 146648075360            1454   0.329          100858374
+## 5  13849771691          245839   0.031              56337
+## 6  26810057242           32871   0.060             815614
+##   PROPDMG.per.event CROPDMG.per.event
+## 1            420461           5615983
+## 2           2024994            149643
+## 3             70233             13396
+## 4          96586679           4271694
+## 5             51154              5183
+## 6            802990             12624
+```
+
 # RESULTS
-```{r eval=TRUE}
+
+```r
 #Across the United States, which types of events (as indicated in the EVTYPE 
 #variable) are most harmful with respect to population health?
 
@@ -346,9 +523,11 @@ h <- ggplot(data=health.harm.per.event, aes(x=EVTYPE, y=value,
 
 #print plot
 grid.arrange(g,h, ncol=1)
+```
 
+![](Assighment.2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-        
+```r
 #Across the United States, which types of events have the greatest economic consequences?
 
 #create tall dataframe for charting purposes
@@ -410,3 +589,5 @@ j <- ggplot(data=economic.per.event, aes(x=EVTYPE, y=value/1e+06,
 #print plot        
 grid.arrange(i,j, ncol=1)
 ```
+
+![](Assighment.2_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
