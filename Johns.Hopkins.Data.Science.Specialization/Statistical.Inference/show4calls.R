@@ -6,3 +6,5 @@ rbind(
   as.vector(t.test(g2, g1, paired = TRUE)$conf.int),
   as.vector(t.test(extra ~ I(relevel(group, 2)), paired = TRUE, data = sleep)$conf.int)
 )
+
+
