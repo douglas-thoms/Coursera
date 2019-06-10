@@ -15,6 +15,7 @@
 ##----------------------------------------------------------------------------
 
 library(ggplot2)
+library(dplyr)
 
 ##----------------------------------------------------------------------------
 ## Simulation
@@ -96,6 +97,9 @@ lines(xfit, yfit, col = "black", lwd = 2)
 ## Part 2
 ##----------------------------------------------------------------------------
 
+#want to determine if each combination of dose and supp has significant impact on growth
+#null hypothesis is there is no growth
+
 df <- ToothGrowth
 
 #review data frame
@@ -109,10 +113,25 @@ print(sd(df$len))
 
 #find NAs - no NAs
 num.NA.obs <- length(df[complete.cases(df) == FALSE,]$len)
+#Observation - no missing or strange values
 
 #aggregate to see differences
-aggegate.mean.df <- aggregate(.~supp+dose,df, mean)
-aggegate.sd.df <- aggregate(.~supp+dose,df, sd)
+ag.mean.df <- aggregate(.~supp+dose, df, mean)
+ag.mean.df <- ag.mean.df %>%
+        rename(mean = len)
+ag.mean.df$mean <- round(ag.mean.df$mean, digits = 2)
+
+ag.sd.df <- aggregate(.~supp+dose, df, sd)
+ag.sd.df <- ag.sd.df %>%
+        rename(sd = len)
+ag.sd.df$sd <- round(ag.sd.df$sd, digits = 2)
+
+ag.mean.sd <- inner_join(ag.mean.df,ag.sd.df)
+
+ag.mean.sd <- ag.mean.sd[with(ag.mean.sd, order(supp, dose)),]
+
+#Observation - mean increases in all cases, standard deviation shrinks with OJ
+# but increases with VC, no crazy outliers
 
 #create a plot of different values
 df$dose <- as.factor(df$dose)
@@ -120,7 +139,16 @@ a <- ggplot(df, aes(x=dose, y=len)) + geom_boxplot() +
         facet_grid(.~supp)
 
 plot(a)
+#Observation - VC has large range in values
 
 #approach - t.test 
-#significane - 0.05, one tailed ho = ha, ha > ho
+#level significance (alpha) - 0.05, one tailed ho = ha, ha > ho
 #assumption iid, normal distribution, randomnized, not paired
+
+#calculations
+#treat each as separate on off
+#Calculate CI to see if ho rejected, is 0 in range
+#Calculate p-value, see if meeting .975
+
+https://stackoverflow.com/questions/37474672/looping-through-t-tests-for-data-frame-subsets-in-r
+https://stackoverflow.com/questions/26244321/dplyr-summarise-multiple-columns-using-t-test
