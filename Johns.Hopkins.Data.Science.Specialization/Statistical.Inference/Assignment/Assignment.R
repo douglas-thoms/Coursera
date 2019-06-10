@@ -100,6 +100,14 @@ lines(xfit, yfit, col = "black", lwd = 2)
 #want to determine if each combination of dose and supp has significant impact on growth
 #null hypothesis is there is no growth
 
+#want to review context of data
+#https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html
+#The response is the length of odontoblasts (cells responsible for tooth growth) 
+#in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) 
+#by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).
+#Does difference in supplement or dose change tooth growth?
+#Ho OJ
+
 df <- ToothGrowth
 
 #review data frame
@@ -148,7 +156,13 @@ plot(a)
 #calculations
 #treat each as separate on off
 #Calculate CI to see if ho rejected, is 0 in range
-#Calculate p-value, see if meeting .975
+#Calculate p-value, see if it is above alpha of .975
 
-https://stackoverflow.com/questions/37474672/looping-through-t-tests-for-data-frame-subsets-in-r
-https://stackoverflow.com/questions/26244321/dplyr-summarise-multiple-columns-using-t-test
+#try sapply mean
+#first, merge to columns
+
+#subset data into distinct groups so can compare
+#1 oj vs ac
+#2 control does oj vs ac per does
+#3 time intervals .1 vs .5 etc
+
