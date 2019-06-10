@@ -78,7 +78,7 @@ print(sam.variance)
 
 #plot a normal distribution in R
 
-h <- hist(expo_mean, breaks = 10, density = 10,
+h <- hist(expo_mean, breaks = 10, density = 20,
           col = "lightgray", xlab = "Accuracy", main = "Overall") 
 xfit <- seq(min(expo_mean), max(expo_mean), length = 40) 
 yfit <- dnorm(xfit, mean = mean(expo_mean), sd = sd(expo_mean)) 
