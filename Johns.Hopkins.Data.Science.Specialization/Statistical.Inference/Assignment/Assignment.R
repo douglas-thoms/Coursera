@@ -11,6 +11,12 @@
 ##----------------------------------------------------------------------------
 
 ##----------------------------------------------------------------------------
+## Library
+##----------------------------------------------------------------------------
+
+library(ggplot2)
+
+##----------------------------------------------------------------------------
 ## Simulation
 ##----------------------------------------------------------------------------
 
@@ -86,3 +92,35 @@ yfit <- yfit * diff(h$mids[1:2]) * length(expo_mean)
 
 lines(xfit, yfit, col = "black", lwd = 2)
 
+##----------------------------------------------------------------------------
+## Part 2
+##----------------------------------------------------------------------------
+
+df <- ToothGrowth
+
+#review data frame
+#min 4.2, max 33.9, median 19.25, mean 18.8, sd 7.65
+
+print(head(df))
+print(dim(df))
+print(fivenum(df$len))
+print(mean(df$len))
+print(sd(df$len))
+
+#find NAs - no NAs
+num.NA.obs <- length(df[complete.cases(df) == FALSE,]$len)
+
+#aggregate to see differences
+aggegate.mean.df <- aggregate(.~supp+dose,df, mean)
+aggegate.sd.df <- aggregate(.~supp+dose,df, sd)
+
+#create a plot of different values
+df$dose <- as.factor(df$dose)
+a <- ggplot(df, aes(x=dose, y=len)) + geom_boxplot() +
+        facet_grid(.~supp)
+
+plot(a)
+
+#approach - t.test 
+#significane - 0.05, one tailed ho = ha, ha > ho
+#assumption iid, normal distribution, randomnized, not paired
