@@ -47,9 +47,9 @@ legend(20, 3000, legend="Population Mean/SD",
        col="green", lty=1, cex = 0.8)
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![](Stats.Inf.Assg.1.Report_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
-The figure below shows a sample of 1000 exponential distribution means. The theoretical mean 5 (which equals the population mean) and sample mean 5.02 are very close as predicted by Central Limit Theorem.
+The figure below shows a sample of 1000 exponential distribution means. The theoretical mean 5 (which equals the population mean) and sample mean 4.98 are very close as predicted by Central Limit Theorem.
 
 ```r
 hist(expo_mean, xlab = "", main = "1000 Simulated Means of Exponential Distributions", cex.main =1)
@@ -59,7 +59,7 @@ legend(6, 225, legend = c("Population Mean", "Sample Mean Average"),
        col=c("green","red"), lty=c(1,2), cex = 0.8)
 ```
 
-![plot of chunk echo](figure/echo-1.png)
+![](Stats.Inf.Assg.1.Report_files/figure-html/echo-1.png)<!-- -->
 
 ### Sample Variance versus Theoretical Variance
 
@@ -67,7 +67,7 @@ legend(6, 225, legend = c("Population Mean", "Sample Mean Average"),
 theor.variance <- pop.variance/n
 sam.variance <- var(expo_mean)
 ```
-The population variance for an exponential distribution is $1/\lambda^2$.  Therefore, the theoretical variance is calculated using the normal distribution variance formula $Var = \sigma^2/n$ which equals $Var = 1/\lambda^2/n$.  The sample variance 0.609 and theoretical variance 0.625 are very close, which is also predicted by the Central Limit Theorem.
+The population variance for an exponential distribution is $1/\lambda^2$.  Therefore, the theoretical variance is calculated using the normal distribution variance formula $Var = \sigma^2/n$ which equals $Var = 1/\lambda^2/n$.  The sample variance 0.663 and theoretical variance 0.625 are very close, which is also predicted by the Central Limit Theorem.
 
 ### Distribution
 
@@ -82,6 +82,6 @@ yfit <- yfit * diff(h$mids[1:2]) * length(expo_mean)
 lines(xfit, yfit, col = "black", lwd = 2)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+![](Stats.Inf.Assg.1.Report_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 The figure above overlays a normal distribution on top of a historgram of the sampled 1000 exponential distribution means.  The normal distribution has the same mean and and standard deviation as the sampled 1000 exponential distribution means.  The histogram and normal distribution has a similar profile indicating the distribution is normal.

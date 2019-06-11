@@ -23,8 +23,7 @@ This report will explore ToothGrowth Data and whether different delivery methods
 ### Data 
 "The response is the length of odontoblasts (cells responsible for tooth growth) 
 in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) 
-by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).""
-(https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html)
+by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC)."
     
 ### Hypothesis
 
@@ -33,12 +32,6 @@ $H_o: \mu_o = \mu_a$, $H_a: \mu_o \neq \mu_a$
 
 ### Data Exploration
 
-The data is structured in the following way.
-
-```r
-df <- ToothGrowth
-head(df)
-```
 
 ```
 ##    len supp dose
@@ -57,24 +50,6 @@ num.NA.obs <- length(df[complete.cases(df) == FALSE,]$len)
 ```
 No data quality issues were detected.  There are 0 missing or non-number values.
 
-
-```r
-#aggregate to see differences
-ag.mean.df <- aggregate(.~supp+dose, df, mean)
-ag.mean.df <- ag.mean.df %>%
-        rename(mean.length = len)
-ag.mean.df$mean <- round(ag.mean.df$mean, digits = 2)
-
-ag.sd.df <- aggregate(.~supp+dose, df, sd)
-ag.sd.df <- ag.sd.df %>%
-        rename(sd.length = len)
-ag.sd.df$sd <- round(ag.sd.df$sd, digits = 2)
-
-ag.mean.sd <- inner_join(ag.mean.df,ag.sd.df)
-
-ag.mean.sd <- ag.mean.sd[with(ag.mean.sd, order(supp, dose)),]
-print(ag.mean.sd)
-```
 
 ```
 ##   supp dose mean.length  mean sd.length   sd
@@ -96,33 +71,12 @@ a <- ggplot(df, aes(x=dose, y=len)) + geom_boxplot() +
 plot(a)
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+![](Stats.Inf.Assg.2.Report_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ### Data Manipulation
 
 Data is subsetted into groups.
 
-```r
-small.dose.len <- df %>%
-        filter(len, dose == 0.5) 
-med.dose.len <- df %>%
-        filter(len, dose == 1) 
-high.dose.len <- df %>%
-        filter(len, dose == 2) 
-
-OJ.small.len <- small.dose.len %>%
-        filter(len, supp == "OJ")
-VC.small.len <- small.dose.len %>%
-        filter(len, supp == "VC")
-OJ.med.len <- med.dose.len %>%
-        filter(len, supp == "OJ")
-VC.med.len <- med.dose.len %>%
-        filter(len, supp == "VC")
-OJ.high.len <- high.dose.len %>%
-        filter(len, supp == "OJ")
-VC.high.len <- high.dose.len %>%
-        filter(len, supp == "VC")
-```
 
 ### Hypothesis Tests
 
@@ -130,7 +84,8 @@ A two-tailed 95% confidence interval will be used since the hypothesis are as fo
 $H_o: \mu_o = \mu_a$, $H_a: \mu_o \neq \mu_a$  
 Therefore, $\alpha=0.025$  
 
-#### Delivery Method Test
+#### Delivery Method Test  
+
 The delivery methods were compared against each other at different doses.
 
 ```r
@@ -189,8 +144,6 @@ t.test(len ~ supp, data = rbind(OJ.high.len, VC.high.len))
 ## mean in group OJ mean in group VC 
 ##            26.06            26.14
 ```
- * At 1 mg/day or lower, the p-value was considered significant and the confidence interval did not include zero.  
- * 2 mg/day we failed to reject the null hypothese as p-value was too large and the confidence interval include 0.    
  * The null hypothesis that delivery method is statistically irrelevant can be rejected at 1 mg/day and lower, but cannot be rejected at 2 mg/day.   
 
 #### Dose Level Test
@@ -309,21 +262,20 @@ t.test(len ~ dose, data = rbind(VC.small.len, VC.high.len))
 ## mean in group 0.5   mean in group 2 
 ##              7.98             26.14
 ```
- * In all tests, the results were considered all relevant as p-values were less than $\alpha$, except for medium and high doses of Orange Juice.
- * The difference between 1 mg/day and 2 mg/day doses of Orange Juice has zero in the confidence interval so we cannot reject the null hypothesis in this case
- * In all other cases we can reject the null hypothesis that dose is statistically unassociated with differences in tooth growth.
+ * In all tests, the results were considered all significant as p-values were less than $\alpha$, except for 1 mg/day vs 2 mg/day doses of Orange Juice.
+
 
 ### Conclusion
 
-The following assumptions were made about the data:  
+Assmptions:  
 
  * Observations are iid variables - independent and identical distributions
  * Data is not paired
  * Data groups variance are not the same
 
-The following conclusions can be drawn from the hypothesis testing:  
+Conclusions:  
 
- * Choice of delivery method is statistically relevant up to 1 mg/day.  There is a statistical association between teeth growth difference and delivery method of vitamin C at these doses.
- * Choice of delivery method is irrelevant for teeth growth difference at 2 mg/day.  There is no statistical association between teeth growth difference and delivery method of vitamin C at 2 mg/day.
- * Amount of dose is statistically relevant for teeth growth regardless of delivery method in most cases.  There is a statistical association between teeth growth difference and doses.
- * There is no statistical association in teeth growth association and 1 mg/day and 2 mg/day doses of Orange Juice.
+ * Choice of delivery method is statistically significant up to 1 mg/day.  There is a statistical association between teeth growth difference and delivery method of vitamin C at these doses.
+ * Choice of delivery method is statistically insignificant for teeth growth difference at 2 mg/day.  There is no statistical association between teeth growth difference and delivery method of vitamin C at 2 mg/day.
+ * Amount of dose is statistically significant for teeth growth regardless of delivery method in most cases.  There is a statistical association between teeth growth difference and doses.
+ * There is no statistical association in teeth growth differnece between 1 mg/day vs 2 mg/day doses of Orange Juice.
