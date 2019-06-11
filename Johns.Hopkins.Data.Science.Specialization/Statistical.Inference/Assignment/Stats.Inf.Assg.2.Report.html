@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Library</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h3>Library</h3>
+
+<pre><code class="r">library(dplyr)
+library(ggplot2)
+</code></pre>
+
+<h3>Overview</h3>
+
+<p>This report will explore ToothGrowth Data and whether different delivery methods and doses are statistically related to differences in tooth growth rate.  Confidence Intervals and Hypothesis tests will be used to see if there is significance difference.</p>
+
+<h3>Data</h3>
+
+<p>&quot;The response is the length of odontoblasts (cells responsible for tooth growth) 
+in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) 
+by one of two delivery methods, orange juice or ascorbic acid (a form of vitamin C and coded as VC).&quot;&quot;
+(<a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html">https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/ToothGrowth.html</a>)</p>
+
+<h3>Hypothesis</h3>
+
+<p>Null hypothesis: The average tooth growth is no different regardless of dose or delivery method used.<br>
+\(H_o: \mu_o = \mu_a\), \(H_a: \mu_o \neq \mu_a\) </p>
+
+<h3>Data Exploration</h3>
+
+<p>The data is structured in the following way.</p>
+
+<pre><code class="r">df &lt;- ToothGrowth
+head(df)
+</code></pre>
+
+<pre><code>##    len supp dose
+## 1  4.2   VC  0.5
+## 2 11.5   VC  0.5
+## 3  7.3   VC  0.5
+## 4  5.8   VC  0.5
+## 5  6.4   VC  0.5
+## 6 10.0   VC  0.5
+</code></pre>
+
+<pre><code class="r">num.NA.obs &lt;- length(df[complete.cases(df) == FALSE,]$len)
+</code></pre>
+
+<p>No data quality issues were detected.  There are 0 missing or non-number values.</p>
+
+<pre><code class="r">#aggregate to see differences
+ag.mean.df &lt;- aggregate(.~supp+dose, df, mean)
+ag.mean.df &lt;- ag.mean.df %&gt;%
+        rename(mean.length = len)
+ag.mean.df$mean &lt;- round(ag.mean.df$mean, digits = 2)
+
+ag.sd.df &lt;- aggregate(.~supp+dose, df, sd)
+ag.sd.df &lt;- ag.sd.df %&gt;%
+        rename(sd.length = len)
+ag.sd.df$sd &lt;- round(ag.sd.df$sd, digits = 2)
+
+ag.mean.sd &lt;- inner_join(ag.mean.df,ag.sd.df)
+
+ag.mean.sd &lt;- ag.mean.sd[with(ag.mean.sd, order(supp, dose)),]
+print(ag.mean.sd)
+</code></pre>
+
+<pre><code>##   supp dose mean.length  mean sd.length   sd
+## 1   OJ  0.5       13.23 13.23  4.459709 4.46
+## 3   OJ  1.0       22.70 22.70  3.910953 3.91
+## 5   OJ  2.0       26.06 26.06  2.655058 2.66
+## 2   VC  0.5        7.98  7.98  2.746634 2.75
+## 4   VC  1.0       16.77 16.77  2.515309 2.52
+## 6   VC  2.0       26.14 26.14  4.797731 4.80
+</code></pre>
+
+<p>The variance of the different doses and delivery methods are not consistent as the table shows below.  This will affect our confidence interval and p-value calculation method - the Two Sample Welch t-test will be used.  </p>
+
+<p>This is further confirmed by graphing the distribution of values.</p>
+
+<pre><code class="r">df$dose &lt;- as.factor(df$dose)
+a &lt;- ggplot(df, aes(x=dose, y=len)) + geom_boxplot() +
+        facet_grid(.~supp)
+plot(a)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"></p>
+
+<h3>Data Manipulation</h3>
+
+<p>Data is subsetted into groups.</p>
+
+<pre><code class="r">small.dose.len &lt;- df %&gt;%
+        filter(len, dose == 0.5) 
+med.dose.len &lt;- df %&gt;%
+        filter(len, dose == 1) 
+high.dose.len &lt;- df %&gt;%
+        filter(len, dose == 2) 
+
+OJ.small.len &lt;- small.dose.len %&gt;%
+        filter(len, supp == &quot;OJ&quot;)
+VC.small.len &lt;- small.dose.len %&gt;%
+        filter(len, supp == &quot;VC&quot;)
+OJ.med.len &lt;- med.dose.len %&gt;%
+        filter(len, supp == &quot;OJ&quot;)
+VC.med.len &lt;- med.dose.len %&gt;%
+        filter(len, supp == &quot;VC&quot;)
+OJ.high.len &lt;- high.dose.len %&gt;%
+        filter(len, supp == &quot;OJ&quot;)
+VC.high.len &lt;- high.dose.len %&gt;%
+        filter(len, supp == &quot;VC&quot;)
+</code></pre>
+
+<h3>Hypothesis Tests</h3>
+
+<p>A two-tailed 95% confidence interval will be used since the hypothesis are as follows<br>
+\(H_o: \mu_o = \mu_a\), \(H_a: \mu_o \neq \mu_a\)<br>
+Therefore, \(\alpha=0.025\)  </p>
+
+<h4>Delivery Method Test</h4>
+
+<p>The delivery methods were compared against each other at different doses.</p>
+
+<pre><code class="r">#OJ 0.5 vs VC 0.5
+t.test(len ~ supp, data = rbind(OJ.small.len, VC.small.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by supp
+## t = 3.1697, df = 14.969, p-value = 0.006359
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  1.719057 8.780943
+## sample estimates:
+## mean in group OJ mean in group VC 
+##            13.23             7.98
+</code></pre>
+
+<pre><code class="r">#OJ 1 vs VC 1
+t.test(len ~ supp, data = rbind(OJ.med.len, VC.med.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by supp
+## t = 4.0328, df = 15.358, p-value = 0.001038
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  2.802148 9.057852
+## sample estimates:
+## mean in group OJ mean in group VC 
+##            22.70            16.77
+</code></pre>
+
+<pre><code class="r">#OJ 2 vs VC 2
+t.test(len ~ supp, data = rbind(OJ.high.len, VC.high.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by supp
+## t = -0.046136, df = 14.04, p-value = 0.9639
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -3.79807  3.63807
+## sample estimates:
+## mean in group OJ mean in group VC 
+##            26.06            26.14
+</code></pre>
+
+<ul>
+<li>At 1 mg/day or lower, the p-value was considered significant and the confidence interval did not include zero.<br></li>
+<li>2 mg/day we failed to reject the null hypothese as p-value was too large and the confidence interval include 0.<br></li>
+<li>The null hypothesis that delivery method is statistically irrelevant can be rejected at 1 mg/day and lower, but cannot be rejected at 2 mg/day.<br></li>
+</ul>
+
+<h4>Dose Level Test</h4>
+
+<p>The dose were compared against each other using the same delivery methods.</p>
+
+<pre><code class="r">#OJ 0.5 vs OJ 0.1
+t.test(len ~ dose, data = rbind(OJ.small.len, OJ.med.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by dose
+## t = -5.0486, df = 17.698, p-value = 8.785e-05
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -13.415634  -5.524366
+## sample estimates:
+## mean in group 0.5   mean in group 1 
+##             13.23             22.70
+</code></pre>
+
+<pre><code class="r">#OJ 1 vs OJ 2
+t.test(len ~ dose, data = rbind(OJ.med.len, OJ.high.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by dose
+## t = -2.2478, df = 15.842, p-value = 0.0392
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -6.5314425 -0.1885575
+## sample estimates:
+## mean in group 1 mean in group 2 
+##           22.70           26.06
+</code></pre>
+
+<pre><code class="r">#OJ 0.5 vs OJ 2
+t.test(len ~ dose, data = rbind(OJ.small.len, OJ.high.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by dose
+## t = -7.817, df = 14.668, p-value = 1.324e-06
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -16.335241  -9.324759
+## sample estimates:
+## mean in group 0.5   mean in group 2 
+##             13.23             26.06
+</code></pre>
+
+<pre><code class="r">#VC 0.5 vs VC 0.1
+t.test(len ~ dose, data = rbind(VC.small.len, VC.med.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by dose
+## t = -7.4634, df = 17.862, p-value = 6.811e-07
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -11.265712  -6.314288
+## sample estimates:
+## mean in group 0.5   mean in group 1 
+##              7.98             16.77
+</code></pre>
+
+<pre><code class="r">#VC 1 vs VC 2
+t.test(len ~ dose, data = rbind(VC.med.len, VC.high.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by dose
+## t = -5.4698, df = 13.6, p-value = 9.156e-05
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -13.054267  -5.685733
+## sample estimates:
+## mean in group 1 mean in group 2 
+##           16.77           26.14
+</code></pre>
+
+<pre><code class="r">#VC 0.5 vs VC 2
+t.test(len ~ dose, data = rbind(VC.small.len, VC.high.len))
+</code></pre>
+
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  len by dose
+## t = -10.388, df = 14.327, p-value = 4.682e-08
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -21.90151 -14.41849
+## sample estimates:
+## mean in group 0.5   mean in group 2 
+##              7.98             26.14
+</code></pre>
+
+<ul>
+<li>In all tests, the results were considered all relevant as p-values were less than \(\alpha\), except for medium and high doses of Orange Juice.</li>
+<li>The difference between 1 mg/day and 2 mg/day doses of Orange Juice has zero in the confidence interval so we cannot reject the null hypothesis in this case</li>
+<li>In all other cases we can reject the null hypothesis that dose is statistically unassociated with differences in tooth growth.</li>
+</ul>
+
+<h3>Conclusion</h3>
+
+<p>The following assumptions were made about the data:  </p>
+
+<ul>
+<li>Observations are iid variables - independent and identical distributions</li>
+<li>Data is not paired</li>
+<li>Data groups variance are not the same</li>
+</ul>
+
+<p>The following conclusions can be drawn from the hypothesis testing:  </p>
+
+<ul>
+<li>Choice of delivery method is statistically relevant up to 1 mg/day.  There is a statistical association between teeth growth difference and delivery method of vitamin C at these doses.</li>
+<li>Choice of delivery method is irrelevant for teeth growth difference at 2 mg/day.  There is no statistical association between teeth growth difference and delivery method of vitamin C at 2 mg/day.</li>
+<li>Amount of dose is statistically relevant for teeth growth regardless of delivery method in most cases.  There is a statistical association between teeth growth difference and doses.</li>
+<li>There is no statistical association in teeth growth association and 1 mg/day and 2 mg/day doses of Orange Juice.</li>
+</ul>
+
+</body>
+
+</html>

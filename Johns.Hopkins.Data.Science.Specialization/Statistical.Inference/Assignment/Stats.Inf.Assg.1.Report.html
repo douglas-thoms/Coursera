@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Overview</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h3>Overview</h3>
+
+<p>This report will explore the Central Thereom Limit, simulating 1000 exponential distribution of 40 observations.  The sample mean and variance will be compared to the theoretical mean and variance as stated by Central Limit Theorem.</p>
+
+<h3>Simulations</h3>
+
+<p>Exponential parameters mean, standard deviation and variance were calculated in the code below.</p>
+
+<pre><code class="r">lambda = 0.2
+n &lt;- 40
+pop.mean &lt;- 1/lambda
+pop.sd &lt;- 1/lambda
+pop.variance &lt;- 1/lambda^2
+</code></pre>
+
+<p>The exponential distribution was simulated using the R function rexp(n, lambda). The rate parameter (\(\lambda\)) is 0.2 for all of the simulations.    </p>
+
+<p>The code below simulates a 1000 exponential distributions and illustrates the distribution of a 1000 simulated exponential distributions means.</p>
+
+<pre><code class="r">expo &lt;- NULL
+for (i in 1 : 1000) expo = c(expo, rexp(40, 0.2))
+expo_mean &lt;- NULL
+for (i in 1 : 1000) expo_mean = c(expo_mean, mean(rexp(40, 0.2)))
+</code></pre>
+
+<h3>Sample Mean versus Theoretical Mean</h3>
+
+<p>The figure below shows the exponential simulations and the population mean/standard deviation 5. The population mean and standard deviation are both defined as \(1/\lambda\).</p>
+
+<pre><code class="r">hist(expo, xlab = &quot;&quot;, breaks = 50, main = &quot;1000 Simulated Exponential Distributions&quot;, cex.main = 1)
+abline(v =5, col = &quot;green&quot;, lwd = 3)
+legend(20, 3000, legend=&quot;Population Mean/SD&quot;,
+       col=&quot;green&quot;, lty=1, cex = 0.8)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"></p>
+
+<p>The figure below shows a sample of 1000 exponential distribution means. The theoretical mean 5 (which equals the population mean) and sample mean 5.02 are very close as predicted by Central Limit Theorem.</p>
+
+<pre><code class="r">hist(expo_mean, xlab = &quot;&quot;, main = &quot;1000 Simulated Means of Exponential Distributions&quot;, cex.main =1)
+abline(v = 5, col = &quot;green&quot;, lwd = 3)
+abline(v = mean(expo_mean), col = &quot;red&quot;, lwd = 3, lty =2)
+legend(6, 225, legend = c(&quot;Population Mean&quot;, &quot;Sample Mean Average&quot;),
+       col=c(&quot;green&quot;,&quot;red&quot;), lty=c(1,2), cex = 0.8)
+</code></pre>
+
+<p><img src="figure/echo-1.png" alt="plot of chunk echo"></p>
+
+<h3>Sample Variance versus Theoretical Variance</h3>
+
+<pre><code class="r">theor.variance &lt;- pop.variance/n
+sam.variance &lt;- var(expo_mean)
+</code></pre>
+
+<p>The population variance for an exponential distribution is \(1/\lambda^2\).  Therefore, the theoretical variance is calculated using the normal distribution variance formula \(Var = \sigma^2/n\) which equals \(Var = 1/\lambda^2/n\).  The sample variance 0.609 and theoretical variance 0.625 are very close, which is also predicted by the Central Limit Theorem.</p>
+
+<h3>Distribution</h3>
+
+<pre><code class="r">h &lt;- hist(expo_mean, breaks = 10, density = 20,
+          col = &quot;lightgray&quot;, ylim = c(0,350), xlab = &quot;&quot;,
+          main = &quot;1000 Simulated Exponential Distributions Means \n vs Normal Distribution&quot;, cex.main = 1) 
+xfit &lt;- seq(min(expo_mean), max(expo_mean), length = 40) 
+yfit &lt;- dnorm(xfit, mean = mean(expo_mean), sd = sd(expo_mean)) 
+yfit &lt;- yfit * diff(h$mids[1:2]) * length(expo_mean) 
+lines(xfit, yfit, col = &quot;black&quot;, lwd = 2)
+</code></pre>
+
+<p><img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"></p>
+
+<p>The figure above overlays a normal distribution on top of a historgram of the sampled 1000 exponential distribution means.  The normal distribution has the same mean and and standard deviation as the sampled 1000 exponential distribution means.  The histogram and normal distribution has a similar profile indicating the distribution is normal.</p>
+
+</body>
+
+</html>

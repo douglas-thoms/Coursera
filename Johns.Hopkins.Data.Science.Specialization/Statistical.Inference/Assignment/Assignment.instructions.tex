@@ -1,0 +1,175 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Assignment instructions},
+            pdfauthor={Douglas Thoms},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Assignment instructions}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Douglas Thoms}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{June 8, 2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{Instructions}\label{instructions}
+
+Part 1: Simulation Exercise Instructionsless In this project you will
+investigate the exponential distribution in R and compare it with the
+Central Limit Theorem. The exponential distribution can be simulated in
+R with rexp(n, lambda) where lambda is the rate parameter. The mean of
+exponential distribution is 1/lambda and the standard deviation is also
+1/lambda. Set lambda = 0.2 for all of the simulations. You will
+investigate the distribution of averages of 40 exponentials. Note that
+you will need to do a thousand simulations.
+
+Illustrate via simulation and associated explanatory text the properties
+of the distribution of the mean of 40 exponentials. You should
+
+Show the sample mean and compare it to the theoretical mean of the
+distribution. Show how variable the sample is (via variance) and compare
+it to the theoretical variance of the distribution. Show that the
+distribution is approximately normal. In point 3, focus on the
+difference between the distribution of a large collection of random
+exponentials and the distribution of a large collection of averages of
+40 exponentials.
+
+As a motivating example, compare the distribution of 1000 random
+uniforms
+
+ and the distribution of 1000 averages of 40 random uniforms
+
+ This distribution looks far more Gaussian than the original uniform
+distribution!
+
+This exercise is asking you to use your knowledge of the theory given in
+class to relate the two distributions.
+
+Confused? Try re-watching video lecture 07 for a starter on how to
+complete this project.
+
+Sample Project Report Structure
+
+Of course, there are multiple ways one could structure a report to
+address the requirements above. However, the more clearly you pose and
+answer each question, the easier it will be for reviewers to clearly
+identify and evaluate your work.
+
+A sample set of headings that could be used to guide the creation of
+your report might be:
+
+Title (give an appropriate title) and Author Name Overview: In a few
+(2-3) sentences explain what is going to be reported on. Simulations:
+Include English explanations of the simulations you ran, with the
+accompanying R code. Your explanations should make clear what the R code
+accomplishes. Sample Mean versus Theoretical Mean: Include figures with
+titles. In the figures, highlight the means you are comparing. Include
+text that explains the figures and what is shown on them, and provides
+appropriate numbers. Sample Variance versus Theoretical Variance:
+Include figures (output from R) with titles. Highlight the variances you
+are comparing. Include text that explains your understanding of the
+differences of the variances. Distribution: Via figures and text,
+explain how one can tell the distribution is approximately normal. Part
+2: Basic Inferential Data Analysis Instructionsless Now in the second
+portion of the project, we're going to analyze the ToothGrowth data in
+the R datasets package.
+
+Load the ToothGrowth data and perform some basic exploratory data
+analyses Provide a basic summary of the data. Use confidence intervals
+and/or hypothesis tests to compare tooth growth by supp and dose. (Only
+use the techniques from class, even if there's other approaches worth
+considering) State your conclusions and the assumptions needed for your
+conclusions.
+
+\subsection{Summary}\label{summary}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  First set up simulation The exponential distribution can be simulated
+  in R with rexp(n, lambda) where lambda is the rate parameter. The mean
+  of exponential distribution is 1/lambda and the standard deviation is
+  also 1/lambda. Set lambda = 0.2 for all of the simulations. You will
+  investigate the distribution of averages of 40 exponentials. Note that
+  you will need to do a thousand simulations.
+\end{enumerate}
+
+
+\end{document}

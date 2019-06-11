@@ -32,11 +32,6 @@ library(dplyr)
 lambda = 0.2
 n <- 40
 
-hist(rexp(1000))
-abline(v =5, col = "green", lwd = 3)
-legend(2, 300, legend="Population Mean/SD",
-       col="green", lty=1)
-
 #calculate population parameters
 pop.mean <- 1/lambda
 pop.sd <- 1/lambda
@@ -52,15 +47,20 @@ print(pop.mean)
 
 #The theoretical mean should be 5
 #Calculating the average of means in 1000 simulations
-
+expo <- NULL
+for (i in 1 : 1000) expo = c(expo, rexp(40, 0.2))
+hist(expo, main = "1000 Simulated Exponential Distributions", xlab = "", breaks = 50)
+abline(v =5, col = "green", lwd = 3)
+legend(20, 3000, legend="Population Mean/SD",
+       col="green", lty=1, cex = 0.8)
 
 expo_mean <- NULL
 for (i in 1 : 1000) expo_mean = c(expo_mean, mean(rexp(40, 0.2)))
-hist(expo_mean)
+hist(expo_mean, main = "1000 Simulated Means of Exponential Distributions", xlab = "")
 abline(v = 5, col = "green", lwd = 3)
 abline(v = mean(expo_mean), col = "red", lwd = 3, lty =2)
-legend(6, 250, legend = c("Population Mean", "Sample Mean Average"),
-       col=c("green","red"), lty=c(1,2))
+legend(6, 225, legend = c("Population Mean", "Sample Mean Average"),
+       col=c("green","red"), lty=c(1,2), cex = 0.8)
 
 print(mean(expo_mean))
 
@@ -86,11 +86,12 @@ print(sam.variance)
 #plot a normal distribution in R
 
 h <- hist(expo_mean, breaks = 10, density = 20,
-          col = "lightgray", xlab = "Accuracy", main = "Overall") 
+          col = "lightgray", ylim = c(0,350),
+          main = "1000 Simulated Exponential Distributions Means \n vs Normal Distribution", 
+          xlab = "") 
 xfit <- seq(min(expo_mean), max(expo_mean), length = 40) 
 yfit <- dnorm(xfit, mean = mean(expo_mean), sd = sd(expo_mean)) 
 yfit <- yfit * diff(h$mids[1:2]) * length(expo_mean) 
-
 lines(xfit, yfit, col = "black", lwd = 2)
 
 ##----------------------------------------------------------------------------
@@ -126,12 +127,12 @@ num.NA.obs <- length(df[complete.cases(df) == FALSE,]$len)
 #aggregate to see differences
 ag.mean.df <- aggregate(.~supp+dose, df, mean)
 ag.mean.df <- ag.mean.df %>%
-        rename(mean = len)
+        rename(mean.length = len)
 ag.mean.df$mean <- round(ag.mean.df$mean, digits = 2)
 
 ag.sd.df <- aggregate(.~supp+dose, df, sd)
 ag.sd.df <- ag.sd.df %>%
-        rename(sd = len)
+        rename(sd.length = len)
 ag.sd.df$sd <- round(ag.sd.df$sd, digits = 2)
 
 ag.mean.sd <- inner_join(ag.mean.df,ag.sd.df)
@@ -158,11 +159,58 @@ plot(a)
 #Calculate CI to see if ho rejected, is 0 in range
 #Calculate p-value, see if it is above alpha of .975
 
-#try sapply mean
-#first, merge to columns
+#create subsets
+
+
+
+
+small.dose.len <- df %>%
+        filter(len, dose == 0.5) 
+
+med.dose.len <- df %>%
+        filter(len, dose == 1) 
+
+high.dose.len <- df %>%
+        filter(len, dose == 2) 
 
 #subset data into distinct groups so can compare
 #1 oj vs ac
 #2 control does oj vs ac per does
 #3 time intervals .1 vs .5 etc
 
+OJ.small.len <- small.dose.len %>%
+        filter(len, supp == "OJ")
+VC.small.len <- small.dose.len %>%
+        filter(len, supp == "VC")
+OJ.med.len <- med.dose.len %>%
+        filter(len, supp == "OJ")
+VC.med.len <- med.dose.len %>%
+        filter(len, supp == "VC")
+OJ.high.len <- high.dose.len %>%
+        filter(len, supp == "OJ")
+VC.high.len <- high.dose.len %>%
+        filter(len, supp == "VC")
+# OJ vs VC
+print("OJ vs VC")
+print(t.test(len ~ supp, data = df))
+
+# OJ vs VC compared according to doses
+print("OJ vs VC compared according to doses")
+print(t.test(len ~ supp, data = rbind(OJ.small.len, VC.small.len)))
+print(t.test(len ~ supp, data = rbind(OJ.med.len, VC.med.len)))
+print(t.test(len ~ supp, data = rbind(OJ.high.len, VC.high.len)))
+
+# Different dose
+print("Different dose")
+print(t.test(len ~ dose, data = rbind(small.dose.len, med.dose.len)))
+print(t.test(len ~ dose, data = rbind(med.dose.len, high.dose.len)))
+print(t.test(len ~ dose, data = rbind(small.dose.len, high.dose.len)))
+
+# Dose compared according to supp
+print("Dose compared according to supp")
+print(t.test(len ~ dose, data = rbind(OJ.small.len, OJ.med.len)))
+print(t.test(len ~ dose, data = rbind(OJ.med.len, OJ.high.len)))
+print(t.test(len ~ dose, data = rbind(OJ.small.len, OJ.high.len)))
+print(t.test(len ~ dose, data = rbind(VC.small.len, VC.med.len)))
+print(t.test(len ~ dose, data = rbind(VC.med.len, VC.high.len)))
+print(t.test(len ~ dose, data = rbind(VC.small.len, VC.high.len)))
