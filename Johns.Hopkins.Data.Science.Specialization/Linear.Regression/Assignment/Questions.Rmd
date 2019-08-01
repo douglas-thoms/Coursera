@@ -1,0 +1,33 @@
+---
+title: "Questions - Staying late to adjust schedule"
+author: "Douglas Thoms"
+date: "May 13, 2019"
+output: html_document
+---
+
+## Type of question
+
+* Descriptive - Y - does type of transmission impact mpg?
+* Exploratory - Y - how does forecast at 6 compare to others in efficiency - review report, what is trend of prices according to 5pm forecast vs 6pm - goes up or down same number of peaks, any charges
+* Inferential - N - inferring on large scale likelihood of transmission controling mpg
+* Predictive - Y - can transmission predict mpg?  What other variables do as well?
+* Causal - N
+* Mechanistic - N - not trying to explain how it works
+
+## Question
+* “Is an automatic or manual transmission better for MPG”
+* "Quantify the MPG difference between automatic and manual transmissions"
+
+## Prelim research 
+* Has this question already been asked?
+
+## Question Quality Check
+1. Of interest to the client - Y
+2. Has it already been answered - NA
+3. Plausible, realistic study - Y
+4. Question is answerable - Y
+5. Is it specific - Y
+
+##Data available
+
+*mpg cars

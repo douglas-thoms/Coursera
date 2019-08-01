@@ -24,8 +24,6 @@
 #“Is an automatic or manual transmission better for MPG”
 #"Quantify the MPG difference between automatic and manual transmissions"
 
-# (1) What type of question
-
 # Criteria
 # 
 #         Did the student interpret the coefficients correctly?
@@ -76,6 +74,11 @@ raw_data <- mtcars
 
 print(summary(raw_data))
 View(raw_data)
+print(dim(raw_data))
+
+#any unusual values, NA
+
+print(length(complete.cases(raw_data)))
 
 #Classify variables properly
 #mpg is continuous num
@@ -96,12 +99,24 @@ proc_data <- raw_data %>%
         mutate(am = as.factor(am)) %>%
         mutate(gear = as.factor(gear)) %>%
         mutate(carb = as.factor(carb))
+
+cont_proc_data <- raw_data %>%
+        select(mpg,disp,hp,drat,wt,qsec)
         
+
 
 ##----------------------------------------------------------------------------
 ## Exploratory Analysis
 ##----------------------------------------------------------------------------
-#(2)
+
+#fivenum on continuous
+sapply(cont_proc_data,fivenum)
+#variance
+sapply(cont_proc_data,sd)
+
+#boxplot on continuous
+
+#bar plot on factors
 
 ##----------------------------------------------------------------------------
 ## Linear Regression Analysis
