@@ -122,3 +122,5 @@ sapply(cont_proc_data,sd)
 ## Linear Regression Analysis
 ##----------------------------------------------------------------------------
 # (3)
+
+#review Heteroscedasticity
