@@ -123,4 +123,5 @@ sapply(cont_proc_data,sd)
 ##----------------------------------------------------------------------------
 # (3)
 
-#review Heteroscedasticity
+#review Heteroscedasticity of residuals
+#review normaility of residuals
