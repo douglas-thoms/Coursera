@@ -121,7 +121,30 @@ sapply(cont_proc_data,sd)
 ##----------------------------------------------------------------------------
 ## Linear Regression Analysis
 ##----------------------------------------------------------------------------
-# (3)
 
+#initial lm shows significant increase in mpg which is expected, how much others involved
+fit.am <- lm(mpg ~ am, mtcars)
+#when bring in all variables, wt seems only significant, makes sense
+fit.all <- lm (mpg ~ ., mtcars)
+#try only weight and am
+fit.wt.am <- lm(mpg ~am + wt, mtcars)
+#wt,am,qsec,hp
+fit.am.wt.qsec <- lm(mpg ~am + wt + qsec, mtcars)
+#wt,hp,am,disp
+fit.am.wt.qsec.hp <- lm(mpg ~am + wt + qsec + hp, mtcars)
+
+anova.check <- anova(fit.am,fit.wt.am,fit.am.wt.qsec,fit.am.wt.qsec.hp)
+
+#influence.measures
+#dfbetas
+#dffits
+
+#plot fit
+#check leverage
+
+#first review impact of factors
+#anova analysis
+
+#vif
 #review Heteroscedasticity of residuals
 #review normaility of residuals
