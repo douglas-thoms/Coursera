@@ -65,6 +65,7 @@
 ##----------------------------------------------------------------------------
 
 library(dplyr)
+library(car)
 
 ##----------------------------------------------------------------------------
 ## Data Acquiring and Cleaning
@@ -110,41 +111,88 @@ cont_proc_data <- raw_data %>%
 ##----------------------------------------------------------------------------
 
 #fivenum on continuous
-sapply(cont_proc_data,fivenum)
-#variance
-sapply(cont_proc_data,sd)
+fivenum.values <- sapply(cont_proc_data,fivenum)
 
-#boxplot on continuous
+#scatterplot
+pairs(proc_data)
 
-#bar plot on factors
+#boxplot
+boxplot(mpg~am, data=mtcars)
+boxplot(mpg~wt, data=mtcars)
+boxplot(mpg~cyl, data=mtcars)
+boxplot(mpg~hp, data=mtcars)
+
+boxplot(am~wt, data=mtcars)
+boxplot(am~cyl, data=mtcars)
+boxplot(am~hp, data=mtcars)
 
 ##----------------------------------------------------------------------------
 ## Linear Regression Analysis
 ##----------------------------------------------------------------------------
 
-#initial lm shows significant increase in mpg which is expected, how much others involved
-fit.am <- lm(mpg ~ am, mtcars)
-#when bring in all variables, wt seems only significant, makes sense
-fit.all <- lm (mpg ~ ., mtcars)
-#try only weight and am
-fit.wt.am <- lm(mpg ~am + wt, mtcars)
-#wt,am,qsec,hp
-fit.am.wt.qsec <- lm(mpg ~am + wt + qsec, mtcars)
-#wt,hp,am,disp
-fit.am.wt.qsec.hp <- lm(mpg ~am + wt + qsec + hp, mtcars)
+#model strategy
+#exploratory suggests auto transmission increase mpg
 
-anova.check <- anova(fit.am,fit.wt.am,fit.am.wt.qsec,fit.am.wt.qsec.hp)
+#initially did a lm with all variables to see if which look more significant
+#order of significance wt,hp,am,disp, cyl, carb, qsec, vs, gear, carb
+fit.all <- lm (mpg ~ ., proc_data)
+print(summary(fit.all))
+#test cofounding vif - wt, dis and hp has high vig
+vif.fit.all <- sqrt(vif(fit.all))
+print(vif.fit.all)
+
+#initial lm shows significant increase in mpg which is expected
+fit.am <- lm(mpg ~ am, proc_data)
+
+#try a model only wt as most significant
+fit.wt <- lm(mpg ~ wt, proc_data)
+#wt,am,qsec,hp
+fit.wt.cyl <- lm(mpg ~ am + wt + cyl, proc_data)
+fit.wt.hp.am <- lm(mpg ~ wt + hp + am, proc_data)
+                 
+fit.wt.cyl.am <- lm(mpg ~ wt + cyl + am, proc_data)
+#wt,hp,am,disp, cyl, carb, qsec, vs, gear, carb
+fit.am.wt.hp.disp <- lm(mpg ~ am + wt + hp + disp, proc_data)
+fit.am.wt.cyl <- lm(mpg ~ am + wt + cyl, proc_data)
+fit.wt.cyl <- lm(mpg ~ wt + cyl, proc_data)
+fit.wt.hp <- lm(mpg ~ wt + hp, proc_data)
+fit.wt.hp.cyl.drat <- lm(mpg ~ wt + hp + cyl + drat, proc_data)
+fit.am.wt.hp.cyl <- lm(mpg ~ am + wt + hp + cyl, proc_data)
+fit.disp.wt.hp.cyl <- lm(mpg ~ disp + wt + hp + cyl, proc_data)
+
+fit.am.wt.disp.cyl.carb <- lm(mpg ~ am + wt + disp + cyl + carb, proc_data)
+
+#best fit so far
+fit.wt.cyl <- lm(mpg ~ wt + cyl, proc_data)
+vif.wt.cyl <- sqrt(vif(fit.wt.cyl))
+
+#with am
+fit.wt.cyl.hp.am <- lm(mpg ~ wt + cyl + hp + am -1, proc_data)
+vif.wt.cyl.am <- sqrt(vif(fit.wt.cyl.am))
+
+anova.check <- anova(fit.wt,fit.wt.cyl,fit.wt.cyl.am)
+
+
 
 #influence.measures
-#dfbetas
-#dffits
+influence.measures(fit.wt.cyl)
+influence.measures(fit.wt.cyl.am)
+#no leverage issues except for auto transmission because impact is so low
 
 #plot fit
+plot(fit.wt.cyl)
+plot(fit.wt.cyl.am)
 #check leverage
+#no maor leverage issues
+#looks normal
 
-#first review impact of factors
-#anova analysis
+##----------------------------------------------------------------------------
+## Finding
+##----------------------------------------------------------------------------
 
-#vif
-#review Heteroscedasticity of residuals
-#review normaility of residuals
+#“Is an automatic or manual transmission better for MPG”
+#The linear regression model cannot confidently determine a difference between
+#the mpg of manual transmission and automatic cars
+#"Quantify the MPG difference between automatic and manual transmissions"
+#model suggsts an increase of 0.15 mpg which is small (and not confident)
+#vif for fit.wt.hp.am much worse than fit.wt.cyl.am
