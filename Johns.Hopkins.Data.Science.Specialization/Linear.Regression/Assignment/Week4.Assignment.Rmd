@@ -1,0 +1,124 @@
+---
+title: "Linear Regression - Week 4 Assignment"
+author: "Douglas Thoms"
+date: "Aug 4, 2019"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height = 3, fig.width = 2)
+```
+
+#### Executive Summary
+Motor Trends wants to explore the relationship between variables and miles per gallon (MPG)
+answering the specific questions:  
+
+* “Is an automatic or manual transmission better for MPG”
+* "Quantify the MPG difference between automatic and manual transmissions"  
+
+A multiple linear regression was applied.  The resulting final model suggests that
+a statistically significant correlation between transmission type and MPG cannot
+be inferred.  Rather, weight and the number of clyinders have the strongest statistically
+correlation with MPG.  
+
+```{r eval=TRUE, include=FALSE}
+library(dplyr)
+library(car)
+library(olsrr)
+```
+
+### Process
+
+##### Dataset cleaning
+The dataset was taken from 1974 Motor Trend, consists of 11 variables (including 
+MPG) and 32 observations.  The data is a mix of continuous values (such as Gross Horse Power) and 
+factors (like number of cylinders).  No empty or inappropriate data values were found.
+
+```{r eval=TRUE,include=FALSE}
+raw_data <- mtcars
+
+length(complete.cases(raw_data))
+
+proc_data <- raw_data %>%
+        mutate(cyl = as.factor(cyl)) %>%
+        mutate(vs = as.factor(vs)) %>%
+        mutate(am = as.factor(am)) %>%
+        mutate(gear = as.factor(gear)) %>%
+        mutate(carb = as.factor(carb))
+
+cont_proc_data <- raw_data %>%
+        select(mpg,disp,hp,drat,wt,qsec)
+```
+
+##### Exploratory Analysis
+
+A summary of data was taken to determine the range, mean and media of data.
+A scatterplot was used to see if potential correlation between different variables.  It was noted that weight, horsepower, displacement and cylinder all showed
+clear trends with relation to MPG.  Furthermore a boxplot shows that the range of MPG values
+are higher for variable am 1 (automatic transmission).
+
+```{r eval=TRUE, echo = FALSE}
+boxplot(mpg~am, data=mtcars)
+```
+
+##### Multiple Linear Regression Analysis
+
+Model strategy  
+
+* Created linear model with all variables, identified the most significant variables:
+weight, horsepower, transmission type, displacement and number of clyinders  
+* Found high variable inflation factor between weight, horsepower and displacement
+* Experimented with variables and found that the variables weight and number of cylinders
+created the most parsimonious model with the best combination of statistical significance, 
+small residuals, high R2 values and low variable inflation factor.  
+* The combination of horse power and weight also provided a good model.  
+* The type of transmission variable did not show statistical significance when combined with weight,
+number of cylinders or horse power variables suggesting the type of transmission is 
+not statistically correlated to MPG.
+* An anova analysis was consistent with this finding showing type of transmission is
+not statistically significant compared to earlier nested models.
+
+Residual and heterodeskedacity tests for weight + number of clyinders linear regression model 
+
+* Influence measures showed no strong leverage outliers.
+* Various residual plots show no unacceptably large residuals.
+* The heteroskedascity test failed to reject the null hypothesis that the variance is not constant 
+(though the p value was close to the 0.05 value)
+
+Findings 
+
+* Failed to reject the hypothesis that the type of transmission is statistically correlated to MPG.  
+* When the type of transmission is included in the linear regression model, the increase in MPG is very small (less than 1 MPG).  
+* Weight and number of cylinders were statistically significant.  Per increase of 1/2 ton, the MPG drops 3.2 MPG, and relative to cylinder 4, a 6-cylinder engine decreases MPG by 4.2 and a 8-cylinder engine decreases MPG by 6.  
+
+***
+
+#### Appendix  
+
+##### Linear Modelling
+```{r eval=TRUE, echo = FALSE, fig.height = 4, fig.width = 3}
+#create linear regression models
+fit.wt <- lm(mpg ~ wt, proc_data)
+
+fit.wt.cyl <- lm(mpg ~ wt + cyl, proc_data)
+summary(fit.wt.cyl)
+
+fit.wt.cyl.am <- lm(mpg ~ wt + cyl + am, proc_data)
+
+#check variable inflation factor of weight cyl model
+vif.fit.wt.cyl <- sqrt(vif(fit.wt.cyl))
+print(vif.fit.wt.cyl)
+
+#anova check shows fit.wt.cyl.am not significant
+anova.check <- anova(fit.wt,fit.wt.cyl,fit.wt.cyl.am)
+anova.check
+
+#use plot to determine any unusual residuals with too much leverage, lacking normality
+plot(fit.wt.cyl)
+
+#test for heteroskedascity
+ols_test_breusch_pagan(fit.wt.cyl, rhs = TRUE, multiple = TRUE)
+
+```

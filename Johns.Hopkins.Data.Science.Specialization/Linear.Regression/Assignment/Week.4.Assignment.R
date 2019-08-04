@@ -66,6 +66,7 @@
 
 library(dplyr)
 library(car)
+library(olsrr)
 
 ##----------------------------------------------------------------------------
 ## Data Acquiring and Cleaning
@@ -100,11 +101,6 @@ proc_data <- raw_data %>%
         mutate(am = as.factor(am)) %>%
         mutate(gear = as.factor(gear)) %>%
         mutate(carb = as.factor(carb))
-
-cont_proc_data <- raw_data %>%
-        select(mpg,disp,hp,drat,wt,qsec)
-        
-
 
 ##----------------------------------------------------------------------------
 ## Exploratory Analysis
@@ -141,58 +137,64 @@ print(summary(fit.all))
 vif.fit.all <- sqrt(vif(fit.all))
 print(vif.fit.all)
 
-#initial lm shows significant increase in mpg which is expected
+#initial lm shows significant increase in mpg which is expected with automatic
 fit.am <- lm(mpg ~ am, proc_data)
 
-#try a model only wt as most significant
+#try a model only wt as most significant variable
 fit.wt <- lm(mpg ~ wt, proc_data)
-#wt,am,qsec,hp
-fit.wt.cyl <- lm(mpg ~ am + wt + cyl, proc_data)
-fit.wt.hp.am <- lm(mpg ~ wt + hp + am, proc_data)
-                 
+
+#add cyl
+fit.wt.cyl <- lm(mpg ~ wt + cyl, proc_data)
+
+#add hp
+fit.wt.cyl.hp <- lm(mpg ~ wt + cyl + hp, proc_data)
+
+#add disp, no relevant
+
+#too many variables, for parsimonous choose between cyl and hp
+summary(fit.wt.cyl)
+summary(fit.wt.hp)
+
+#vif for fit.wt.hp.am much worse than fit.wt.cyl.am
+vif.fit.wt.cyl <- sqrt(vif(fit.wt.cyl))
+print(vif.fit.wt.cyl)
+vif.fit.wt.hp <- sqrt(vif(fit.wt.hp))
+print(vif.fit.wt.hp)
+
+#cyl has lower residuals and better vif, so ideal model to determine
+#mpg is mpg ~ wt + cyl
+
+#see if am is significant in either model, it is not
 fit.wt.cyl.am <- lm(mpg ~ wt + cyl + am, proc_data)
-#wt,hp,am,disp, cyl, carb, qsec, vs, gear, carb
-fit.am.wt.hp.disp <- lm(mpg ~ am + wt + hp + disp, proc_data)
-fit.am.wt.cyl <- lm(mpg ~ am + wt + cyl, proc_data)
-fit.wt.cyl <- lm(mpg ~ wt + cyl, proc_data)
-fit.wt.hp <- lm(mpg ~ wt + hp, proc_data)
-fit.wt.hp.cyl.drat <- lm(mpg ~ wt + hp + cyl + drat, proc_data)
-fit.am.wt.hp.cyl <- lm(mpg ~ am + wt + hp + cyl, proc_data)
-fit.disp.wt.hp.cyl <- lm(mpg ~ disp + wt + hp + cyl, proc_data)
 
-fit.am.wt.disp.cyl.carb <- lm(mpg ~ am + wt + disp + cyl + carb, proc_data)
-
-#best fit so far
-fit.wt.cyl <- lm(mpg ~ wt + cyl, proc_data)
-vif.wt.cyl <- sqrt(vif(fit.wt.cyl))
-
-#with am
-fit.wt.cyl.hp.am <- lm(mpg ~ wt + cyl + hp + am -1, proc_data)
-vif.wt.cyl.am <- sqrt(vif(fit.wt.cyl.am))
-
+#anova check shows fit.wt.cyl.am not significant
 anova.check <- anova(fit.wt,fit.wt.cyl,fit.wt.cyl.am)
 
+fit.wt.hp.am <- lm(mpg ~ wt + hp + am, proc_data)
+summary(fit.wt.cyl)
+summary(fit.wt.cyl.am)               
 
-
-#influence.measures
+#use influence.measures to determine if any unusual residuals have too much leverage
 influence.measures(fit.wt.cyl)
 influence.measures(fit.wt.cyl.am)
-#no leverage issues except for auto transmission because impact is so low
 
-#plot fit
+#use plot to determine any unusual residuals with too much leverage, lacking normality
 plot(fit.wt.cyl)
 plot(fit.wt.cyl.am)
-#check leverage
-#no maor leverage issues
-#looks normal
 
+#test ofr heteroskedascity
+ols <- ols_test_breusch_pagan(fit.wt.cyl, rhs = TRUE, multiple = TRUE)
+ols.am <- ols_test_breusch_pagan(fit.wt.cyl.am, rhs = TRUE, multiple = TRUE)
+ols.hp <- ols_test_breusch_pagan(fit.wt.hp
+                                 , rhs = TRUE, multiple = TRUE)
 ##----------------------------------------------------------------------------
 ## Finding
 ##----------------------------------------------------------------------------
 
 #“Is an automatic or manual transmission better for MPG”
-#The linear regression model cannot confidently determine a difference between
-#the mpg of manual transmission and automatic cars
+#The linear regression model cannot confidently determine a correlation between
+#type of transmission and mpg as it fails p-value test.
 #"Quantify the MPG difference between automatic and manual transmissions"
-#model suggsts an increase of 0.15 mpg which is small (and not confident)
-#vif for fit.wt.hp.am much worse than fit.wt.cyl.am
+#Model suggsts an increase of 0.15 mpg which is small and not statistically significant
+#My modelling suggest that the weight and cylinders are the strongest variables
+#correlated to miles-per-gallon.
