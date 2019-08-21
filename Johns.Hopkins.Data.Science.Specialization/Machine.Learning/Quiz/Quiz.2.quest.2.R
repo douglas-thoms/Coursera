@@ -1,3 +1,5 @@
+library(ggplot2)
+library(GGally)
 library(Hmisc)
 library(dplyr)
 library(AppliedPredictiveModeling)
@@ -26,3 +28,7 @@ names <- names[-length(names)]
 p2 <- featurePlot(x = training[, names], y = training$CompressiveStrength, plot = "pairs")
 
 plot(p2)
+
+p3 <- ggpairs(concrete)
+
+plot(p3)
