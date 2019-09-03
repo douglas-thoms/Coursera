@@ -26,3 +26,6 @@ result2 <- confusionMatrix(pred2,vowel.test$y)
 
 a <- qplot(pred1,pred2,colour=y,data=vowel.test)
 print(a)
+
+#create dataframe of pred1 = pred 2 = vowel.test$y -> how many compared to all
+#of vowel.test$y
