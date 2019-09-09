@@ -84,13 +84,18 @@
 # If you use the document you create for this class for any purpose please cite them 
 # as they have been very generous in allowing their data to be used for this kind of assignment.
 
-download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
-              destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+if(!file.exists("training.csv")){
+        download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
+                      destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+}
+
 
 training = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 
+if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
               destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+}
 
 testing = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 
