@@ -61,7 +61,7 @@
 ## Library
 ##----------------------------------------------------------------------------
 
-
+library(dplyr)
 
 ##----------------------------------------------------------------------------
 ## Question
@@ -72,6 +72,37 @@
 ##----------------------------------------------------------------------------
 ## Input Data
 ##----------------------------------------------------------------------------
+
+
+# Weight Lifting Exercises Dataset
+# 
+# On-body sensing schema
+# 
+# The approach we propose for the Weight Lifting Exercises dataset is to investigate 
+# "how (well)" an activity was performed by the wearer. The "how (well)" investigation 
+# has only received little attention so far, even though it potentially provides 
+# useful information for a large variety of applications,such as sports training.
+# 
+# In this work (see the paper) we first define quality of execution and investigate 
+# three aspects that pertain to qualitative activity recognition: the problem of 
+# specifying correct execution, the automatic and robust detection of execution mistakes, 
+# and how to provide feedback on the quality of execution to the user. We tried 
+# out an on-body sensing approach (dataset here), but also an "ambient sensing approach" 
+# (by using Microsoft Kinect - dataset still unavailable)
+# 
+# Six young health participants were asked to perform one set of 10 repetitions 
+# of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly 
+# according to the specification (Class A), throwing the elbows to the front (Class B), 
+# lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) 
+# and throwing the hips to the front (Class E).
+# 
+# Class A corresponds to the specified execution of the exercise, while the other 
+# 4 classes correspond to common mistakes. Participants were supervised by an 
+# experienced weight lifter to make sure the execution complied to the manner 
+# they were supposed to simulate. The exercises were performed by six male participants 
+# aged between 20-28 years, with little weight lifting experience. We made sure that 
+# all participants could easily simulate the mistakes in a safe and controlled manner 
+# by using a relatively light dumbbell (1.25kg).
 
 # The training data for this project are available here:
 #         https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
@@ -89,15 +120,53 @@ if(!file.exists("training.csv")){
                       destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 }
 
-
-training = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+#read sources and put in NA in blank
+training = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
+                    na.strings=c("","NA"))
 
 if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
               destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 }
 
-testing = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+#read sources and put in NA in blank
+testing = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
+                   na.strings=c("","NA"))
+
+##----------------------------------------------------------------------------
+# Exploratory analysis
+##----------------------------------------------------------------------------
+
+#Ideally the training and data sets variablility and other qualities be similar
+
+training.dim <- dim(training)
+testing.dim <- dim(testing)
+
+#different set of columns betweeing training and testing
+
+#function to see which columns have all NA
+take.NA = function(x){
+                 if(sum(is.na(x)) == length(x)){
+                        x="TRUE"
+                 } else{
+                        x="non NA values present"
+                 }
+        }
+
+#remove all values that are completely NA
+testing.non.zero.values <- apply(testing, 2, take.NA)
+
+#remove all NA columns
+testing.proc <- testing[,testing.non.zero.values != TRUE]
+
+#create vector to select to remove vectors in training that were removed from testing
+training.remove.vectors <- names(testing)[testing.non.zero.values == TRUE]
+
+#remove columns
+training.proc <- training[, !colnames(training) %in% training.remove.vectors]
+training.proc <- training.proc[training.proc$new_window == "no", ]                          
+
+
 
 ##----------------------------------------------------------------------------
 ## Features
@@ -121,3 +190,10 @@ testing = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Da
 ##----------------------------------------------------------------------------
 ## Evaluations
 ##----------------------------------------------------------------------------
+
+# Aiming for
+#-interpretable
+#-simple
+#-accurate
+
+#cross-validation
