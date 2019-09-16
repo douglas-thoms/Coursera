@@ -62,6 +62,7 @@
 ##----------------------------------------------------------------------------
 
 library(dplyr)
+library(ggplot2)
 
 ##----------------------------------------------------------------------------
 ## Question
@@ -163,8 +164,35 @@ testing.proc <- testing[,testing.non.zero.values != TRUE]
 training.remove.vectors <- names(testing)[testing.non.zero.values == TRUE]
 
 #remove columns
-training.proc <- training[, !colnames(training) %in% training.remove.vectors]
-training.proc <- training.proc[training.proc$new_window == "no", ]                          
+training.proc.raw <- training[, !colnames(training) %in% training.remove.vectors]
+
+#check for NA, empty spaces in observation
+x <- complete.cases(training.proc.raw)[FALSE]
+
+training.proc.num_window <- training.proc.raw[training.proc.raw$new_window == "no", ]                          
+
+#no codebook, need to determine meaning of num_window
+#research paper suggests classe corresponds to repetitions
+#if classes also corresponds to num_window that means num_window equals repetition
+#and new_window equals sliding window
+
+#create table of frequency of classe per num_window
+#using code below to create table and count number of num_window that
+#have only one type of classe e.  All num_window have exclusively one classe
+table.classe.training.proc <- table(training.proc.num_window$num_window, training.proc.num_window$classe)
+table.classe.training.proc <- data.frame(table.classe.training.proc)
+table.classe.training.proc <- table.classe.training.proc[table.classe.training.proc$Freq > 0, ] 
+classe.per.num_window <- count(table.classe.training.proc, Var1)
+#length of vector is 857, same as all observations
+freq.1.classe.num_window <- length(classe.per.num_window[classe.per.num_window$n == 1,]$Var1)
+
+#num_window will be treated as a repetition 
+
+#testing.proc num_window vs new_window
+training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
+
+#Initially, two sets of features will be tested - a) raw observations and
+#b) the average calculations
 
 
 
