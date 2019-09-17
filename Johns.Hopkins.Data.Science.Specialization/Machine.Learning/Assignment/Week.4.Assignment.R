@@ -63,6 +63,7 @@
 
 library(dplyr)
 library(ggplot2)
+library(caret)
 
 ##----------------------------------------------------------------------------
 ## Question
@@ -118,20 +119,20 @@ library(ggplot2)
 
 if(!file.exists("training.csv")){
         download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
-                      destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+                      destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 }
 
 #read sources and put in NA in blank
-training = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
+training = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
                     na.strings=c("","NA"))
 
 if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
-              destfile = "c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+              destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 }
 
 #read sources and put in NA in blank
-testing = read.csv("c:/users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
+testing = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
                    na.strings=c("","NA"))
 
 ##----------------------------------------------------------------------------
@@ -191,29 +192,38 @@ freq.1.classe.num_window <- length(classe.per.num_window[classe.per.num_window$n
 #testing.proc num_window vs new_window
 training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
 
+#plotting predictors week 2 - box plot with overlays
+#density plots
+
+#distribution see if classe is equally distributed
+
 #Initially, two sets of features will be tested - a) raw observations and
 #b) the average calculations
 
+#is mean and standard the same or one much bigger
 
+#histogram to see if normal distribution
 
 ##----------------------------------------------------------------------------
 ## Features
 ##----------------------------------------------------------------------------
 
+#here can be changes to features
+#covariate creation - useful for less
+#PCA
 
 ##----------------------------------------------------------------------------
 ## Algorithms
 ##----------------------------------------------------------------------------
 
+#random forest
+#glm
+glm.num.ob <- train(classe~.,data = training.proc.num_window)
 
 ##----------------------------------------------------------------------------
 ## Parameters
 ##----------------------------------------------------------------------------
 
-
-##----------------------------------------------------------------------------
-## Algorithms
-##----------------------------------------------------------------------------
 
 ##----------------------------------------------------------------------------
 ## Evaluations
@@ -225,3 +235,5 @@ training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
 #-accurate
 
 #cross-validation
+#sensitivity/spceificty see week 1 type of errors
+#ROC curves - week 1 
