@@ -64,6 +64,8 @@
 library(dplyr)
 library(ggplot2)
 library(caret)
+library(parallel)
+library(doParallel)
 
 ##----------------------------------------------------------------------------
 ## Question
@@ -170,7 +172,13 @@ training.proc.raw <- training[, !colnames(training) %in% training.remove.vectors
 #check for NA, empty spaces in observation
 x <- complete.cases(training.proc.raw)[FALSE]
 
+#remove variables with unlikely relation like training window, etc
+training.proc.raw <- select(training.proc.raw, -X, -user_name,-raw_timestamp_part_1,
+          -raw_timestamp_part_2, -cvtd_timestamp)
+
 training.proc.num_window <- training.proc.raw[training.proc.raw$new_window == "no", ]                          
+
+#feature plot
 
 #no codebook, need to determine meaning of num_window
 #research paper suggests classe corresponds to repetitions
@@ -192,16 +200,23 @@ freq.1.classe.num_window <- length(classe.per.num_window[classe.per.num_window$n
 #testing.proc num_window vs new_window
 training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
 
-#plotting predictors week 2 - box plot with overlays
+#plotting predictors week 2 - box plot with overlays - factors
 #density plots
 
-#distribution see if classe is equally distributed
+classe.dist <- aggregate(Freq~Var2, data = table.classe.training.proc, sum)
 
+#distribution see if classe is equally distributed
+plot1.obj <- qplot(Var2, Freq, data = classe.dist, geom = "count", ylim = c(0,6000))
+plot(plot1.obj)
 #Initially, two sets of features will be tested - a) raw observations and
 #b) the average calculations
 
 #is mean and standard the same or one much bigger
+#summarise_each(iris, funs(mean))
 
+ave.mean.test <- select(training.proc.num_window, -num_window, -new_window, -classe)
+
+ave.mean.test <- rbind(summarise_each(ave.mean.test, mean), summarise_each(ave.mean.test, sd))
 #histogram to see if normal distribution
 
 ##----------------------------------------------------------------------------
@@ -216,9 +231,24 @@ training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
 ## Algorithms
 ##----------------------------------------------------------------------------
 
-#random forest
-#glm
-glm.num.ob <- train(classe~.,data = training.proc.num_window)
+
+cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "cv",
+                           number = 5,
+                           allowParallel = TRUE)
+
+fit <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)], 
+             trControl = fitControl)
+
+stopCluster(cluster)
+registerDoSEQ()
+
+
+fit
+fit$resample
+confusionMatrix.train(fit)
 
 ##----------------------------------------------------------------------------
 ## Parameters
