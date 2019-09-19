@@ -223,32 +223,37 @@ ave.mean.test <- rbind(summarise_each(ave.mean.test, mean), summarise_each(ave.m
 ## Features
 ##----------------------------------------------------------------------------
 
+set.seed(3553)
+
 #here can be changes to features
 #covariate creation - useful for less
 #PCA
 
 ##----------------------------------------------------------------------------
-## Algorithms
+## Algorithms and Evaluation
 ##----------------------------------------------------------------------------
 
+#test three different types
 
-cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
-registerDoParallel(cluster)
+#random forest algorithm
+# cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
+# registerDoParallel(cluster)
+# 
+# fitControl.rf <- trainControl(method = "cv",
+#                            number = 5,
+#                            allowParallel = TRUE)
+# 
+# fit.rf.obj <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)],
+#              trControl = fitControl.rf)
+# 
+# stopCluster(cluster)
+# registerDoSEQ()
 
-fitControl <- trainControl(method = "cv",
-                           number = 5,
-                           allowParallel = TRUE)
-
-fit <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)], 
-             trControl = fitControl)
-
-stopCluster(cluster)
-registerDoSEQ()
 
 
-fit
-fit$resample
-confusionMatrix.train(fit)
+fit.rf.resample <- fit.rf.obj$resample
+fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
+
 
 ##----------------------------------------------------------------------------
 ## Parameters
@@ -256,14 +261,18 @@ confusionMatrix.train(fit)
 
 
 ##----------------------------------------------------------------------------
-## Evaluations
+## Evaluate
 ##----------------------------------------------------------------------------
+
 
 # Aiming for
 #-interpretable
 #-simple
 #-accurate
-
+        
 #cross-validation
 #sensitivity/spceificty see week 1 type of errors
 #ROC curves - week 1 
+        
+plot(fit.rf.obj, main = "Accuracy by Predictor Count")
+varImpPlot(fit.rf.obj$finalModel, main = "Variable Importance Plot: Random Forest")
