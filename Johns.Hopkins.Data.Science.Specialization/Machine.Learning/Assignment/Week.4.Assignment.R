@@ -122,20 +122,20 @@ library(earth)
 
 if(!file.exists("training.csv")){
         download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
-                      destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+                      destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 }
 
 #read sources and put in NA in blank
-training = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
+training = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
                     na.strings=c("","NA"))
 
 if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
-              destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+              destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 }
 
 #read sources and put in NA in blank
-testing = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
+testing = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
                    na.strings=c("","NA"))
 
 ##----------------------------------------------------------------------------
@@ -207,8 +207,11 @@ training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
 classe.dist <- aggregate(Freq~Var2, data = table.classe.training.proc, sum)
 
 #distribution see if classe is equally distributed
-plot1.obj <- qplot(Var2, Freq, data = classe.dist, geom = "count", ylim = c(0,6000))
+plot1.obj <- ggplot(data = classe.dist, aes(x = Var2, y = Freq, fill = Var2)) +
+        geom_bar(stat = "identity")
 plot(plot1.obj)
+#plot1.obj <- qplot(Var2, Freq, data = classe.dist, geom = "count", ylim = c(0,6000))
+#plot(plot1.obj)
 #Initially, two sets of features will be tested - a) raw observations and
 #b) the average calculations
 
@@ -261,14 +264,14 @@ registerDoSEQ()
 
 
 
-fit.rf.resample <- fit.rf.obj$resample
-fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
+#fit.rf.resample <- fit.rf.obj$resample
+#fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
 
 fit.gbm.resample <- fit.gbm.obj$resample
 fit.gbm.conf <- confusionMatrix.train(fit.gbm.obj)
 
-fit.lda.resample <- fit.lda.obj$resample
-fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
+#fit.lda.resample <- fit.lda.obj$resample
+#fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
 
 #fit.bag.resample <- fit.bag.obj$resample
 #fit.bag.conf <- confusionMatrix.train(fit.bag.obj)
@@ -297,9 +300,9 @@ fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
 #plot(fit.rf.obj, main = "Accuracy by Predictor Count")
 #plot(fit.rf.obj$finalModel, main = "Variable Importance Plot: Random Forest")
 
-par(mfrow = c(1,2))
-plot(fit.gbm.obj, main = "Accuracy by Predictor Count")
-plot(fit.gbm.obj$finalModel, main = "Variable Importance Plot: Gradient Boosting Machines")
+#par(mfrow = c(1,2))
+#plot(fit.gbm.obj, main = "Accuracy by Predictor Count")
+#plot(fit.gbm.obj$finalModel, main = "Variable Importance Plot: Gradient Boosting Machines")
 
 #par(mfrow = c(1, 2))
 #plot(fit.lda.obj, main = "Accuracy by Predictor Count")

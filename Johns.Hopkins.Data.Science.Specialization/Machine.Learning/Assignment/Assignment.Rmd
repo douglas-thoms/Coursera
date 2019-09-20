@@ -1,0 +1,96 @@
+---
+title: "Assignment-Machine.Learning"
+author: "Douglas Thoms"
+date: "September 19, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project Parameters
+
+<2000 words
+=< 5 figures
+-out of error rate
+-accuracy compared
+in htlm
+
+how you built your model
+how you used cross validation
+what you think the expected out of sample error is
+and why you made the choices you did
+
+
+
+
+### Sections
+
+## Prediction objective
+
+-This group studied the quality of exercise, would they be able to classify the
+quality of exercise and errors using physical sensors of movement
+
+-The paramaters of this classification exercise are that any variables in training can
+be used to correctly classify the classe variable
+
+-The classe variable represents the type of error with "A" representing a correct
+dumbell curve and "B","C","D" and "E" representing type errors in technique.
+
+##Inputs
+
+-The data has already been partitioned in a training and testing sets.
+-No codebook has been provided but the research paper has been providing summarizing
+the methodology of the study and the context of the data
+-therefore, some individual variables are ambigious in their meaning such as
+num_window and new_window - investigations will be need to determine these variables
+
+
+## Cleaning Data, Exploratory Analysis
+- The training and testing set's have different numbers of columns.  On further examination
+this is because the researchers calculated more variables like minimum, maximum,
+average and standard deviation.  These variables are not in the testing dataset so they cannot
+be used as predictors.  These variables were removed from the training set.
+
+- Two variables were unclear,"new_window" and "num_window".  Since there is no
+codebook, the study was used.  According to the study, subjects did one set of 10 repetitions
+of each "class" of exercise.  The researchers would record the data using a sliding window
+ranging from 0.5 secs to 2.5 secs.  The "new_window" variables that are "yes" have the calculated
+variables like minimum, maximum, etc.  This suggests these observations represent the end
+of the sliding windows were all the values are calculated.  Regarding "num_window", the num_window values all consistently refer to the same classe variable.  For instance, all "num_window" 11 values correspond to classe "A".  This suggests num_window either represents a set of repetitions
+or individual repetitions
+
+-Some variables shared by both testing and training were excluded as perdictors
+as they had no obvious relation to classifying the repetitions.  Removing these predictors
+improved the performance of the models.
+
+-The classified variable is discrete and not continuous.  Therefore, a simple
+count bar graph was used to see the distribution of types of exercise.
+
+```{r pressure, echo=FALSE}
+plot1.obj <- ggplot(data = classe.dist, aes(x = Var2, y = Freq, fill = Var2)) +
+        geom_bar(stat = "identity")
+plot(plot1.obj)
+```
+
+
+## Features
+
+
+##Evaluation
+
+-why did I choose 5 k-folds - do these provide of out sample example?
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
