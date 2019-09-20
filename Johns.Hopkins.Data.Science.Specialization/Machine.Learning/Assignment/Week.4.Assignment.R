@@ -122,20 +122,20 @@ library(earth)
 
 if(!file.exists("training.csv")){
         download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
-                      destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+                      destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 }
 
 #read sources and put in NA in blank
-training = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
+training = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
                     na.strings=c("","NA"))
 
 if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
-              destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+              destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 }
 
 #read sources and put in NA in blank
-testing = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
+testing = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
                    na.strings=c("","NA"))
 
 ##----------------------------------------------------------------------------
@@ -144,8 +144,10 @@ testing = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Scien
 
 #Ideally the training and data sets variablility and other qualities be similar
 
-training.dim <- dim(training)
-testing.dim <- dim(testing)
+dim(training)
+head(select(training,1:10))
+dim(testing)
+head(select(testing,1:10))
 
 #different set of columns betweeing training and testing
 
@@ -208,7 +210,9 @@ classe.dist <- aggregate(Freq~Var2, data = table.classe.training.proc, sum)
 
 #distribution see if classe is equally distributed
 plot1.obj <- ggplot(data = classe.dist, aes(x = Var2, y = Freq, fill = Var2)) +
-        geom_bar(stat = "identity")
+        geom_bar(stat = "identity") + 
+        labs(title = "Distribution of \'classe\' Variables", x = "", y = "") +
+        theme(legend.position = "none")
 plot(plot1.obj)
 #plot1.obj <- qplot(Var2, Freq, data = classe.dist, geom = "count", ylim = c(0,6000))
 #plot(plot1.obj)
@@ -267,8 +271,8 @@ registerDoSEQ()
 #fit.rf.resample <- fit.rf.obj$resample
 #fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
 
-fit.gbm.resample <- fit.gbm.obj$resample
-fit.gbm.conf <- confusionMatrix.train(fit.gbm.obj)
+#fit.gbm.resample <- fit.gbm.obj$resample
+#fit.gbm.conf <- confusionMatrix.train(fit.gbm.obj)
 
 #fit.lda.resample <- fit.lda.obj$resample
 #fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
