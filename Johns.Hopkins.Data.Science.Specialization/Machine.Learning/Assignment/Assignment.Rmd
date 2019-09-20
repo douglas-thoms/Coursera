@@ -29,6 +29,7 @@ library(earth)
 <2000 words
 =< 5 figures
 -classe distribution
+-sd vs mean
 -out of error rate
 -accuracy compared
 in htlm
@@ -89,8 +90,8 @@ dim(testing)
 head(select(testing,1:10))
 ```
 
-* therefore, some individual variables are ambigious in their meaning such as
-num_window and new_window - investigations will be need to determine these variables  
+* Some individual variables are ambigious in their meaning such as
+num_window and new_window - investigations will be need to determine these variables.  
 
 ## Cleaning Data, Exploratory Analysis
 
@@ -126,26 +127,14 @@ training.proc.raw <- select(training.proc.raw, -X, -user_name,-raw_timestamp_par
 training.proc.num_window <- training.proc.raw[training.proc.raw$new_window == "no", ] 
 ```
 
-* Two variables were unclear,"new_window" and "num_window".  Since there is no
-codebook, the study was used.  According to the study, subjects did one set of 10 repetitions
-of each "class" of exercise.  The researchers would record the data using a sliding window
-ranging from 0.5 secs to 2.5 secs.  The "new_window" variables that are "yes" have the calculated
-variables like minimum, maximum, etc.  This suggests these observations represent the end
-of the sliding windows were all the values are calculated.  Regarding "num_window", the num_window values all consistently refer to the same classe variable.  For instance, all "num_window" 11 values correspond to classe "A".  This suggests num_window either represents a set of repetitions
-or individual repetitions  
+* Two variables were unclear, "new_window" and "num_window".  Since there is no
+codebook, the study was used as reference.  
   
-* The testing set has columns that are exclusively NA.  On further examination
-this is because these columns are only populated when "new_window" equals "yes".  
-In the testing dataset there are no observations where "new_window" equals "yes".  Therefore, these columns were removed from both the training and testing sets since they would not be useful as predictors.  
-  
-* Some variables shared by both testing and training were excluded as perdictors
-as they had no obvious relation to classifying the repetitions.  Removing these predictors
-improved the performance of the models.  
+According to the study, subjects did one set of 10 repetitionsof each "class" of exercise.  The researchers would record the data using a sliding window ranging from 0.5 secs to 2.5 secs.  The "new_window" variables that are "yes" have the calculated variables like minimum, maximum, etc.  
 
-* The classified variable is discrete and not continuous.  Therefore, a simple
-count bar graph was used to see the distribution of types of exercise.  
-  
-```{r echo = FALSE, eval=TRUE}
+This suggests these observations represent the end of the sliding windows were all the values are calculated.  Regarding "num_window", the num_window values all consistently refer to the same classe variable.  For instance, all "num_window" 11 values correspond to classe "A".  This suggests num_window either represents a set of repetitions or individual repetitions. This was determined using the code below. 
+
+```{r echo = TRUE}
 #create table of frequency of classe per num_window
 #using code below to create table and count number of num_window that
 #have only one type of classe e.  All num_window have exclusively one classe
@@ -153,44 +142,100 @@ table.classe.training.proc <- table(training.proc.num_window$num_window, trainin
 table.classe.training.proc <- data.frame(table.classe.training.proc)
 table.classe.training.proc <- table.classe.training.proc[table.classe.training.proc$Freq > 0, ] 
 classe.per.num_window <- count(table.classe.training.proc, Var1)
+
 #length of vector is 857, same as all observations
 freq.1.classe.num_window <- length(classe.per.num_window[classe.per.num_window$n == 1,]$Var1)
+#num_window will be treated as a repetition
+```
+  
+* The testing set has columns that are exclusively NA.  On further examination this is because these columns are the caculated values and are populated when the "new_window" variable equals "yes" - none of the testing "new_window" variables equals "yes".  Therefore, these columns were removed from both the training and testing sets since they would not be useful as predictors.  
+  
+* Some variables shared by both testing and training were excluded as perdictors
+as they had no obvious relation to classifying the repetitions.  Removing these predictors
+improved the performance of the models.  
 
-#num_window will be treated as a repetition 
 
-#testing.proc num_window vs new_window
-training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
+  
 
-#plotting predictors week 2 - box plot with overlays - factors
-#density plots
+
+## Features
+
+* The classified variable is discrete and not continuous.  Therefore, a simple
+count bar graph was used to see the distribution of types of exercise.  All of the 
+potential outcomes have a reasonable amounts of observations.  It looks like there
+is a reasonable balance of outcomes and predictors
+
+```{r echo = FALSE, eval=TRUE}
+#check distribution of casse
 
 classe.dist <- aggregate(Freq~Var2, data = table.classe.training.proc, sum)
-
-#distribution see if classe is equally distributed
 plot1.obj <- ggplot(data = classe.dist, aes(x = Var2, y = Freq, fill = Var2)) +
         geom_bar(stat = "identity") + 
         labs(title = "Distribution of \'classe\' Variables", x = "", y = "") +
         theme(legend.position = "none")
-
 plot(plot1.obj)
 ```
 
-## Features
+* The mean and standard deviation were graphed to see if there were any extreme outliers or unusual values.  None were found.
+```{r echo = FALSE, eval=TRUE}
+ave.mean.test <- select(training.proc.num_window, -num_window, -new_window, -classe)
 
+ave.mean.test <- t(rbind(summarise_each(ave.mean.test, mean), summarise_each(ave.mean.test, sd)))
+ave.mean.test <- data.frame(ave.mean.test)
+names(ave.mean.test) <- c("mean", "SD")
+
+plot2.obj <- ggplot(data = ave.mean.test, aes(x = mean, y = SD)) +
+        geom_jitter() +
+        labs(title = "Comparison of mean vs standard distirbution", 
+             x = "Mean", y = "Standard Deviation") +
+        theme(legend.position = "none")
+plot(plot2.obj)
+
+```
+
+The review suggests no need for feature modification and preprocessing.
+
+## Algorithims
+
+* Parallel processing was enabled to speed processing  
+  
+* K-fold cross validation was included using trainControl function.    
+
+
+```{r cache = TRUE}
+#random forest algorithm
+cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "cv",
+                           number = 5,
+                           allowParallel = TRUE)
+
+#fit.rf.obj <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)],
+#                    trControl = fitControl)
+
+```
+
+```{r cache = TRUE}
+#fit.gbm.obj <- train(classe~., method="gbm", data = training.proc.num_window[c(-1,-2)],
+#                    trControl = fitControl)
+```
+
+```{r cache = TRUE}
+#fit.lda.obj <- train(classe~., method="lda", data = training.proc.num_window[c(-1,-2)],
+#                     trControl = fitControl)
+
+stopCluster(cluster)
+registerDoSEQ()
+```
 
 ##Evaluation
 
--why did I choose 5 k-folds - do these provide of out sample example?
 
 
-```{r cars}
-summary(cars)
-```
+5 k-folds were chosen since it represents 20% of testing data.
 
-## Including Plots
+PROVIDE A FIGURE COMPARING OUT OF SAMPLE from different models
 
-You can also embed plots, for example:
+THEN PROVIDE CHART ON random forest
 
-
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

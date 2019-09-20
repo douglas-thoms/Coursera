@@ -200,32 +200,6 @@ freq.1.classe.num_window <- length(classe.per.num_window[classe.per.num_window$n
 
 #num_window will be treated as a repetition 
 
-#testing.proc num_window vs new_window
-training.proc.yes <- training.proc.raw[training.proc.raw$new_window == "yes", ]
-
-#plotting predictors week 2 - box plot with overlays - factors
-#density plots
-
-classe.dist <- aggregate(Freq~Var2, data = table.classe.training.proc, sum)
-
-#distribution see if classe is equally distributed
-plot1.obj <- ggplot(data = classe.dist, aes(x = Var2, y = Freq, fill = Var2)) +
-        geom_bar(stat = "identity") + 
-        labs(title = "Distribution of \'classe\' Variables", x = "", y = "") +
-        theme(legend.position = "none")
-plot(plot1.obj)
-#plot1.obj <- qplot(Var2, Freq, data = classe.dist, geom = "count", ylim = c(0,6000))
-#plot(plot1.obj)
-#Initially, two sets of features will be tested - a) raw observations and
-#b) the average calculations
-
-#is mean and standard the same or one much bigger
-#summarise_each(iris, funs(mean))
-
-ave.mean.test <- select(training.proc.num_window, -num_window, -new_window, -classe)
-
-ave.mean.test <- rbind(summarise_each(ave.mean.test, mean), summarise_each(ave.mean.test, sd))
-#histogram to see if normal distribution
 
 ##----------------------------------------------------------------------------
 ## Features
@@ -233,9 +207,37 @@ ave.mean.test <- rbind(summarise_each(ave.mean.test, mean), summarise_each(ave.m
 
 set.seed(3553)
 
-#here can be changes to features
-#covariate creation - useful for less
-#PCA
+
+#check distribution of casse
+
+classe.dist <- aggregate(Freq~Var2, data = table.classe.training.proc, sum)
+plot1.obj <- ggplot(data = classe.dist, aes(x = Var2, y = Freq, fill = Var2)) +
+        geom_bar(stat = "identity") + 
+        labs(title = "Distribution of \'classe\' Variables", x = "", y = "") +
+        theme(legend.position = "none")
+plot(plot1.obj)
+
+
+
+ave.mean.test <- select(training.proc.num_window, -num_window, -new_window, -classe)
+
+ave.mean.test <- t(rbind(summarise_each(ave.mean.test, mean), summarise_each(ave.mean.test, sd)))
+ave.mean.test <- data.frame(ave.mean.test)
+names(ave.mean.test) <- c("mean", "SD")
+
+plot2.obj <- ggplot(data = ave.mean.test, aes(x = mean, y = SD)) +
+        geom_jitter() +
+        labs(title = "Comparison of mean vs standard distirbution", 
+             x = "Mean", y = "Standard Deviation") +
+        theme(legend.position = "none")
+plot(plot2.obj)
+
+
+
+#suggests no feature preprocessing needed as no very large outliers
+
+
+#feature plot - week 2 3:08 plotting predictors
 
 ##----------------------------------------------------------------------------
 ## Algorithms and Evaluation
@@ -261,7 +263,7 @@ fitControl <- trainControl(method = "cv",
 #                     trControl = fitControl)
 
 #fit.bag.obj <- train(classe~., method="bagEarth", data = training.proc.num_window[c(-1,-2)],
-#                     trControl = fitControl)
+              #       trControl = fitControl)
 
 stopCluster(cluster)
 registerDoSEQ()
