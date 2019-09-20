@@ -66,6 +66,7 @@ library(ggplot2)
 library(caret)
 library(parallel)
 library(doParallel)
+library(earth)
 
 ##----------------------------------------------------------------------------
 ## Question
@@ -121,20 +122,20 @@ library(doParallel)
 
 if(!file.exists("training.csv")){
         download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
-                      destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+                      destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 }
 
 #read sources and put in NA in blank
-training = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
+training = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
                     na.strings=c("","NA"))
 
 if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
-              destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+              destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 }
 
 #read sources and put in NA in blank
-testing = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
+testing = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
                    na.strings=c("","NA"))
 
 ##----------------------------------------------------------------------------
@@ -170,7 +171,7 @@ training.remove.vectors <- names(testing)[testing.non.zero.values == TRUE]
 training.proc.raw <- training[, !colnames(training) %in% training.remove.vectors]
 
 #check for NA, empty spaces in observation
-x <- complete.cases(training.proc.raw)[FALSE]
+empty.cells <- complete.cases(training.proc.raw)[FALSE]
 
 #remove variables with unlikely relation like training window, etc
 training.proc.raw <- select(training.proc.raw, -X, -user_name,-raw_timestamp_part_1,
@@ -236,23 +237,41 @@ set.seed(3553)
 #test three different types
 
 #random forest algorithm
-# cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
-# registerDoParallel(cluster)
-# 
-# fitControl.rf <- trainControl(method = "cv",
-#                            number = 5,
-#                            allowParallel = TRUE)
-# 
-# fit.rf.obj <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)],
-#              trControl = fitControl.rf)
-# 
-# stopCluster(cluster)
-# registerDoSEQ()
+cluster <- makeCluster(detectCores() - 1) # convention to leave 1 core for OS
+registerDoParallel(cluster)
+
+fitControl <- trainControl(method = "cv",
+                           number = 5,
+                           allowParallel = TRUE)
+
+#fit.rf.obj <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)],
+#                    trControl = fitControl)
+
+#fit.gbm.obj <- train(classe~., method="gbm", data = training.proc.num_window[c(-1,-2)],
+#                     trControl = fitControl)
+
+#fit.lda.obj <- train(classe~., method="lda", data = training.proc.num_window[c(-1,-2)],
+#                     trControl = fitControl)
+
+#fit.bag.obj <- train(classe~., method="bagEarth", data = training.proc.num_window[c(-1,-2)],
+#                     trControl = fitControl)
+
+stopCluster(cluster)
+registerDoSEQ()
 
 
 
 fit.rf.resample <- fit.rf.obj$resample
 fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
+
+fit.gbm.resample <- fit.gbm.obj$resample
+fit.gbm.conf <- confusionMatrix.train(fit.gbm.obj)
+
+fit.lda.resample <- fit.lda.obj$resample
+fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
+
+#fit.bag.resample <- fit.bag.obj$resample
+#fit.bag.conf <- confusionMatrix.train(fit.bag.obj)
 
 
 ##----------------------------------------------------------------------------
@@ -273,6 +292,15 @@ fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
 #cross-validation
 #sensitivity/spceificty see week 1 type of errors
 #ROC curves - week 1 
-        
-plot(fit.rf.obj, main = "Accuracy by Predictor Count")
-varImpPlot(fit.rf.obj$finalModel, main = "Variable Importance Plot: Random Forest")
+
+#par(mfrow = c(1,2))    
+#plot(fit.rf.obj, main = "Accuracy by Predictor Count")
+#plot(fit.rf.obj$finalModel, main = "Variable Importance Plot: Random Forest")
+
+par(mfrow = c(1,2))
+plot(fit.gbm.obj, main = "Accuracy by Predictor Count")
+plot(fit.gbm.obj$finalModel, main = "Variable Importance Plot: Gradient Boosting Machines")
+
+#par(mfrow = c(1, 2))
+#plot(fit.lda.obj, main = "Accuracy by Predictor Count")
+#plot(fit.lda.obj$finalModel, main = "Variable Importance Plot: Linear Discriminant Analysis")
