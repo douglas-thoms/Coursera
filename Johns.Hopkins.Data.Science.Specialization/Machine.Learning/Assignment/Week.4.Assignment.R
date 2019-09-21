@@ -122,20 +122,20 @@ library(earth)
 
 if(!file.exists("training.csv")){
         download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv", 
-                      destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
+                      destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv")
 }
 
 #read sources and put in NA in blank
-training = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
+training = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/training.csv",
                     na.strings=c("","NA"))
 
 if(!file.exists("testing.csv")){
 download.file("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv", 
-              destfile = "C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
+              destfile = "C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv")
 }
 
 #read sources and put in NA in blank
-testing = read.csv("C:/Users/dthoms/Documents/Training/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
+testing = read.csv("C:/Users/Douglas/Documents/Coursera/Johns.Hopkins.Data.Science.Specialization/Machine.Learning/Assignment/testing.csv",
                    na.strings=c("","NA"))
 
 ##----------------------------------------------------------------------------
@@ -262,35 +262,66 @@ fitControl <- trainControl(method = "cv",
 #fit.lda.obj <- train(classe~., method="lda", data = training.proc.num_window[c(-1,-2)],
 #                     trControl = fitControl)
 
-#fit.bag.obj <- train(classe~., method="bagEarth", data = training.proc.num_window[c(-1,-2)],
-              #       trControl = fitControl)
 
 stopCluster(cluster)
 registerDoSEQ()
 
+#Accuracy calcs
+predict.rf <- predict(fit.rf.obj, newdata = training, type = "raw")
+rf.train.accuracy <- confusionMatrix(predict.rf, training$classe)
 
+predict.gbm <- predict(fit.gbm.obj, newdata = training, type = "raw")
+gbm.train.accuracy <- confusionMatrix(predict.gbm, training$classe)
 
-#fit.rf.resample <- fit.rf.obj$resample
-#fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
+predict.lda <- predict(fit.lda.obj, newdata = training, type = "raw")
+lda.train.accuracy <- confusionMatrix(predict.lda, training$classe)
 
-#fit.gbm.resample <- fit.gbm.obj$resample
-#fit.gbm.conf <- confusionMatrix.train(fit.gbm.obj)
+fit.in.sample.list <- list(rf.train.accuracy, gbm.train.accuracy, lda.train.accuracy)
+fit.name.vct <- c("Random Forest","GBM","LDA")
 
-#fit.lda.resample <- fit.lda.obj$resample
-#fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
+fit.all.in.sample <- data.frame()
 
-#fit.bag.resample <- fit.bag.obj$resample
-#fit.bag.conf <- confusionMatrix.train(fit.bag.obj)
+for(i in 1:3){
+        tmp <- data.frame(t(fit.in.sample.list[[i]]$overall[c(1,2)]))
+        tmp <- tmp%>%
+                mutate(Model = fit.name.vct[i]) %>%
+                mutate(In.Sample.Error = 1 - Accuracy) %>%
+                select(Model, In.Sample.Error, Accuracy, Kappa)
+
+        if (i==1) fit.all.in.sample <- tmp else fit.all.in.sample <-
+                        rbind(fit.all.in.sample, tmp)
+}
+
+fit.rf.resample <- fit.rf.obj$resample
+fit.rf.conf <- confusionMatrix.train(fit.rf.obj)
+
+fit.gbm.resample <- fit.gbm.obj$resample
+fit.gbm.conf <- confusionMatrix.train(fit.gbm.obj)
+
+fit.lda.resample <- fit.lda.obj$resample
+fit.lda.conf <- confusionMatrix.train(fit.lda.obj)
+
+fit.resample.list <- list(fit.rf.resample, fit.gbm.resample, fit.lda.resample)
+
+fit.all.resample <- data.frame()
+
+for(i in 1:3){
+        tmp <- fit.resample.list[[i]] %>%
+                select(-Resample) %>%
+                summarise(Mean.Accuracy = mean(Accuracy), Mean.Kappa = mean(Kappa)) %>%
+                mutate(Model = fit.name.vct[i]) %>%
+                mutate(Out.of.Sample.Error = 1 - Mean.Accuracy) %>%
+                select(Model, Out.of.Sample.Error, Mean.Accuracy, Mean.Kappa)
+
+        if (i==1) fit.all.resample <- tmp else fit.all.resample <-
+                                                    rbind(fit.all.resample, tmp)
+}
 
 
 ##----------------------------------------------------------------------------
 ## Parameters
 ##----------------------------------------------------------------------------
 
-
-##----------------------------------------------------------------------------
-## Evaluate
-##----------------------------------------------------------------------------
 
 
 # Aiming for
