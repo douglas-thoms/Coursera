@@ -253,14 +253,14 @@ fitControl <- trainControl(method = "cv",
                            number = 5,
                            allowParallel = TRUE)
 
-#fit.rf.obj <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)],
-#                    trControl = fitControl)
+fit.rf.obj <- train(classe~., method="rf", data = training.proc.num_window[c(-1,-2)],
+                    trControl = fitControl)
 
-#fit.gbm.obj <- train(classe~., method="gbm", data = training.proc.num_window[c(-1,-2)],
-#                     trControl = fitControl)
+fit.gbm.obj <- train(classe~., method="gbm", data = training.proc.num_window[c(-1,-2)],
+                     trControl = fitControl)
 
-#fit.lda.obj <- train(classe~., method="lda", data = training.proc.num_window[c(-1,-2)],
-#                     trControl = fitControl)
+fit.lda.obj <- train(classe~., method="lda", data = training.proc.num_window[c(-1,-2)],
+                     trControl = fitControl)
 
 
 stopCluster(cluster)
@@ -317,6 +317,10 @@ for(i in 1:3){
                                                     rbind(fit.all.resample, tmp)
 }
 
+plot3.obj <- plot(fit.rf.obj, main = "Random Forest: Accuracy by Predictor Count")
+print(plot3.obj)
+
+Var.Imp <- varImp(fit.rf.obj, scale = TRUE)
 
 ##----------------------------------------------------------------------------
 ## Parameters
@@ -329,9 +333,7 @@ for(i in 1:3){
 #-simple
 #-accurate
         
-#cross-validation
-#sensitivity/spceificty see week 1 type of errors
-#ROC curves - week 1 
+
 
 #par(mfrow = c(1,2))    
 #plot(fit.rf.obj, main = "Accuracy by Predictor Count")
