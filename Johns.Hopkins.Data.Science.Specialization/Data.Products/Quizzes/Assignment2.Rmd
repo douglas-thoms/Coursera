@@ -1,0 +1,32 @@
+---
+title: "Assignment2"
+author: "Douglas Thoms"
+date: "October 1, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Create dataframe
+```{r echo=TRUE}
+my_cities <- data.frame(name = c("Kitchener","Waterloo","London", "Windsor"),
+                 pop = c(242368,113520,404699,233763),
+                 lat = c(43.4516,43.4643,42.9849,42.3149),
+                 lng = c(-80.4925,-80.5204,-81.2453,-83.0364))
+
+```
+
+## My Map
+
+```{r echo=FALSE, , warning=FALSE}
+library(leaflet)
+my_cities <- my_cities %>%
+        leaflet() %>%
+        addTiles() %>%
+        addCircles(weight = 1, radius = sqrt(my_cities$pop) * 30)
+my_cities
+```
+
+
