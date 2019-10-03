@@ -1,0 +1,39 @@
+---
+title: "Assignment3"
+author: "Douglas Thoms"
+date: "October 3, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Library
+
+```{r}
+library(plotly)
+```
+
+## Requirements
+
+Required: A presentation using R markdown with a plot created by plotly
+Data: mtcars
+
+
+## Data
+
+```{r}
+attach(mtcars)
+head(mtcars)
+head(df)
+```
+
+## Plot
+3d graph of mpg, weight, hp
+
+``` {r}
+set.seed(3553)
+plot_ly(x=mtcars$wt, y=mtcars$mpg, z=mtcars$hp, type = "scatter3d",
+        mode = "markers", color = as.factor(cyl), size = disp)
+```
