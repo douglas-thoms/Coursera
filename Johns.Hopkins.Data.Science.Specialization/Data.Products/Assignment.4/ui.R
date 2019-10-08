@@ -2,6 +2,7 @@ library(shiny)
 
 #Data set
 #cancenus
+#mode - immigrants - language /ethniticity/age inputs - what is mode in map for population?
 
 #What to display?
 #lm actual vs predict?
