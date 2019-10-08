@@ -4,7 +4,7 @@ census_variables <- c("v_CA16_5051","v_CA16_5054","v_CA16_5057","v_CA16_5060","v
                       "v_CA16_5066","v_CA16_5069","v_CA16_5072","v_CA16_5075",
                       "v_CA16_5078","v_CA16_5081","v_CA16_5084","v_CA16_5087",
                       "v_CA16_5090","v_CA16_5093")
-census_data <- get_census(dataset='CA16', regions=list(C="01"), 
+census_data <- get_census(dataset='CA16', regions=list(C="01"), labels = "short", 
                           vectors=census_variables, level='PR', geo_format='sf')
 #census_data <- get_census(dataset='CA16', regions=list(CMA="59933"), 
 #                          vectors=c("v_CA16_408","v_CA16_409","v_CA16_410"), level='CSD')
