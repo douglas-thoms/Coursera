@@ -1,6 +1,7 @@
-library(shiny)
 library(cancensus)
 library(sf)
+library(leaflet)
+library(dplyr)
 
 #Data set
 #cancenus
@@ -24,20 +25,20 @@ ui <- fluidPage(
                       "Master's degree" = "v_CA16_5090",
                       "Earned doctorate" = "v_CA16_5093")),
         
-        # Sidebar with a slider input for number of bins 
-        sidebarLayout(
-                sidebarPanel(
-                        sliderInput("bins",
-                                    "Number of bins:",
-                                    min = 1,
-                                    max = 50,
-                                    value = 30)
-                ),
+        # # Sidebar with a slider input for number of bins 
+        # sidebarLayout(
+        #         sidebarPanel(
+        #                 sliderInput("bins",
+        #                             "Number of bins:",
+        #                             min = 1,
+        #                             max = 50,
+        #                             value = 30)
+        #         ),
                 
                 # Show a plot of the generated distribution
                 mainPanel(
-                        plotOutput("distPlot")
+                        leafletOutput("map")
                 )
         )
-)
+#)
 
