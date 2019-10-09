@@ -15,7 +15,7 @@ census_variables <- c("v_CA16_5051","v_CA16_5054","v_CA16_5057","v_CA16_5060","v
                       "v_CA16_5090","v_CA16_5093")
 
 census_data <- get_census(dataset='CA16', regions=list(C="01"), labels = "short", 
-                          vectors=census_variables, level='PR', geo_format='sf')
+                          vectors="v_CA16_5051", level='PR', geo_format='sf')
 
 census_data <- census_data %>%
         mutate(map_data = (v_CA16_5081/Population)*100)

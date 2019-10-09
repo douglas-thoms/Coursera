@@ -25,6 +25,11 @@ ui <- fluidPage(
                       "Master's degree" = "v_CA16_5090",
                       "Earned doctorate" = "v_CA16_5093")),
         
+        selectInput("area", "Region Level:",
+                    c("Province" = "PR",
+                      "Census Metropolitan Area" = "CMA",
+                      "Census Subdivision" = "CSD")),
+        
         # # Sidebar with a slider input for number of bins 
         # sidebarLayout(
         #         sidebarPanel(

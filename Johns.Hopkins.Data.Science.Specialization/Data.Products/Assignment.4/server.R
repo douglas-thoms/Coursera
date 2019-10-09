@@ -9,9 +9,11 @@ server <- function(input, output,session) {
                               "v_CA16_5066","v_CA16_5069","v_CA16_5072","v_CA16_5075",
                               "v_CA16_5078","v_CA16_5081","v_CA16_5084","v_CA16_5087",
                               "v_CA16_5090","v_CA16_5093")
-        
+ #ADD CHANGE TO LEVEL WITH INPUT AREA - need reactive region or something   
         census_data <- get_census(dataset='CA16', regions=list(C="01"), labels = "short", 
-                                  vectors=census_variables, level='PR', geo_format='sf')
+                                  vectors=census_variables, level="PR", geo_format='sf')
+        
+# CAN Select position
         
         output$map <- renderLeaflet({
                 #base map on select input
@@ -21,7 +23,7 @@ server <- function(input, output,session) {
                 #does not accept input variable but accepts if put regular column in
                 
                 census_data <- census_data %>%
-                        mutate(map_data = (input$variable/Population)*100)
+                        mutate(map_data = (!!as.symbol(input$variable)/Population)*100)
                 
                 pal <- colorNumeric("RdYlBu", domain = census_data$map_data)
                 
