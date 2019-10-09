@@ -17,7 +17,7 @@ ui <- fluidPage(
         titlePanel("Education Levels in Canada"),
         
         #input
-        selectInput("variable", "Education Level:",
+        selectInput("variable", "Highest Education Level:",
                     c("No certificate, diploma or degree" = "v_CA16_5054",
                       "Secondary (high) school diploma or equivalency certificate" = "v_CA16_5057",
                       "Postsecondary certificate, diploma or degree" = "v_CA16_5060",
@@ -28,6 +28,7 @@ ui <- fluidPage(
         selectInput("area", "Region Level:",
                     c("Province" = "PR",
                       "Census Metropolitan Area" = "CMA",
+                      "Census Division" = "CD",
                       "Census Subdivision" = "CSD")),
         
         # # Sidebar with a slider input for number of bins 
