@@ -1,5 +1,6 @@
 library(shiny)
 library(cancensus)
+library(sf)
 
 #Data set
 #cancenus
