@@ -47,7 +47,7 @@ server.R - https://tinyurl.com/y4ljulnf
 Data source is Canada's 2001, 2006, 2011, 2016 and accessed
 using the R package cancensus API features.
 
-The percentage of population was calculated with the following formula:  
+The following command was used to collect data. 
 
 ```{r include = FALSE}
 library(cancensus)
