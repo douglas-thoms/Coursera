@@ -16,35 +16,34 @@ ui <- fluidPage(
         # Application title
         titlePanel("Education Levels in Canada"),
         
-        #input
-        selectInput("variable", "Highest Education Level:",
-                    c("No certificate, diploma or degree" = "v_CA16_5054",
-                      "Secondary (high) school diploma or equivalency certificate" = "v_CA16_5057",
-                      "Postsecondary certificate, diploma or degree" = "v_CA16_5060",
-                      "Bachelor's degree" = "v_CA16_5081",
-                      "Master's degree" = "v_CA16_5090",
-                      "Earned doctorate" = "v_CA16_5093")),
-        
-        selectInput("area", "Region Level:",
-                    c("Province" = "PR",
-                      "Census Metropolitan Area" = "CMA",
-                      "Census Division" = "CD",
-                      "Census Subdivision" = "CSD")),
-        
-        # # Sidebar with a slider input for number of bins 
-        # sidebarLayout(
-        #         sidebarPanel(
-        #                 sliderInput("bins",
-        #                             "Number of bins:",
-        #                             min = 1,
-        #                             max = 50,
-        #                             value = 30)
-        #         ),
+        sidebarPanel(
+                #input for education level
+                selectInput("variable", "Highest Education Level:",
+                            c("No certificate, diploma or degree" = "v_CA16_5054",
+                              "Secondary (high) school diploma or equivalency certificate" = "v_CA16_5057",
+                              "Postsecondary certificate, diploma or degree" = "v_CA16_5060",
+                              "Bachelor's degree" = "v_CA16_5081",
+                              "Master's degree" = "v_CA16_5090",
+                              "Earned doctorate" = "v_CA16_5093")),
+                #input for Region level
+                selectInput("area", "Region Level:",
+                            c("Province" = "PR",
+                              "Census Division" = "CD")),
                 
-                # Show a plot of the generated distribution
+                #input for Region level
+                selectInput("year", "Census Year:",
+                            c("2001 Canada Census" = "CA01",
+                              "2006 Canada Census" = "CA06",
+                              "2011 Canada Census and NH" = "CA11",
+                              "2016 Canada Census" = "CA16"))
+                ),
+        
+        #main panel setup
                 mainPanel(
-                        leafletOutput("map")
-                )
-        )
-#)
-
+                        # Output: Tabset w/ plot, summary, and table ----
+                        tabsetPanel(type = "tabs",
+                                    tabPanel("Map", leafletOutput("map")),
+                                    tabPanel("Documentation", htmlOutput("text"))
+                                    )
+                        )
+)

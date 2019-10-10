@@ -18,7 +18,7 @@ server <- function(input, output,session) {
                 
                 #calculate population that have this degree as their highest education
                 
-                census_data <- get_census(dataset='CA16', regions=list(C="01"), labels = "short", 
+                census_data <- get_census(dataset=input$year, regions=list(C="01"), labels = "short", 
                                           vectors=census_variables, level=input$area, geo_format='sf')
                 
                 census_data <- census_data %>%
@@ -39,11 +39,24 @@ server <- function(input, output,session) {
                                   opacity = 1
                         )
                 
-                # # generate bins based on input$bins from ui.R
-                # x    <- faithful[, 2] 
-                # bins <- seq(min(x), max(x), length.out = input$bins + 1)
-                # 
-                # # draw the histogram with the specified number of bins
-                # hist(x, breaks = bins, col = 'darkgray', border = 'white')
+
+        })
+        
+        output$text <- renderUI({
+                str1 <- "Data Source: Canada Census 2001, 2006, 2011, 2016 (accessed using R Package cancensus)"
+                str2 <- ""
+                str3 <- "Input 1: Select education level"
+                str4 <- "Input 2: Select geographical aggregation"
+                str5 <- "Input 3: Select year dataset of census"
+                str6 <- ""
+                str7 <- "Output: Percentage of Population that has attained selected education"
+                str8 <- ""
+                str9 <- "ui.R code: https://github.com/douglas-thoms/Coursera/blob/master/Johns.Hopkins.Data.Science.Specialization/Data.Products/Assignment.4/ui.R"
+                str10 <- ""
+                str11 <- "ui.R code: https://github.com/douglas-thoms/Coursera/blob/master/Johns.Hopkins.Data.Science.Specialization/Data.Products/Assignment.4/server.R"
+                str12 <- ""
+                str13 <- "Server calculation:  population % with education level = (population with education/Total Population)*100"
+                HTML(paste(str1, str2, str3, str4, str5, str6, str7, str8, str9, str10, str11, 
+                           str12, str13, sep = '<br/>'))
         })
 }

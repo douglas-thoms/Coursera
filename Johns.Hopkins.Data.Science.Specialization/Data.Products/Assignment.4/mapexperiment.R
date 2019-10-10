@@ -18,7 +18,7 @@ census_data <- get_census(dataset='CA16', regions=list(C="01"), labels = "short"
                           vectors="v_CA16_5051", level='PR', geo_format='sf')
 
 census_data <- census_data %>%
-        mutate(map_data = (v_CA16_5081/Population)*100)
+        mutate(map_data = (v_CA16_5051/Population)*100)
 
 pal <- colorNumeric("RdYlBu", domain = census_data$map_data)
 
