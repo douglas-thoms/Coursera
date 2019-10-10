@@ -1,0 +1,91 @@
+---
+title: "Canada Education Level App"
+author: "Douglas Thoms"
+date: "October 10, 2019"
+output: ioslides_presentation
+---
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+
+.pre-scrolly {
+  max-height: 400px;
+  overflow-y: auto;
+}
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Objective and Code
+
+### **Objective**
+
+Determine the level of education in Canada according to different regions.  
+
+Specifically, what percentage of population have a specific education level as their highest 
+level of education?  
+  
+  
+### **Code**  
+
+ui.R - https://tinyurl.com/yxpzrpy5  
+server.R - https://tinyurl.com/y4ljulnf
+
+
+
+## Data
+
+Data source is Canada's 2001, 2006, 2011, 2016 and accessed
+using the R package cancensus API features.
+
+The percentage of population was calculated with the following formula:  
+
+```{r include = FALSE}
+library(cancensus)
+library(sf)
+        options(cancensus.api_key = 
+                        "CensusMapper_7dd2122753cfb78fec890b61d909bdc4")
+        options(cancensus.cache_path = getwd())
+```
+
+```{r echo = TRUE,tidy=TRUE}
+                census_data <- get_census(dataset='CA16', regions=list(C="01"), 
+                                          labels = "short", 
+                                          vectors="v_CA16_5051", level="PR", 
+                                          geo_format='sf')
+```
+
+
+## Sample of Data
+
+
+<div class='pre-scrolly'>
+```{r echo = TRUE,eval=TRUE}
+summary(census_data)
+```
+</div>
+
+
+## Calcuation and App Function
+
+The output is calculated as follows:
+
+$edu.lvl.per = (pop.with.specific.edu.lvl / area.pop) * 100$
+
+So, if 10 people's highest education level is a bachelor's degree and the area population is 100, then 10% of the population highest education is a bachelor's degree.  
+  
+https://douglas-thoms.shinyapps.io/Canada-Education-Level/  
+
+
+![Education Levels of Canada](C:\Users\dthoms\Documents\Training\Coursera\Johns.Hopkins.Data.Science.Specialization\Data.Products\Assignment.4\image.png)  
+  
+
