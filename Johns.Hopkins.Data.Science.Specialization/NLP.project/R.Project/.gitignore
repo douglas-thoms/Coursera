@@ -5,3 +5,6 @@
 
 # Ignore big zip files
 *.zip
+
+#Ignore all data
+/data

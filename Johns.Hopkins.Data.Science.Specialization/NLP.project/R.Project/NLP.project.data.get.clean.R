@@ -36,4 +36,13 @@ dir.create(data.directory)
 #set up download date for file
 if(!file.exists(training.data.file)){
 training.data.file <- download.file(training.data.loc, training.data.file)
-}                                                             
+
+training.data.date <- date()
+
+zipF <- file.choose()
+unzip(zipF, exdir = data.directory)
+
+}
+
+#need function or tables to efficiently input files
+
