@@ -21,6 +21,9 @@
 session.info.list <- sessionInfo()
 home.directory <- getwd()
 data.directory <- paste(home.directory,"data", sep = "/")
+training.data.file <- paste(data.directory,"Coursera-SwiftKey.zip",                                                          
+                           sep = "/")
+
 dir.create(data.directory)
 
 ##----------------------------------------------------------------------------
@@ -31,5 +34,6 @@ dir.create(data.directory)
 
 #set up if loop to check for file
 #set up download date for file
-training.data.file <- download.file(training.data.loc, paste(data.directory,"Coursera-SwiftKey.zip",                                                          sep = "/"))
-                                                             
+if(!file.exists(training.data.file)){
+training.data.file <- download.file(training.data.loc, training.data.file)
+}                                                             
