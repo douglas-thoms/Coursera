@@ -19,6 +19,9 @@
 ##----------------------------------------------------------------------------
 
 session.info.list <- sessionInfo()
+
+
+
 home.directory <- getwd()
 data.directory <- paste(home.directory,"data", sep = "/")
 training.data.file <- paste(data.directory,"Coursera-SwiftKey.zip",                                                          
@@ -44,5 +47,16 @@ unzip(zipF, exdir = data.directory)
 
 }
 
-#need function or tables to efficiently input files
+#loops reads in texts files from zip file
+file.vector <- list.files(path = "./data/final/en_US")
+
+for (i in 1:3){
+        
+        path = paste("./data/final/en_US", file.vector[i], sep = "/")
+             assign(file.vector[i], read.delim(path))
+        
+}
+
+
+
 
