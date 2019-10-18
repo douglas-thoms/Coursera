@@ -1,0 +1,9 @@
+---
+title: "R Notebook - NLP project"
+output: html_notebook
+---
+
+Research Sources
+
+text processing
+http://www.mjdenny.com/Text_Processing_In_R.html

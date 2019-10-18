@@ -32,7 +32,7 @@ training.data.file.path <- paste(data.directory,"Coursera-SwiftKey.zip",
 dir.create(data.directory)
 
 ##----------------------------------------------------------------------------
-## Acquiredata
+## Acquiredata and Clean
 ##---------------------------------------------------------------------------
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
@@ -88,7 +88,9 @@ sample.rate = 1000/blogs.lines
 #rbinom -> if good, keep in new data frame
 
 
-        
+# create loop with j
+#add removing profanities
+#add putting all lower case
 # #input and sample news
 news.con <- file('./data/final/en_US/en_US.news.txt','rb')
 x <- 0
@@ -138,13 +140,9 @@ colnames(twitter) <- "twitter"
 close(twitter.con)
 rownames(twitter) <-c(1:x)
 
-# blogs.con <- file('./data/final/en_US/en_US.blogs.txt','rb')
-# en_US.blogs.txt <- readLines(blogs.con, 5, encoding = "UTF-8", skipNul = TRUE)
-# close(blogs.con)
-# en_US.blogs <- data.frame(en_US.blogs.txt, stringsAsFactors = FALSE)
-# 
-# #en_US.twitter.txt<-fread("./data/final/en_US/en_US.twitter.txt", sep='\n', header=FALSE)
-# twitter.con <- file('./data/final/en_US/en_US.twitter.txt','rb')
-# en_US.twitter.txt <- readLines(twitter.con, 5, encoding = "UTF-8", skipNul = TRUE)
-# close(twitter.con)
-# en_US.twitter <- data.frame(en_US.twitter.txt)
+
+##----------------------------------------------------------------------------
+## Tokenize
+##---------------------------------------------------------------------------
+
+#use quanteda
