@@ -3,6 +3,12 @@ title: "R Notebook - NLP project"
 output: html_notebook
 ---
 
+Read tm and quanteda packages
+https://github.com/lgreski/datasciencectacontent/blob/master/markdown/capstone-ngramComputerCapacity.md
+https://www.coursera.org/learn/data-science-project/discussions/all/threads/7HcUyzJXEeeZ1Qo60q6J_A
+https://lagunita.stanford.edu/c4x/Engineering/CS-224N/asset/slp4.pdf
+https://github.com/rstudio/cheatsheets/raw/master/quanteda.pdf
+
 Research Sources
 
 text processing

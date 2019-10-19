@@ -36,7 +36,7 @@ dir.create(data.directory)
 ##---------------------------------------------------------------------------
 
 #List of profanity to ignore
-profanity <- c("cool")
+profanity <- c("fuck")
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
@@ -87,7 +87,7 @@ twitter.sample.size <- (twitter.sample * twitter.lines)/(twitter.sample + twitte
 sample.rate = .9 #2000/blogs.lines
 
 
-
+#turn into dataframe and function
 # create loop with j
 #add removing profanities - create counter
 #add putting all lower case
@@ -101,27 +101,31 @@ file.vct <- c('.//data//final//en_US//en_US.news.txt',
 num.lines <- data.frame(c(3, 4, 5), row.names = c('news','blogs','twitter'))
 var.vct <- c('news','blogs','twitter')
 
-# for(j in 1:3){
-#         con <- file(file.vct[j],'rb')
-#         x <- 0
-#    
-#          for(i in 1:num.lines[j,1]){
-#                 tmp <- readLines(con, 1, encoding = "UTF-8", skipNul = TRUE)
-#                 if(rbinom(1,1,sample.rate) & length(tmp)){
-#                         x <- x + 1
-#                         if(x == 1) assign(var.vct[j], tmp) else assign(var.vct[j], 
-#                                                                        as.data.frame(rbind(news,tmp),
-#                                                                                   stringsAsFactors = FALSE)
-#                                                                        )
-#                 }
-#                      
-#         }
-#         close(con) 
-}
-#assign(var.vct[1], as.data.frame(var.vct[1]))
+for(j in 1:3){
+        con <- file(file.vct[j],'rb')
+        x <- 0
 
-x <- blogs %>%
-filter(V1,grepl(paste(profanity, collapse="|"), blogs) == TRUE)
+         for(i in 1:num.lines[j,1]){
+                tmp <- readLines(con, 1, encoding = "UTF-8", skipNul = TRUE)
+                
+                if(rbinom(1,1,sample.rate) & length(tmp)){
+                        x <- x + 1
+                        if(x == 1) tmp2 <- tmp else tmp2 <- c(tmp2,tmp)
+                                                                       
+                }
+                
+                names(tmp2) <- var.vct[j]
+                assign(var.vct[j],tmp2)
+        }
+        close(con)
+}
+
+#use package to remove profanity and stop words
+blog.prof.l <- grepl(paste(profanity, collapse="|"),blogs)
+blog.prof <- length(blogs[!blog.prof])
+
+#x <- blogs %>%
+#filter(blogs,grepl(paste(profanity, collapse="|"),blogs$blogs))
 
 # news.con <- file('./data/final/en_US/en_US.news.txt','rb')
 # x <- 0
@@ -177,3 +181,8 @@ filter(V1,grepl(paste(profanity, collapse="|"), blogs) == TRUE)
 ##---------------------------------------------------------------------------
 
 #use quanteda
+
+
+# function_name <- function(file.path, source) {
+#         Function body 
+# }
