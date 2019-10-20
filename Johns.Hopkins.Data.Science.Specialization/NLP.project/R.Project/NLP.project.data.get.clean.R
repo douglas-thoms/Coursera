@@ -11,8 +11,27 @@
 ##----------------------------------------------------------------------------
 
 ##----------------------------------------------------------------------------
-## Background
+## Functions
 ##----------------------------------------------------------------------------
+
+get.lines <- function(df,type.info) {
+        con <- file(as.character(df[type.info,2]),'rb')
+        x <- 0
+        #tmp2 <- as.character()
+        
+        for(i in 1:df[type.info,1]){
+                tmp <- readLines(con, 1, encoding = "UTF-8", skipNul = TRUE)
+                
+                if(rbinom(1,1,sample.rate) & length(tmp)){
+                        x <- x + 1
+                        if(x == 1) tmp2 <- tmp else tmp2 <- c(tmp2,tmp)
+                        
+                }
+                
+        }
+        close(con)
+        return(as.character(tmp2))
+}
 
 ##----------------------------------------------------------------------------
 ## Libraries and system
@@ -35,8 +54,6 @@ dir.create(data.directory)
 ## Acquiredata and Clean
 ##---------------------------------------------------------------------------
 
-#List of profanity to ignore
-profanity <- c("fuck")
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
@@ -52,16 +69,6 @@ unzip(training.data.file.path, exdir = data.directory)
 
 }
 
-#loops reads in texts files from zip file
-#file.vector <- list.files(path = "./data/final/en_US")
-
-# for (i in 1:3){
-#         
-#         path = paste("./data/final/en_US", file.vector[i], sep = "/")
-#              assign(file.vector[i], read.delim(path, header = F, fileEncoding = "UTF-8"))
-#         
-# }
-
 #determine sample - assume normal distribution
 # 95% confidence interval
 # Sample Size Calculation:
@@ -71,22 +78,41 @@ unzip(training.data.file.path, exdir = data.directory)
 
 #use sample of 2000
 
-news.lines <- 1010274
-blogs.lines <-  899289 
-twitter.lines <- 2360149
+
+input.info.df <- data.frame(
+        num.lines = c(1010274, 899289, 2360149),
+        path = c('.//data//final//en_US//en_US.news.txt',
+                  './/data//final//en_US//en_US.blogs.txt',
+                  './/data//final//en_US//en_US.twitter.txt'),
+        names = c('news','blogs','twitter')
+)
         
 news.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
-news.sample.size <- (news.sample * news.lines)/(news.sample + news.lines - 1)
+news.sample.size <- (news.sample * input.info.df[1,1])/(news.sample + input.info.df[1,1] - 1)
 
 blogs.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
-blogs.sample.size <- (blogs.sample * blogs.lines)/(blogs.sample + blogs.lines - 1)
+blogs.sample.size <- (blogs.sample * input.info.df[2,1])/(blogs.sample + input.info.df[2,1] - 1)
 
 twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
-twitter.sample.size <- (twitter.sample * twitter.lines)/(twitter.sample + twitter.lines - 1)
+twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
 
-sample.rate = .9 #2000/blogs.lines
+sample.rate = 2000/input.info.df[2,1]*10
+
+news<- get.lines(input.info.df,1)
+blogs<- get.lines(input.info.df,2)
+twitter<- get.lines(input.info.df,3)
 
 
+
+
+##----------------------------------------------------------------------------
+## Tokenize and Prfanity removal
+##---------------------------------------------------------------------------
+
+#use quanteda
+
+
+#use quanteda
 #turn into dataframe and function
 # create loop with j
 #add removing profanities - create counter
@@ -94,95 +120,11 @@ sample.rate = .9 #2000/blogs.lines
 # #input and sample news
 
 
-file.vct <- c('.//data//final//en_US//en_US.news.txt',
-              './/data//final//en_US//en_US.blogs.txt',
-              './/data//final//en_US//en_US.twitter.txt')
-#num.lines <- data.frame(c(1010274, 899289,2360149), row.names = c('news','blogs','twitter'))
-num.lines <- data.frame(c(3, 4, 5), row.names = c('news','blogs','twitter'))
-var.vct <- c('news','blogs','twitter')
 
-for(j in 1:3){
-        con <- file(file.vct[j],'rb')
-        x <- 0
 
-         for(i in 1:num.lines[j,1]){
-                tmp <- readLines(con, 1, encoding = "UTF-8", skipNul = TRUE)
-                
-                if(rbinom(1,1,sample.rate) & length(tmp)){
-                        x <- x + 1
-                        if(x == 1) tmp2 <- tmp else tmp2 <- c(tmp2,tmp)
-                                                                       
-                }
-                
-                names(tmp2) <- var.vct[j]
-                assign(var.vct[j],tmp2)
-        }
-        close(con)
-}
 
 #use package to remove profanity and stop words
-blog.prof.l <- grepl(paste(profanity, collapse="|"),blogs)
-blog.prof <- length(blogs[!blog.prof])
-
-#x <- blogs %>%
-#filter(blogs,grepl(paste(profanity, collapse="|"),blogs$blogs))
-
-# news.con <- file('./data/final/en_US/en_US.news.txt','rb')
-# x <- 0
-# for(i in 1:news.lines){
-#         tmp <- readLines(news.con, 1, encoding = "UTF-8", skipNul = TRUE)
-#         if(rbinom(1,1,sample.rate)){
-#               x <- x + 1
-#               if(x == 1) news <- tmp else news <- rbind(news,tmp)
-#         }
-# 
-# }
-# close(news.con)
-# news <- as.data.frame(news)
-# colnames(news) <- "news"
-# rownames(news) <-c(1:x)
-# 
-# # #input and sample blogs
-# blogs.con <- file('./data/final/en_US/en_US.blogs.txt','rb')
-# x <- 0
-# for(i in 1:blogs.lines){
-#         tmp <- data.frame()
-#         tmp <- readLines(blogs.con, 1, encoding = "UTF-8", skipNul = TRUE)
-#         if(rbinom(1,1,sample.rate)){
-#                 x <- x + 1
-#                 if(x == 1) blogs <- tmp else blogs <- rbind(blogs,tmp)
-#         }
-# 
-# }
-# close(blogs.con)
-# blogs <- as.data.frame(blogs)
-# colnames(blogs) <- "blogs"
-# rownames(blogs) <-c(1:x)
-# 
-# #input and sample twitter
-# twitter.con <- file('./data/final/en_US/en_US.twitter.txt', 'rb')
-# x <- 0
-# for(i in 1:twitter.lines){
-#         tmp <- readLines(twitter.con, 1, encoding = "UTF-8", skipNul = TRUE)
-#         if(rbinom(1,1,sample.rate)){
-#                 x <- x + 1
-#                 if(x == 1) twitter <- tmp else twitter <- rbind(twitter,tmp)
-#         }
-# 
-# }
-# twitter <- as.data.frame(twitter)
-# colnames(twitter) <- "twitter"
-# close(twitter.con)
-# rownames(twitter) <-c(1:x)
+# blog.prof.l <- grepl(paste(profanity, collapse="|"),blogs)
+# blog.prof <- length(blogs[!blog.prof])
 
 
-##----------------------------------------------------------------------------
-## Tokenize
-##---------------------------------------------------------------------------
-
-#use quanteda
-
-
-# function_name <- function(file.path, source) {
-#         Function body 
-# }
