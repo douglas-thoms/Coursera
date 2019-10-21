@@ -33,6 +33,13 @@ get.lines <- function(df,type.info) {
         return(as.character(tmp2))
 }
 
+create.corpus <- function(input,file,URL){
+        
+        output <- corpus(input, docnames = rep("news.sample",length(input)))
+        metadoc(output, "source") <- "cheese"
+        return(output)
+}
+
 ##----------------------------------------------------------------------------
 ## Libraries and system
 ##----------------------------------------------------------------------------
@@ -114,8 +121,12 @@ twitter<- get.lines(input.info.df,3)
 
 #create corpus
 
-x <- corpus(news, docnames = rep("news.sample",22351))
-
+news.cor <- create.corpus(news,"en_US.news.txt",
+                          "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
+blogs.cor <- create.corpus(blogs, "en_US.blogs.txt",
+                           "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
+twitter.cor <- create.corpus(twitter, "en_US.twitter.txt",
+                             "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
 
 #user doc vars
 #source is file
