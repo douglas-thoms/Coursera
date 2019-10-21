@@ -38,7 +38,8 @@ get.lines <- function(df,type.info) {
 ##----------------------------------------------------------------------------
 
 session.info.list <- sessionInfo()
-library(dplyr)
+
+library(quanteda)
 
 set.seed(3353)
 
@@ -111,17 +112,16 @@ twitter<- get.lines(input.info.df,3)
 
 #use quanteda
 
+#create corpus
 
-#use quanteda
-#turn into dataframe and function
-# create loop with j
-#add removing profanities - create counter
-#add putting all lower case
-# #input and sample news
+x <- corpus(news, docnames = rep("news.sample",22351))
 
 
+#user doc vars
+#source is file
+#URL
 
-
+#corpus + corpus to join
 
 #use package to remove profanity and stop words
 # blog.prof.l <- grepl(paste(profanity, collapse="|"),blogs)
