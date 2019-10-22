@@ -33,10 +33,12 @@ get.lines <- function(df,type.info) {
         return(as.character(tmp2))
 }
 
-create.corpus <- function(input,file,URL){
+
+create.corpus <- function(input,text_name,file,URL){
         
-        output <- corpus(input, docnames = rep("news.sample",length(input)))
-        metadoc(output, "source") <- "cheese"
+        output <- corpus(input, docnames = rep(text_name,length(input)))
+        metadoc(output, "source") <- as.character(file)
+        metadoc(output, "URL") <- as.character(URL)
         return(output)
 }
 
@@ -121,12 +123,15 @@ twitter<- get.lines(input.info.df,3)
 
 #create corpus
 
-news.cor <- create.corpus(news,"en_US.news.txt",
+news.cor <- create.corpus(news,"news.sample","en_US.news.txt",
                           "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-blogs.cor <- create.corpus(blogs, "en_US.blogs.txt",
+blogs.cor <- create.corpus(blogs,"blogs.sample", "en_US.blogs.txt",
                            "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-twitter.cor <- create.corpus(twitter, "en_US.twitter.txt",
+twitter.cor <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt",
                              "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
+
+news.cor <- dfm(news.cor, tolower = TRUE, stem = FALSE, 
+                remove_punct = TRUE, remove = stopwords("english"))
 
 #user doc vars
 #source is file
