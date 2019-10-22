@@ -116,22 +116,32 @@ twitter<- get.lines(input.info.df,3)
 
 
 ##----------------------------------------------------------------------------
-## Tokenize and Prfanity removal
+## Tokenize and Profanity removal
 ##---------------------------------------------------------------------------
 
 #use quanteda
 
 #create corpus
 
-news.cor <- create.corpus(news,"news.sample","en_US.news.txt",
+news.corpus <- create.corpus(news,"news.sample","en_US.news.txt",
                           "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-blogs.cor <- create.corpus(blogs,"blogs.sample", "en_US.blogs.txt",
+blogs.corpus <- create.corpus(blogs,"blogs.sample", "en_US.blogs.txt",
                            "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-twitter.cor <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt",
+twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt",
                              "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
 
-news.cor <- dfm(news.cor, tolower = TRUE, stem = FALSE, 
-                remove_punct = TRUE, remove = stopwords("english"))
+total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
+
+#token
+total.tokens <- tokens(total.corpus)
+
+cleaned.tokens.2 <- tokens(total.tokens, remove_punct = TRUE, 
+                     remove_numbers = TRUE)
+
+#then clean
+
+#news.cor <- dfm(news.cor, tolower = TRUE, stem = FALSE, 
+#                remove_punct = TRUE, remove = stopwords("english"))
 
 #user doc vars
 #source is file
