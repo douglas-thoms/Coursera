@@ -121,9 +121,8 @@ twitter<- get.lines(input.info.df,3)
 
 ##----------------------------------------------------------------------------
 ## Tokenize and Profanity removal
-##---------------------------------------------------------------------------
+##----------------------------------------------------------------------------
 
-#use quanteda
 
 #create corpus
 
@@ -136,7 +135,7 @@ twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt
 
 total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
 
-#token
+#create tokens
 total.tokens <- total.corpus %>%
                 tokens(remove_punct = TRUE, 
                      remove_numbers = TRUE) %>%
@@ -145,23 +144,19 @@ total.tokens <- total.corpus %>%
                 tokens_remove(profanity$V1) %>%
                 tokens_tolower()
 
-total.dfm <- dfm(total.tokens)
+ngrams.tokens <- tokens_ngrams(total.tokens, 2:3)
+
+#create dfm
+
+ngrams.dfm <- dfm(ngrams.tokens)
+words.dfm <- dfm(total.tokens)
 
 head(kwic(total.tokens, "love", window = 3))
 
-#then clean
 
-#news.cor <- dfm(news.cor, tolower = TRUE, stem = FALSE, 
-#                remove_punct = TRUE, remove = stopwords("english"))
+##----------------------------------------------------------------------------
+## Explore Data and N-grams
+##----------------------------------------------------------------------------
 
-#user doc vars
-#source is file
-#URL
-
-#corpus + corpus to join
-
-#use package to remove profanity and stop words
-# blog.prof.l <- grepl(paste(profanity, collapse="|"),blogs)
-# blog.prof <- length(blogs[!blog.prof])
-
-
+nfeat(total.dfm)
+ndoc(total.dfm)
