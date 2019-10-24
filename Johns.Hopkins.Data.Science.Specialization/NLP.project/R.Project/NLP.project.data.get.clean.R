@@ -49,6 +49,7 @@ create.corpus <- function(input,text_name,file,URL){
 session.info.list <- sessionInfo()
 
 library(quanteda)
+library(dplyr)
 
 set.seed(3353)
 
@@ -64,6 +65,9 @@ dir.create(data.directory)
 ## Acquiredata and Clean
 ##---------------------------------------------------------------------------
 
+#download profanity list
+profanity.file <- paste(data.directory,"profanities.csv",sep = "/")
+profanity <- as.vector(read.csv2(profanity.file, header = FALSE, stringsAsFactors = FALSE))
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
@@ -133,10 +137,17 @@ twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt
 total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
 
 #token
-total.tokens <- tokens(total.corpus)
+total.tokens <- total.corpus %>%
+                tokens(remove_punct = TRUE, 
+                     remove_numbers = TRUE) %>%
+                tokens_wordstem() %>%
+                tokens_select(stopwords('english'),selection='remove') %>%
+                tokens_remove(profanity$V1) %>%
+                tokens_tolower()
 
-cleaned.tokens.2 <- tokens(total.tokens, remove_punct = TRUE, 
-                     remove_numbers = TRUE)
+total.dfm <- dfm(total.tokens)
+
+head(kwic(total.tokens, "love", window = 3))
 
 #then clean
 
