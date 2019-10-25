@@ -10,6 +10,7 @@ https://lagunita.stanford.edu/c4x/Engineering/CS-224N/asset/slp4.pdf
 https://github.com/rstudio/cheatsheets/raw/master/quanteda.pdf
 https://data.library.virginia.edu/a-beginners-guide-to-text-analysis-with-quanteda/
 https://www.bnosac.be/index.php/blog/56-an-overview-of-text-mining-visualisations-possibilities-with-r-on-the-ceta-trade-agreement
+https://github.com/shuangsong/capstone/blob/master/books/bigram-2x2.pdf
 
 Research Sources
 

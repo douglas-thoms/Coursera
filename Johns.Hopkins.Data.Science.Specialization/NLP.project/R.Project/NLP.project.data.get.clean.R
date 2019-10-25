@@ -120,7 +120,7 @@ twitter<- get.lines(input.info.df,3)
 
 
 ##----------------------------------------------------------------------------
-## Tokenize and Profanity removal
+## Clean Data/Tokenization/Ngrams
 ##----------------------------------------------------------------------------
 
 
@@ -134,6 +134,8 @@ twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt
                              "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
 
 total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
+
+#need to look for and clean misspellings - any packages - do after wordstem
 
 #create tokens
 total.tokens <- total.corpus %>%
@@ -158,7 +160,7 @@ words.dfm <- dfm(total.tokens)
 ## Explore Data and N-grams
 ##----------------------------------------------------------------------------
 
-nfeat(word.dfm)
+nfeat(words.dfm)
 ndoc(ngrams.dfm)
 
 #potential graphs
