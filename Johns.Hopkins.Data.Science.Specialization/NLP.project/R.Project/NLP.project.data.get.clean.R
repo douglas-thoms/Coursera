@@ -151,12 +151,17 @@ ngrams.tokens <- tokens_ngrams(total.tokens, 2:3)
 ngrams.dfm <- dfm(ngrams.tokens)
 words.dfm <- dfm(total.tokens)
 
-head(kwic(total.tokens, "love", window = 3))
+#head(kwic(total.tokens, "love", window = 3))
 
 
 ##----------------------------------------------------------------------------
 ## Explore Data and N-grams
 ##----------------------------------------------------------------------------
 
-nfeat(total.dfm)
-ndoc(total.dfm)
+nfeat(word.dfm)
+ndoc(ngrams.dfm)
+
+#potential graphs
+#bar graphs of most popular words and n grams
+#word display with all words together with different  sizes
+#compare against different sources

@@ -1,0 +1,9 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Questions
+What are the different frequencies between blogs, news and twitter?
+
+This is a predictive question?  If given a word, what follows new (confirm)
