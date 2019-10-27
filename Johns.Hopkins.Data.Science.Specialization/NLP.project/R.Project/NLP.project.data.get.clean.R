@@ -37,8 +37,8 @@ get.lines <- function(df,type.info) {
 create.corpus <- function(input,text_name,file,URL){
         
         output <- corpus(input, docnames = rep(text_name,length(input)))
-        metadoc(output, "source") <- as.character(file)
-        metadoc(output, "URL") <- as.character(URL)
+        docvars(output, "source") <- as.character(file)
+        docvars(output, "URL") <- as.character(URL)
         return(output)
 }
 
@@ -50,6 +50,7 @@ session.info.list <- sessionInfo()
 
 library(quanteda)
 library(dplyr)
+library(ggplot2)
 
 set.seed(3353)
 
@@ -136,6 +137,18 @@ twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt
 total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
 
 #need to look for and clean misspellings - any packages - do after wordstem
+#create dictionary?
+#remove @ stuff
+#remove numbers
+#add in profanity
+
+#create dictionary of words to exclude
+dict.fixed <- dictionary(list(profanity = profanity$V1))
+
+dict.regex <- dictionary(list(at.mark = "[@]",
+                        number = "[0-9]",
+                        period = "[.]"
+))
 
 #create tokens
 total.tokens <- total.corpus %>%
@@ -143,7 +156,8 @@ total.tokens <- total.corpus %>%
                      remove_numbers = TRUE) %>%
                 tokens_wordstem() %>%
                 tokens_select(stopwords('english'),selection='remove') %>%
-                tokens_remove(profanity$V1) %>%
+                tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
+                tokens_select(dict.fixed, selection = 'remove', valuetype = "fixed") %>%
                 tokens_tolower()
 
 ngrams.tokens <- tokens_ngrams(total.tokens, 2:3)
@@ -174,8 +188,8 @@ my_dfm <- dfm_trim(words.dfm, min_termfreq = 500)
 #sample is nfeat(word.dfm)
 
 #graphs of most popular words and n grams
-textplot_wordcloud(words.dfm,max_words = 120)
-textplot_wordcloud(ngrams.dfm,max_words = 120)
+#textplot_wordcloud(words.dfm,max_words = 120)
+#textplot_wordcloud(ngrams.dfm,max_words = 120)
 #compare against different sources
 #dendogram
 #bar graph top 100

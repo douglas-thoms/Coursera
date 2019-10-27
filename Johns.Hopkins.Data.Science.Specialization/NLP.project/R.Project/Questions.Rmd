@@ -66,6 +66,7 @@ swiftkey
 #### How do you evaluate how many of the words come from foreign languages?
   
 #### Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?
+wordstem, lemmazation
 
 ## Stage: Modelling
 
