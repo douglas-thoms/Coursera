@@ -13,6 +13,7 @@ https://www.bnosac.be/index.php/blog/56-an-overview-of-text-mining-visualisation
 https://github.com/shuangsong/capstone/blob/master/books/bigram-2x2.pdf
 https://cran.r-project.org/web/packages/ngram/ngram.pdf
 https://www.coursera.org/learn/data-science-project/discussions/all/threads/V40gAPE3EeWFuw7QEATDpw
+https://quanteda.io/articles/quickstart.html
 
 Research Sources
 

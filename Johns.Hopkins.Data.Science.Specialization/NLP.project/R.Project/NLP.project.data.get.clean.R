@@ -162,8 +162,20 @@ words.dfm <- dfm(total.tokens)
 
 nfeat(words.dfm)
 ndoc(ngrams.dfm)
+#need to subset top features for next
+#use dfm_subset
+#y <- names(topfeatures(words.dfm))
+
+y <- names(topfeatures(words.dfm, n = 100))
+my_dfm <- dfm_trim(words.dfm, min_termfreq = 500)
 
 #potential graphs
-#bar graphs of most popular words and n grams
-#word display with all words together with different  sizes
+#distribution of words according to number of features
+#sample is nfeat(word.dfm)
+
+#graphs of most popular words and n grams
+textplot_wordcloud(words.dfm,max_words = 120)
+textplot_wordcloud(ngrams.dfm,max_words = 120)
 #compare against different sources
+#dendogram
+#bar graph top 100
