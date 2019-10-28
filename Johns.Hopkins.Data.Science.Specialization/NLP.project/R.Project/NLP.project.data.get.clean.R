@@ -43,6 +43,8 @@ create.corpus <- function(input,text_name,file,URL){
         return(output)
 }
 
+
+
 ##----------------------------------------------------------------------------
 ## Libraries and system
 ##----------------------------------------------------------------------------
@@ -173,26 +175,14 @@ words.dfm <- dfm(total.tokens)
 ## Explore Data and N-grams
 ##----------------------------------------------------------------------------
 
+#make matrix of features of unigram, bi-gram, tri-gram
+#nfeat
+#top features
+#sparsity
+
 #find raw number of feature
 nfeat(words.dfm)
 #find number of docs
-ndoc (words.dfm)
-#need to subset top features for next
-#use dfm_subset
+ndoc(words.dfm)
 
-#what are top features
-#y <- names(topfeatures(words.dfm))
 
-y <- names(topfeatures(words.dfm, n = 100))
-my_dfm <- dfm_trim(words.dfm, min_termfreq = 500)
-
-#potential graphs
-#distribution of words according to number of features
-#sample is nfeat(word.dfm)
-
-#graphs of most popular words and n grams
-#textplot_wordcloud(words.dfm,max_words = 120)
-#textplot_wordcloud(ngrams.dfm,max_words = 120)
-#compare against different sources
-#dendogram
-#bar graph top 100

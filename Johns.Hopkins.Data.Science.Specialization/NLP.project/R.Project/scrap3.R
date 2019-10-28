@@ -2,6 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(quanteda)
 
+#compare against different sources
 #subset for source
 #dfm <- dfm_subset(words.dfm, source == "en_US.news.txt")
 
@@ -12,10 +13,11 @@ dfm <- words.dfm
 #create word cloud - all three sources
 textplot_wordcloud(dfm,max_words = 120)
 
-#test.dfm <- dfm_trim(dfm, min_termfreq = 2)
+dfm.trunct <- dfm_trim(dfm, min_termfreq = 5)
 
 #get frequency of words
 features <- textstat_frequency(dfm) 
+features.trunct <- textstat_frequency(dfm.trunct)
 
 #see how distribution of features in bar chart - what number of features
 #appear once, twice, etc
@@ -28,9 +30,10 @@ distribution.features <- features %>%
 
 a <- ggplot(distribution.features, aes(x = number.features, y = frequency.of.word)) +
         geom_point() + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        coord_cartesian(ylim = c(0,50))
 
-plot(a)           
+plot(a)             
 
 #as can see, majority are one time words and often not real words
 
@@ -39,11 +42,11 @@ head(distribution.features, n = 50)
 
 
 # Sort by reverse frequency order
-features$feature <- with(features, reorder(feature, -frequency))
+features.trunct$feature <- with(features.trunct, reorder(feature, -frequency))
 
-b <- ggplot(features, aes(x = feature, y = frequency)) +
+b <- ggplot(features.trunct, aes(x = feature, y = frequency)) +
         geom_point() + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) #make this blank
 
 plot(b)
 
@@ -51,7 +54,7 @@ plot(b)
 #first create textstate_frequency df, then reverse with  lowest rank at top
 #calculate total words and percentage rows based on that row and lower
 
-features <- features %>% 
+features.trunct <- features.trunct %>% 
         arrange(rank) %>%
         mutate(cusum.words = cumsum(frequency)) %>%
         mutate(feature.counter = 1) %>%
@@ -61,7 +64,7 @@ features <- features %>%
         arrange(-total.words.per)
 #row_number())
 
-c <- ggplot(features,aes(x=total.words.per,y=cusum.feature)) +
+c <- ggplot(features.trunct,aes(x=total.words.per,y=cusum.feature)) +
         geom_point() +
         scale_x_reverse(name = "Total words(%)")
 
@@ -69,3 +72,16 @@ plot(c)
 
 
 #create denodram
+
+
+dfm.trunct2 <- dfm_trim(words.dfm, min_termfreq = 2300)
+
+# hierarchical clustering - get distances on normalized dfm
+tstat_dist <- textstat_dist(dfm.trunct2, margin = "features")
+# hiarchical clustering the distance object
+pres_cluster <- hclust(as.dist(tstat_dist))
+# label with document names
+#pres_cluster$labels <- features(test.dfm)
+# plot as a dendrogram
+plot(pres_cluster, xlab = "", sub = "",
+     main = "Euclidean Distance on Normalized Token Frequency")
