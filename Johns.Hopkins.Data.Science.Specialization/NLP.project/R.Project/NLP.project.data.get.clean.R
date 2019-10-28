@@ -43,7 +43,13 @@ create.corpus <- function(input,text_name,file,URL){
         return(output)
 }
 
-
+#create matrix of statistics
+get.stats <- function(dfm){
+        return(data.frame(num.features = nfeat(dfm),
+                          sparsity = sparsity(dfm),
+                          num.docs = ndoc(dfm)))
+               
+}
 
 ##----------------------------------------------------------------------------
 ## Libraries and system
@@ -179,6 +185,11 @@ words.dfm <- dfm(total.tokens)
 #nfeat
 #top features
 #sparsity
+
+x <- get.stats(words.dfm)
+
+#matrix of topfeatures comparing unigram,bigram,trigram
+y <- topfeatures(words.dfm)
 
 #find raw number of feature
 nfeat(words.dfm)
