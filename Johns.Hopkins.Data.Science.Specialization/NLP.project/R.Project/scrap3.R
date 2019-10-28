@@ -1,11 +1,16 @@
+library(ggplot2)
+library(dplyr)
+library(quanteda)
+
 #subset for source
-dfm <- dfm_subset(words.dfm, source == "en_US.news.txt")
+#dfm <- dfm_subset(words.dfm, source == "en_US.news.txt")
+dfm <- words.dfm
 #create word cloud
 textplot_wordcloud(dfm,max_words = 120)
 #create two bar charts
 
 
-test.dfm <- dfm_trim(dfm, min_termfreq = 1)
+test.dfm <- dfm_trim(dfm, min_termfreq = 2)
 
 features.dfm <- textstat_frequency(dfm)
 
