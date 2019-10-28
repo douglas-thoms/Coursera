@@ -14,7 +14,11 @@ textplot_wordcloud(dfm,max_words = 120)
 
 #test.dfm <- dfm_trim(dfm, min_termfreq = 2)
 
+#get frequency of words
 features <- textstat_frequency(dfm) 
+
+#see how distribution of features in bar chart - what number of features
+#appear once, twice, etc
 
 distribution.features <- features %>%
             aggregate(by = list(features$frequency), FUN = length) %>%
@@ -22,14 +26,15 @@ distribution.features <- features %>%
             rename(number.features = frequency) %>%
             select(frequency.of.word,number.features)
 
-a <- ggplot(distribution.features, aes(x = frequency.of.word, y = number.features)) +
+a <- ggplot(distribution.features, aes(x = number.features, y = frequency.of.word)) +
         geom_point() + 
         theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 plot(a)           
 
-#see how distribution of features in bar chart - what number of features
-#appear once, twice, etc
+#as can see, majority are one time words and often not real words
+
+head(distribution.features, n = 50)
 
 
 
