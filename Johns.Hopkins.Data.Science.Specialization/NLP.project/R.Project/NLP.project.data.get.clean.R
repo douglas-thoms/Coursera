@@ -14,6 +14,7 @@
 ## Functions
 ##----------------------------------------------------------------------------
 
+#read lines from a text file, sampling them using rbinom
 get.lines <- function(df,type.info) {
         con <- file(as.character(df[type.info,2]),'rb')
         x <- 0
@@ -33,7 +34,7 @@ get.lines <- function(df,type.info) {
         return(as.character(tmp2))
 }
 
-
+#creates corpus from large matrix, adds URL and source name is docvars
 create.corpus <- function(input,text_name,file,URL){
         
         output <- corpus(input, docnames = rep(text_name,length(input)))
@@ -52,6 +53,7 @@ library(quanteda)
 library(dplyr)
 library(ggplot2)
 
+#for reproducibility, same randomness
 set.seed(3353)
 
 
@@ -72,8 +74,8 @@ profanity <- as.vector(read.csv2(profanity.file, header = FALSE, stringsAsFactor
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
-#set up if loop to check for file
-#set up download date for file
+
+#download and unzip file if not present
 if(!file.exists(training.data.file.path)){
 download.file(training.data.loc, training.data.file.path)
 
@@ -91,17 +93,18 @@ unzip(training.data.file.path, exdir = data.directory)
 # Finite Population Correction:
 #         True Sample = (Sample Size X Population) / (Sample Size + Population – 1)
 
-#use sample of 2000
 
-
+#create data frame of 3 different files info
 input.info.df <- data.frame(
         num.lines = c(1010274, 899289, 2360149),
         path = c('.//data//final//en_US//en_US.news.txt',
-                  './/data//final//en_US//en_US.blogs.txt',
-                  './/data//final//en_US//en_US.twitter.txt'),
+                 './/data//final//en_US//en_US.blogs.txt',
+                 './/data//final//en_US//en_US.twitter.txt'),
         names = c('news','blogs','twitter')
 )
-        
+
+
+#determine sample rate to use
 news.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
 news.sample.size <- (news.sample * input.info.df[1,1])/(news.sample + input.info.df[1,1] - 1)
 
@@ -112,11 +115,24 @@ twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
 twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
 
 sample.rate = 2000/input.info.df[2,1]*10
+#use sample of 2000
 
+#use function to read lines from text file
 news<- get.lines(input.info.df,1)
 blogs<- get.lines(input.info.df,2)
 twitter<- get.lines(input.info.df,3)
 
+#create corpus from matrices
+
+news.corpus <- create.corpus(news,"news.sample","en_US.news.txt",
+                             "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
+blogs.corpus <- create.corpus(blogs,"blogs.sample", "en_US.blogs.txt",
+                              "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
+twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt",
+                                "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
+
+#create one corpus
+total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
 
 
 
@@ -125,29 +141,12 @@ twitter<- get.lines(input.info.df,3)
 ##----------------------------------------------------------------------------
 
 
-#create corpus
-
-news.corpus <- create.corpus(news,"news.sample","en_US.news.txt",
-                          "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-blogs.corpus <- create.corpus(blogs,"blogs.sample", "en_US.blogs.txt",
-                           "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt",
-                             "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-
-total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
-
-#need to look for and clean misspellings - any packages - do after wordstem
-#create dictionary?
-#remove @ stuff
-#remove numbers
-#add in profanity
-
 #create dictionary of words to exclude
 dict.fixed <- dictionary(list(profanity = profanity$V1))
 
-dict.regex <- dictionary(list(at.mark = "[@]",
-                        number = "[0-9]",
-                        period = "[.]"
+#create regex expression to exclude
+dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
+                        number = "[0-9]"
 ))
 
 #create tokens
@@ -174,10 +173,14 @@ words.dfm <- dfm(total.tokens)
 ## Explore Data and N-grams
 ##----------------------------------------------------------------------------
 
+#find raw number of feature
 nfeat(words.dfm)
-ndoc(ngrams.dfm)
+#find number of docs
+ndoc (words.dfm)
 #need to subset top features for next
 #use dfm_subset
+
+#what are top features
 #y <- names(topfeatures(words.dfm))
 
 y <- names(topfeatures(words.dfm, n = 100))
