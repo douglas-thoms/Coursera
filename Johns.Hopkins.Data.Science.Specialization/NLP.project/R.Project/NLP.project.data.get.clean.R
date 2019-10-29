@@ -52,7 +52,7 @@ get.stats <- function(dfm){
 }
 
 ##----------------------------------------------------------------------------
-## Libraries and system
+## Libraries, data and system
 ##----------------------------------------------------------------------------
 
 session.info.list <- sessionInfo()
@@ -60,6 +60,11 @@ session.info.list <- sessionInfo()
 library(quanteda)
 library(dplyr)
 library(ggplot2)
+library(lexicon)
+
+data("profanity_zac_anger")
+data("grady_augmented")
+
 
 #for reproducibility, same randomness
 set.seed(3353)
@@ -77,8 +82,6 @@ dir.create(data.directory)
 ##---------------------------------------------------------------------------
 
 #download profanity list
-profanity.file <- paste(data.directory,"profanities.csv",sep = "/")
-profanity <- as.vector(read.csv2(profanity.file, header = FALSE, stringsAsFactors = FALSE))
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
@@ -151,7 +154,7 @@ total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corp
 
 #create dictionary of words to exclude
 #add profane from lexicon
-dict.fixed <- dictionary(list(profanity = profanity$V1))
+dict.profane <- dictionary(list(profanity = profanity_zac_anger))
 
 #create regex expression to exclude
 dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
@@ -164,17 +167,47 @@ dict.english <- dictionary(list(grady = grady_augmented
 
 #use lexicon grady_augmented and profane
 
-make do with worstemming for now, if need lemitization use later
+#make do with worstemming for now, if need lemitization use later
 
 #create tokens
+#remove profane, stopwords and non-words
 total.tokens <- total.corpus %>%
                 tokens(remove_punct = TRUE, 
                      remove_numbers = TRUE) %>%
-                tokens_wordstem() %>%
                 tokens_select(stopwords('english'),selection='remove') %>%
                 tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
-                tokens_select(dict.fixed, selection = 'remove', valuetype = "fixed") %>%
+                tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
+
+#see frequency and types of words
+dfm <- dfm(total.tokens)
+frequency.words <- textstat_frequency(dfm)
+n.feat.non.word <- nfeat(dfm)
+
+#remove non-english words
+total.tokens <- tokens_select(total.tokens,dict.english, selection = 'keep', valuetype = "fixed")
+
+#see frequency and types of words        
+english.dfm <- dfm(total.tokens) 
+frequency.eng.words <- textstat_frequency(english.dfm)
+n.feat.english.word <- nfeat(english.dfm)
+
+#reduce features but uncapitalizing and word stem
+total.tokens <- total.tokens %>%
+                tokens_wordstem() %>%
                 tokens_tolower()
+
+#see frequency and type of words
+wordstem.dfm <- dfm(total.tokens)
+frequency.word.stem <- textstat_frequency(wordstem.dfm)
+n.feat.word.stem <- nfeat(wordstem.dfm)
+
+
+
+#tokens_wordstem() %>%
+#tokens_tolower()
+
+
+
 
 ngrams.tokens <- tokens_ngrams(total.tokens, 2:3)
 
