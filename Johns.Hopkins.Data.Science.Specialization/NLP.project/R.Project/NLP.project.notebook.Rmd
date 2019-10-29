@@ -18,6 +18,9 @@ https://quanteda.io/articles/quickstart.html
 Dictionaries
 lexicon package
 
+Lemmatization
+https://stackoverflow.com/questions/28214148/how-to-perform-lemmatization-in-r/28318683
+
 Research Sources
 
 text processing
