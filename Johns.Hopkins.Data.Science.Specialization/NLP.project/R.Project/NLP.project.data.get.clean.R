@@ -150,12 +150,21 @@ total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corp
 
 
 #create dictionary of words to exclude
+#add profane from lexicon
 dict.fixed <- dictionary(list(profanity = profanity$V1))
 
 #create regex expression to exclude
 dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
                         number = "[0-9]"
 ))
+
+#add names - US and stuff
+dict.english <- dictionary(list(grady = grady_augmented
+))
+
+#use lexicon grady_augmented and profane
+
+make do with worstemming for now, if need lemitization use later
 
 #create tokens
 total.tokens <- total.corpus %>%
