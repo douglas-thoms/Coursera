@@ -166,10 +166,7 @@ dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
 
 #add names - US and stuff
 #See if these others work later
-dict.english <- dictionary(list(grady = grady_augmented #,
-                                #first.name = freq_first_names,
-                                #last.name =  freq_last_names,
-                                #places = data_dictionary_newsmap_en
+dict.english <- dictionary(list(grady = grady_augmented
                                 ))
 
 #use lexicon grady_augmented and profane

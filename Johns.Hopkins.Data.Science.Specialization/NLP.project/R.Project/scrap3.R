@@ -7,13 +7,13 @@ library(quanteda)
 #dfm <- dfm_subset(words.dfm, source == "en_US.news.txt")
 
 #find top features
-topfeatures <- topfeatures(words.dfm,n = 40)
+topfeatures <- topfeatures(english.dfm,n = 40)
 
-dfm <- words.dfm
-#create word cloud - all three sources
+dfm <- english.dfm
+
 textplot_wordcloud(dfm,max_words = 120)
 
-dfm.trunct <- dfm_trim(dfm, min_termfreq = 5)
+dfm.trunct <- dfm_trim(dfm, min_termfreq = 1)
 
 #get frequency of words
 features <- textstat_frequency(dfm) 
