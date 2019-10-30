@@ -61,10 +61,13 @@ library(quanteda)
 library(dplyr)
 library(ggplot2)
 library(lexicon)
+library(newsmap)
 
-data("profanity_zac_anger")
-data("grady_augmented")
-
+data(profanity_zac_anger)
+data(grady_augmented)
+data(freq_first_names)
+data(freq_last_names)
+data(data_dictionary_newsmap_en)
 
 #for reproducibility, same randomness
 set.seed(3353)
@@ -162,8 +165,12 @@ dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
 ))
 
 #add names - US and stuff
-dict.english <- dictionary(list(grady = grady_augmented
-))
+#See if these others work later
+dict.english <- dictionary(list(grady = grady_augmented #,
+                                #first.name = freq_first_names,
+                                #last.name =  freq_last_names,
+                                #places = data_dictionary_newsmap_en
+                                ))
 
 #use lexicon grady_augmented and profane
 
