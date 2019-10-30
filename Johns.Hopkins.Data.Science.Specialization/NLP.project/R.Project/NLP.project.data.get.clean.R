@@ -192,6 +192,10 @@ english.dfm <- dfm(total.tokens)
 frequency.eng.words <- textstat_frequency(english.dfm)
 n.feat.english.word <- nfeat(english.dfm)
 
+
+#tokens("New York City is located in the United States.") %>%
+#tokens_compound(pattern = phrase(c("New York City", "United States")))
+
 #reduce features but uncapitalizing and word stem
 total.tokens <- total.tokens %>%
                 tokens_wordstem() %>%
@@ -250,3 +254,19 @@ y <- topfeatures(words.dfm)
 #choose largest probability
 #then figure out how packages markov chains can help
 #create probability matricies then use markov chains
+
+#set up small test sample
+y <- dfm_subset(bigram.dfm, bigram.dfm[1:5])
+
+#step, summarize bigram features into count
+z <- convert(y, to = "data.frame")
+zz <-select(z,-document)
+zzz <- summarise_all(zz,sum)
+
+
+# step 3
+#choose prediction word and grepl all selections
+#get following equation specific bigram/total frequency
+#select all bigrams with first target word, remove rest from matrix
+#then apply over all, frequency of specific bigram divided by total frequency
+#take max value and return
