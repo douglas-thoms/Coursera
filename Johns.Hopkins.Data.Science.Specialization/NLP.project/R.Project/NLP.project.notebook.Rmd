@@ -17,6 +17,7 @@ https://quanteda.io/articles/quickstart.html
 
 Dictionaries
 lexicon package
+newsmap
 
 Lemmatization
 https://stackoverflow.com/questions/28214148/how-to-perform-lemmatization-in-r/28318683
@@ -26,43 +27,8 @@ Research Sources
 text processing
 http://www.mjdenny.com/Text_Processing_In_R.html
 
-
-Profanity Research
-arse
-ass
-asshole
-B
-bastard
-bitch
-bollocks
-child-fucker
-crap
-cunt
-damn
-frigger
-fuck
-goddamn
-godsdamn
-hell
-holy shit
-horseshit
-Jesus Christ
-Jesus fuck
-Jesus H. Christ
-Jesus Harold Christ
-Jesus wept
-Jesus, Mary and Joseph
-Judas Priest
-motherfucker
-nigga
-nigger
-prick
-shit
-shit ass
-shitass
-slut
-son of a bitch
-son of a motherless goat
-son of a whore
-sweet Jesus
-twat
+Modelling
+Ngrams - ngram package, marko chains
+https://rpubs.com/mszczepaniak/predictkbo3model
+https://www.analyticsvidhya.com/blog/2014/07/markov-chain-simplified/
+https://www.youtube.com/watch?v=UyC0bBiZY-A

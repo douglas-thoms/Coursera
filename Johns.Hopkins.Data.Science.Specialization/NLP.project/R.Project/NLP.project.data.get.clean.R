@@ -61,13 +61,10 @@ library(quanteda)
 library(dplyr)
 library(ggplot2)
 library(lexicon)
-library(newsmap)
 
 data(profanity_zac_anger)
 data(grady_augmented)
-data(freq_first_names)
-data(freq_last_names)
-data(data_dictionary_newsmap_en)
+
 
 #for reproducibility, same randomness
 set.seed(3353)
@@ -128,7 +125,7 @@ blogs.sample.size <- (blogs.sample * input.info.df[2,1])/(blogs.sample + input.i
 twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
 twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
 
-sample.rate = 2000/input.info.df[2,1]*10
+sample.rate = 1000/input.info.df[2,1]*10
 #use sample of 2000
 
 #use function to read lines from text file
@@ -206,25 +203,24 @@ frequency.word.stem <- textstat_frequency(wordstem.dfm)
 n.feat.word.stem <- nfeat(wordstem.dfm)
 
 
+unigram.dfm <- wordstem.dfm
+frequency.uni <- textstat_frequency(unigram.dfm)
+n.feat.unigram.word <- nfeat(unigram.dfm)
 
-#tokens_wordstem() %>%
-#tokens_tolower()
+bigram.dfm <- dfm(tokens_ngrams(total.tokens,2))
+frequency.bi <- textstat_frequency(bigram.dfm)
+n.feat.bigram.word <- nfeat(bigram.dfm)
 
+trigram.dfm <- dfm(tokens_ngrams(total.tokens,3))        
+frequency.tri <- textstat_frequency(trigram.dfm)
+n.feat.trigram.word <- nfeat(trigram.dfm)
 
-
-
-ngrams.tokens <- tokens_ngrams(total.tokens, 2:3)
-
-#create dfm
-
-ngrams.dfm <- dfm(ngrams.tokens)
-words.dfm <- dfm(total.tokens)
 
 #head(kwic(total.tokens, "love", window = 3))
 
 
 ##----------------------------------------------------------------------------
-## Explore Data and N-grams
+## Explore Data, creat N-grams
 ##----------------------------------------------------------------------------
 
 #make matrix of features of unigram, bi-gram, tri-gram
@@ -238,8 +234,19 @@ x <- get.stats(words.dfm)
 y <- topfeatures(words.dfm)
 
 #find raw number of feature
-nfeat(words.dfm)
-#find number of docs
-ndoc(words.dfm)
 
 
+##----------------------------------------------------------------------------
+## Create model
+##----------------------------------------------------------------------------
+
+#partition testing set - 20%
+
+#create very small test set initially - only a couple of lines
+
+#in this matrix find eat
+#bigram matrix find eat*
+#calculate all probabilities
+#choose largest probability
+#then figure out how packages markov chains can help
+#create probability matricies then use markov chains
