@@ -1,6 +1,8 @@
 library(dplyr)
 library(quanteda)
 
+#use stupid back off model
+#alpha = 0.4
 #need to calculate unigram total, not total of bigram
 
 #set up small test sample
