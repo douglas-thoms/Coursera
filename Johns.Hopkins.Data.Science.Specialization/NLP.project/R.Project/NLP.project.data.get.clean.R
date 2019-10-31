@@ -158,7 +158,7 @@ dict.profane <- dictionary(list(profanity = profanity_zac_anger))
 
 #create regex expression to exclude
 dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
-                        number = "[0-9]"
+                        number = "*.[0-9]-[0-9]."
 ))
 
 #add names - US and stuff

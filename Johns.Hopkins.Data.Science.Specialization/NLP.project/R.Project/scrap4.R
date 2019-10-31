@@ -1,6 +1,8 @@
 library(dplyr)
 library(quanteda)
 
+#need to calculate unigram total, not total of bigram
+
 #set up small test sample
 df <-   bigram.dfm %>%
         dfm_subset(bigram.dfm[1:300]) %>%

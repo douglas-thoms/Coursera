@@ -32,3 +32,7 @@ Ngrams - ngram package, marko chains
 https://rpubs.com/mszczepaniak/predictkbo3model
 https://www.analyticsvidhya.com/blog/2014/07/markov-chain-simplified/
 https://www.youtube.com/watch?v=UyC0bBiZY-A
+Kneser-Ney smoothing
+https://rpubs.com/pferriere/dscapreport
+http://smithamilli.com/blog/kneser-ney/
+https://www.youtube.com/watch?v=eNLUo3AIvcQ
