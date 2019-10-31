@@ -1,17 +1,28 @@
-# dict.regex <- dictionary(list(at.mark = "[@]",
-#                         number = "[0-9]",
-#                         period = "[.]"
-# ))
-# 
-# z <- dfm(tokens_select(total.tokens, dict, selection = "keep", valuetype = "regex"))
+library(dplyr)
+library(quanteda)
 
-#www.
-#.com
-#.gov
-#.net
+#set up small test sample
+df <-   bigram.dfm %>%
+        dfm_subset(bigram.dfm[1:300]) %>%
+        #step, summarize bigram features into count
+        convert(to = "data.frame") %>%
+        select(-document) %>%
+        summarise_all(sum) %>%
+        select(matches("^last_*.")) %>%
+        t()
+        
+df <- data.frame(bigram = row.names(df), df)
+
+df <- df %>%
+        rename(frequency = df) %>%
+        mutate(total = sum(frequency)) %>%
+        mutate(percent = frequency/total) %>%
+        arrange(desc(percent))
+
+result <- df[1,1]
+#need to take out word    
+        
 
 
-dict.fix <- dictionary(list(profanity = profanity$V1
-))
-
-z <- dfm(tokens_select(total.tokens, dict.fix, selection = "keep", valuetype = "fixed"))
+        
+        
