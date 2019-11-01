@@ -17,13 +17,9 @@ dict2 <- dictionary(paste(ngram.one.smaller,"*",sep=""))
 
 #use stupid back off model
 #alpha = 0.4
-<<<<<<< HEAD
 #based it on 5-gram model
 #then use kneser mayer as comparison
 #need to calculate unigram total, not total of bigram
-=======
-#need to calculate of n-1gram total, not total of bigram
->>>>>>> 53ab2e62f547a357c56b8a0fc8d4373713f29c6c
 
 #set up small test sample
 df <-   trigram.dfm %>%
@@ -50,17 +46,12 @@ df <- data.frame(bigram = row.names(df), df)
 
 #df1 <- data.frame(unigram = row.names(df1), df1)
 
-# 
+#
 # df <- df %>%
 #         rename(frequency = df) %>%
 #         mutate(total = sum(frequency)) %>%
 #         mutate(percent = frequency/total) %>%
 #         arrange(desc(percent))
-# 
+#
 # result <- df[1,1]
-#need to take out word    
-        
-
-
-        
-        
+#need to take out word
