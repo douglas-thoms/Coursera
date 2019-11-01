@@ -3,6 +3,8 @@ library(quanteda)
 
 #use stupid back off model
 #alpha = 0.4
+#based it on 5-gram model
+#then use kneser mayer as comparison
 #need to calculate unigram total, not total of bigram
 
 #set up small test sample
