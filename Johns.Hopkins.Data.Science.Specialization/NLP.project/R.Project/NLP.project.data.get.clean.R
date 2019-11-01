@@ -158,7 +158,7 @@ dict.profane <- dictionary(list(profanity = profanity_zac_anger))
 
 #create regex expression to exclude
 dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
-                        number = "*.[0-9]-[0-9]."
+                        number = "[0-9]-[0-9]"
 ))
 
 #add names - US and stuff
@@ -219,6 +219,8 @@ trigram.dfm <- dfm(tokens_ngrams(total.tokens,3))
 frequency.tri <- textstat_frequency(trigram.dfm)
 n.feat.trigram.word <- nfeat(trigram.dfm)
 
+ngram.dfm <- dfm(tokens_ngrams(total.tokens,1:5))
+
 
 #head(kwic(total.tokens, "love", window = 3))
 
@@ -227,15 +229,7 @@ n.feat.trigram.word <- nfeat(trigram.dfm)
 ## Explore Data, creat N-grams
 ##----------------------------------------------------------------------------
 
-#make matrix of features of unigram, bi-gram, tri-gram
-#nfeat
-#top features
-#sparsity
 
-x <- get.stats(words.dfm)
-
-#matrix of topfeatures comparing unigram,bigram,trigram
-y <- topfeatures(words.dfm)
 
 #find raw number of feature
 
@@ -255,13 +249,6 @@ y <- topfeatures(words.dfm)
 #then figure out how packages markov chains can help
 #create probability matricies then use markov chains
 
-#set up small test sample
-y <- dfm_subset(bigram.dfm, bigram.dfm[1:5])
-
-#step, summarize bigram features into count
-z <- convert(y, to = "data.frame")
-zz <-select(z,-document)
-zzz <- summarise_all(zz,sum)
 
 
 # step 3
