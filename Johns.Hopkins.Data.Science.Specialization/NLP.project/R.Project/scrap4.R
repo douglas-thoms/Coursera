@@ -1,13 +1,12 @@
 library(dplyr)
 library(quanteda)
+library(ngram)
 
 
 
 #determine string length
 #input string of words
 sentence <- "let use tree monkey"
-#count number of words in sentence
-num.words <- sapply(strsplit(sentence, " "),length)
 #if over 4, truncuate to last 4 words
 
 #add in underscore, add wildcard * to last work
@@ -26,53 +25,28 @@ while (nfeat(df.select) < 2){
         df.select <- dfm_select(ngram.dfm,pattern = sentence.prep, valuetype = "glob")
         
 }
+
+#
+
 #else calculate frequency of all groups
 #apply stupid back off
 
 
-#get n-1gram - end of sentence till underscore
-#ngram.one.smaller <- gsub( "_{1}.[^_]*$","*",sentence.under)
+df.select2 <- df.select %>%
+             convert(to = "data.frame") %>%
+             select(-document) %>%
+             summarise_all(sum) %>%
+             t() 
+  
 
+df.select2 <- data.frame(ngram = row.names(df.select2), df.select2)
+df.select2 <- transform(df.select2, ngram = gsub("_"," ",ngram))
 
-
+temp <- strsplit(df.select2$ngram,split=" ")
+df.select2$ngram.type <- sapply(temp,length)
 
 #use stupid back off model
 #alpha = 0.4
 #based it on 5-gram model
 #then use kneser mayer as comparison
-#need to calculate unigram total, not total of bigram
 
-#set up small test sample
-#df <-   trigram.dfm %>%
- #       dfm_subset(trigram.dfm[1:300]) %>%
-  #      dfm_select(trigram.dfm, dict1,valuetype = "glob")
-         # #step, summarize bigram features into count
-         # convert(to = "data.frame") %>%
-         # select(-document) %>%
-         # summarise_all(sum) %>%
-         # select(contains(sentence.under)) %>%
-         # t()
-
-#df <- data.frame(bigram = row.names(df), df)
-
-# df1 <-  unigram.dfm %>%
-#         dfm_subset(unigram.dfm[1:300]) %>%
-#         dfm_lookup(dict2)
-#         #step, summarize bigram features into count
-#         convert(to = "data.frame")# %>%
-       # select(-document) # %>%
-       # summarise_all(sum) # %>%
-       # select(contains(ngram.one.smaller)) #%>%
-       # t()
-
-#df1 <- data.frame(unigram = row.names(df1), df1)
-
-#
-# df <- df %>%
-#         rename(frequency = df) %>%
-#         mutate(total = sum(frequency)) %>%
-#         mutate(percent = frequency/total) %>%
-#         arrange(desc(percent))
-#
-# result <- df[1,1]
-#need to take out word
