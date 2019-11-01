@@ -1,18 +1,31 @@
 library(dplyr)
 library(quanteda)
 
+
+
+#determine string length
 #input string of words
-sentence <- "last year"
+sentence <- "let us"
 #count number of words in sentence
 num.words <- sapply(strsplit(sentence, " "),length)
-#add in underscore
-sentence.under <- gsub(" ", "_", sentence)
+#if over 4, truncuate to last 4 words
+
+#add in underscore, add wildcard * to last work
+sentence.prep <- paste(gsub(" ", "_", sentence),"*",sep = "")
+
+
+#check if ngram is observed
+#combine all n-grams into one dfm
+#search for n-1gram with *wildcard, if observed, get frequency
+#else, drop last word, if observed, get frequency, continue
+#calculate frequency of n-1gram, calculate frequency of all derivatives
+#apply stupid back off
+
+
 #get n-1gram - end of sentence till underscore
-ngram.one.smaller <- gsub( "_{1}.[^_]*$","",sentence.under)
+#ngram.one.smaller <- gsub( "_{1}.[^_]*$","*",sentence.under)
 
-dict1 <- dictionary(list(search = paste(sentence.under,"*",sep="")))
-dict2 <- dictionary(paste(ngram.one.smaller,"*",sep=""))
-
+df.select <- dfm_select(df,pattern = ngram.one.smaller, valuetype = "glob")
 
 
 #use stupid back off model
@@ -23,7 +36,7 @@ dict2 <- dictionary(paste(ngram.one.smaller,"*",sep=""))
 
 #set up small test sample
 df <-   trigram.dfm %>%
-        dfm_subset(bigram.dfm[1:300]) %>%
+        dfm_subset(trigram.dfm[1:300]) %>%
         dfm_select(trigram.dfm, dict1,valuetype = "glob")
          # #step, summarize bigram features into count
          # convert(to = "data.frame") %>%
