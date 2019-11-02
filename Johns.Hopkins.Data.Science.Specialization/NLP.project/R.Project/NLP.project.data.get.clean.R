@@ -175,7 +175,7 @@ dict.english <- dictionary(list(grady = grady_augmented
 total.tokens <- total.corpus %>%
                 tokens(remove_punct = TRUE, 
                      remove_numbers = TRUE) %>%
-                tokens_select(stopwords('english'),selection='remove') %>%
+                #tokens_select(stopwords('english'),selection='remove') %>%
                 tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
                 tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
 
@@ -198,7 +198,7 @@ n.feat.english.word <- nfeat(english.dfm)
 
 #reduce features but uncapitalizing and word stem
 total.tokens <- total.tokens %>%
-                tokens_wordstem() %>%
+                #tokens_wordstem() %>%
                 tokens_tolower()
 
 #see frequency and type of words
