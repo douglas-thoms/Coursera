@@ -25,10 +25,16 @@ while (nfeat(df.select) < 2){
         sentence.w.under <- gsub( "^[^_]*_","",sentence.w.under)
         sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
                                "(","^",sentence.w.under,"$",")",sep = "")
-        print(sentence)
-        print(sentence.prep)
+        #print(sentence)
+        #print(sentence.prep)
         
         df.select <- dfm_select(ngram.dfm,pattern = sentence.prep, valuetype = "regex")
+        
+        if (grepl("_",sentence.w.under) == FALSE) {
+                
+                print(paste("Error: \'", sentence.w.under, "\' not in vocabulary"))
+                break 
+        }
         
 }
 
@@ -53,12 +59,19 @@ temp <- strsplit(df.select2$ngram,split=" ")
 df.select2$ngram.type <- sapply(temp,length)
 
 df.select2 <- rename(df.select2,frequency = df.select2)
-df.select2 <- mutate(df.select2,score = 0.4^(5-ngram.type)*(frequency/max(frequency)),
-                     last.word = str_extract(ngram, "(\\S+)$"))
-df.select2 <- filter(df.select2,frequency !=max(frequency))
+df.select2 <- mutate(df.select2,score = 0.4^(5-ngram.type)*(frequency/max(frequency)))
+                     #last.word = str_extract(ngram, "(\\S+)$"))
+                     
 
-answer <- filter(df.select2,score == max(score))[1,5]
-print(answer)
+                     
+root.ngram <- filter(df.select2,ngram.type == min(ngram.type))[1,3]
+
+df.select2 <- mutate(df.select2,last.word = word(ngram,start=min(ngram.type+1),end = ngram.type))
+#"(\\s[a-z]*){2}$"
+answer <- df.select2 %>%
+        filter(frequency !=max(frequency)) %>%
+        filter(score == max(score))
+print(answer[1,5])
 
 #use stupid back off model
 #alpha = 0.4

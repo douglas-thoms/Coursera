@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/546188/4cd91e248b254401af068c753a0690f4
+bundleId: https://api.rpubs.com/api/v1/document/546188/4cd91e248b254401af068c753a0690f4
+url: http://rpubs.com/douglas_thoms/546188
+when: 1572804557.97327

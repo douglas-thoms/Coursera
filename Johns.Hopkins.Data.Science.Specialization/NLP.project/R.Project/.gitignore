@@ -8,3 +8,6 @@
 
 #Ignore all data
 /data
+
+#Ignore R-markup cache files
+/Capstone.Milestone.Report_cache
