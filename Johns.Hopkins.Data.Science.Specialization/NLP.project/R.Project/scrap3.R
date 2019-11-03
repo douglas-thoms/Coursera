@@ -56,21 +56,21 @@ head(distribution.features, n = 50)
 #first create textstate_frequency df, then reverse with  lowest rank at top
 #calculate total words and percentage rows based on that row and lower
 
-# features.trunct <- features.trunct %>% 
-#         arrange(rank) %>%
-#         mutate(cusum.words = cumsum(frequency)) %>%
-#         mutate(feature.counter = 1) %>%
-#         mutate(cusum.feature = cumsum(feature.counter)) %>%
-#         mutate(total.words = sum(frequency)) %>%
-#         mutate(total.words.per = (cusum.words/total.words)*100) %>%
-#         arrange(-total.words.per)
-# #row_number())
-# 
-# c <- ggplot(features.trunct,aes(x=total.words.per,y=cusum.feature)) +
-#         geom_point() +
-#         scale_x_reverse(name = "Total words(%)")
-# 
-# plot(c)
+features.trunct <- features.trunct %>%
+        arrange(rank) %>%
+        mutate(cusum.words = cumsum(frequency)) %>%
+        mutate(feature.counter = 1) %>%
+        mutate(cusum.feature = cumsum(feature.counter)) %>%
+        mutate(total.words = sum(frequency)) %>%
+        mutate(total.words.per = (cusum.words/total.words)*100) %>%
+        arrange(-total.words.per)
+#row_number())
+
+c <- ggplot(features.trunct,aes(x=total.words.per,y=cusum.feature)) +
+        geom_point() +
+        scale_x_reverse(name = "Total words(%)")
+
+plot(c)
 
 
 #create denodram
