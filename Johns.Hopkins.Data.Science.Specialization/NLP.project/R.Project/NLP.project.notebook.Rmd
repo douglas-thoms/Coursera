@@ -41,3 +41,9 @@ http://www.marekrei.com/pub/Machine_Learning_for_Language_Modelling_-_lecture2.p
 
 
 use kneser-ney or katz
+
+
+Testing Model and Code Rprof()
+Size object.size()
+Profiler to test time
+Todo list to improve models
