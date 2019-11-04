@@ -233,13 +233,13 @@ ngram.dfm <- dfm(tokens_ngrams(total.tokens,1:5))
 #find raw number of feature
 
 
-##----------------------------------------------------------------------------
-## Create model
-##----------------------------------------------------------------------------
 
 #partition testing set - 20%
 
-#create very small test set initially - only a couple of lines
+##----------------------------------------------------------------------------
+## Model
+##----------------------------------------------------------------------------
+#Create very small test set initially - only a couple of lines
 
 #determine string length
 #input string of words
@@ -309,7 +309,7 @@ root.ngram <- filter(df.select2,ngram.type == min(ngram.type))[1,3]
 df.select2 <- mutate(df.select2,last.word = word(ngram,start=min(ngram.type+1),end = ngram.type))
 #"(\\s[a-z]*){2}$"
 answer <- df.select2 %>%
-        filter(frequency !=max(frequency)) %>%
+        filter(frequency !=min(ngram.type)) %>%
         filter(score == max(score))
 print(answer[1,5])
 
