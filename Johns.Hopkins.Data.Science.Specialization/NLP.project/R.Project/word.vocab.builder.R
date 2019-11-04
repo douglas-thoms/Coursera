@@ -10,6 +10,7 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 
+        
 ##----------------------------------------------------------------------------
 ## Functions
 ##----------------------------------------------------------------------------
@@ -127,7 +128,7 @@ blogs.sample.size <- (blogs.sample * input.info.df[2,1])/(blogs.sample + input.i
 twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
 twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
 
-sample.rate = 2000/input.info.df[2,1]*10
+sample.rate = 2000/input.info.df[2,1]*50
 #use sample of 2000
 
 #use function to read lines from text file
@@ -181,18 +182,8 @@ total.tokens <- total.corpus %>%
         tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
 
-#see frequency and types of words
-dfm <- dfm(total.tokens)
-frequency.words <- textstat_frequency(dfm)
-n.feat.non.word <- nfeat(dfm)
-
 #remove non-english words
 total.tokens <- tokens_select(total.tokens,dict.english, selection = 'keep', valuetype = "fixed")
-
-#see frequency and types of words        
-english.dfm <- dfm(total.tokens) 
-frequency.eng.words <- textstat_frequency(english.dfm)
-n.feat.english.word <- nfeat(english.dfm)
 
 
 #tokens("New York City is located in the United States.") %>%
@@ -204,6 +195,7 @@ total.tokens <- total.tokens %>%
         tokens_tolower()
 
 num.tokens <- sum(ntoken(total.tokens))
+ngrams.dfm <- dfm(tokens_ngrams(total.tokens,1:5)) 
+nfeat.ngrams <- nfeat(ngrams.dfm)
 
 
-ngram.dfm <- dfm(tokens_ngrams(total.tokens,1:5))

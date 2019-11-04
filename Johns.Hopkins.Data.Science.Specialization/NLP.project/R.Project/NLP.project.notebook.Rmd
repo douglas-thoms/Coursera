@@ -38,6 +38,7 @@ http://smithamilli.com/blog/kneser-ney/
 https://www.youtube.com/watch?v=eNLUo3AIvcQ
 https://en.wikipedia.org/wiki/Katz%27s_back-off_model
 http://www.marekrei.com/pub/Machine_Learning_for_Language_Modelling_-_lecture2.pdf
+http://adv-r.had.co.nz/memory.html
 
 
 use kneser-ney or katz
@@ -47,3 +48,18 @@ Testing Model and Code Rprof()
 Size object.size()
 Profiler to test time
 Todo list to improve models
+
+Things to modify
+-ngram length - probably not
+-are words actually in dictionary including full ngram, check
+
+Correct answers
+[1] "You're the reason why I smile everyday. Can you follow me please? It would mean the"
+[1] "world"
+
+[1] "Ohhhhh #PointBreak is on tomorrow. Love that film and haven't seen it in quite some"
+[1] "time now"
+
+[1] "Well I'm pretty sure my granny has some old bagpipes in her garage I'll dust them off and be on my"
+[1] "way starting"
+

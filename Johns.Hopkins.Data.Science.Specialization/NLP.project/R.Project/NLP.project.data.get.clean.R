@@ -233,13 +233,13 @@ ngram.dfm <- dfm(tokens_ngrams(total.tokens,1:5))
 #find raw number of feature
 
 
-##----------------------------------------------------------------------------
-## Create model
-##----------------------------------------------------------------------------
 
 #partition testing set - 20%
 
-#create very small test set initially - only a couple of lines
+##----------------------------------------------------------------------------
+## Model
+##----------------------------------------------------------------------------
+#Create very small test set initially - only a couple of lines
 
 #determine string length
 #input string of words
