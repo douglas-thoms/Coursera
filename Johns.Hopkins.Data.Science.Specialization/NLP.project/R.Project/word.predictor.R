@@ -5,7 +5,7 @@
 ##  Date:       04NOV2019
 ##
 ##  Uses word.vocab.builder.R to predict the next word
-##  
+##
 ##
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ if (!exists("ngram.dfm")) {
         source("word.vocab.builder.R")
         #ngram.dfm <- get.data()
 }
-        
+
 ##----------------------------------------------------------------------------
 ## Model
 ##----------------------------------------------------------------------------
@@ -68,15 +68,15 @@ while (nfeat(df.select) < 2){
                                "(","^",sentence.w.under,"$",")",sep = "")
         #print(sentence)
         #print(sentence.prep)
-        
+
         df.select <- dfm_select(ngram.dfm,pattern = sentence.prep, valuetype = "regex")
-        
+
         if (grepl("_",sentence.w.under) == FALSE) {
-                
+
                 print(paste("Error: \'", sentence.w.under, "\' not in vocabulary"))
-                break 
+                break
         }
-        
+
 }
 
 
@@ -90,7 +90,7 @@ df.select2 <- df.select %>%
         convert(to = "data.frame") %>%
         select(-document) %>%
         summarise_all(sum) %>%
-        t() 
+        t()
 
 
 df.select2 <- data.frame(ngram = row.names(df.select2), df.select2)
@@ -118,8 +118,3 @@ print(answer[1,5])
 #alpha = 0.4
 #based it on 5-gram model
 #then use kneser mayer as comparison
-
-
-
-
-
