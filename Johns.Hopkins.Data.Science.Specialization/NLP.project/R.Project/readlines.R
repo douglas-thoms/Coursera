@@ -30,15 +30,16 @@
 #read lines from a text file, sampling them using rbinom
 get.lines <- function(df,type.info) {
         con <- file(as.character(df[type.info,2]),'rb')
-        x <- 0
-        #tmp2 <- as.character()
+        start <- date()
+
+        tmp2 <- "blank"
         
         for(i in 1:df[type.info,1]){
                 tmp <- readLines(con, 1, encoding = "UTF-8", skipNul = TRUE)
                 
-                if(rbinom(1,1,sample.rate) & length(tmp)){
-                        x <- x + 1
-                        if(x == 1) tmp2 <- tmp else tmp2 <- c(tmp2,tmp)
+                if(rbinom(1,1,sample.rate)){
+                        
+                        tmp2 <- c(tmp2,tmp)
                         
                 }
                 
@@ -132,7 +133,7 @@ blogs.sample.size <- (blogs.sample * input.info.df[2,1])/(blogs.sample + input.i
 twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
 twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
 
-sample.rate = 2000/input.info.df[2,1] * 10
+sample.rate = 2000/input.info.df[2,1] * 50
 #use sample of 2000
 
 #use function to read lines from text file
@@ -151,3 +152,5 @@ twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt
 
 #create one corpus
 total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
+
+end <- date()
