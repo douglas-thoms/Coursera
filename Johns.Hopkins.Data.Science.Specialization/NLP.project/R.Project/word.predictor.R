@@ -13,7 +13,7 @@
 ##----------------------------------------------------------------------------
 ## Library, Environment
 ##----------------------------------------------------------------------------
-
+start <- date()
 session.info.list <- sessionInfo()
 
 library(quanteda)
@@ -30,8 +30,8 @@ library(ngram)
 #if statement to call vocab if dfm not generated
 
 #Call ngram.dfm for vocabulary
-if (!exists("ngram.dfm")) {
-        print("constructing variable ngram.dfm")
+if (!exists("ngram.trim")) {
+        print("constructing variable ngram.trim")
         source("word.vocab.builder.R")
         #ngram.dfm <- get.data()
 }
@@ -43,14 +43,17 @@ if (!exists("ngram.dfm")) {
 
 #determine string length
 #input string of words
-sentence <- "The guy in front of me just bought a pound of bacon, a bouquet, and a case of"
+sentence <- "little"
 print(sentence)
 sentence.length <- wordcount(sentence)
+
+#qdap - stop words, remove them
+
 #if over 4, truncuate to last 4 words
 if (sentence.length >4) sentence <- word(sentence, start = sentence.length-4, end = sentence.length)
 
 sentence.w.under <- gsub(" ", "_", sentence)
-
+#MAKE SIMPLE JUST CUT DOWN TO LAST WORD
 #add in underscore, add wildcard * to last work
 sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
                        "(","^",sentence.w.under,"$",")",sep = "")
@@ -61,7 +64,7 @@ sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
 #search for n-1gram with *wildcard, if observed, move on
 #if not drop first word in 4gram
 #while there are less than 2 features bigram will be shortened
-df.select <- dfm_select(ngram.dfm,pattern = sentence.prep, valuetype = "regex")
+df.select <- dfm_select(ngram.trim,pattern = sentence.prep, valuetype = "regex")
 while (nfeat(df.select) < 2){
         sentence.w.under <- gsub( "^[^_]*_","",sentence.w.under)
         sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
@@ -69,7 +72,7 @@ while (nfeat(df.select) < 2){
         #print(sentence)
         #print(sentence.prep)
 
-        df.select <- dfm_select(ngram.dfm,pattern = sentence.prep, valuetype = "regex")
+        df.select <- dfm_select(ngram.trim,pattern = sentence.prep, valuetype = "regex")
 
         if (grepl("_",sentence.w.under) == FALSE) {
 
@@ -110,7 +113,7 @@ root.ngram <- filter(df.select2,ngram.type == min(ngram.type))[1,3]
 df.select2 <- mutate(df.select2,last.word = word(ngram,start=min(ngram.type+1),end = ngram.type))
 #"(\\s[a-z]*){2}$"
 answer <- df.select2 %>%
-        filter(frequency !=max(frequency)) %>%
+        filter(ngram.type !=min(ngram.type)) %>%
         filter(score == max(score))
 print(answer[1,5])
 
@@ -118,3 +121,5 @@ print(answer[1,5])
 #alpha = 0.4
 #based it on 5-gram model
 #then use kneser mayer as comparison
+
+end <- date()

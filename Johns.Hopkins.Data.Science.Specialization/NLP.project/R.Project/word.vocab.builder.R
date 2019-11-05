@@ -9,7 +9,7 @@
 ##
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
-
+start <- date()
 
 ##----------------------------------------------------------------------------
 ## Functions
@@ -59,56 +59,6 @@ if (!exists("news")) {
         #ngram.dfm <- get.data()
 }
 
-#determine sample - assume normal distribution
-# 95% confidence interval
-# Sample Size Calculation:
-#         Sample Size = (Distribution of 50%) / ((Margin of Error% / Confidence Level Score)Squared)
-# Finite Population Correction:
-#         True Sample = (Sample Size X Population) / (Sample Size + Population – 1)
-
-
-#create data frame of 3 different files info
-input.info.df <- data.frame(
-        num.lines = c(1010274, 899289, 2360149),
-        path = c('.//data//final//en_US//en_US.news.txt',
-                 './/data//final//en_US//en_US.blogs.txt',
-                 './/data//final//en_US//en_US.twitter.txt'),
-        names = c('news','blogs','twitter')
-)
-
-
-#determine sample rate to use
-news.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
-news.sample.size <- (news.sample * input.info.df[1,1])/(news.sample + input.info.df[1,1] - 1)
-
-blogs.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
-blogs.sample.size <- (blogs.sample * input.info.df[2,1])/(blogs.sample + input.info.df[2,1] - 1)
-
-twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
-twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
-
-sample.rate = 2000/input.info.df[2,1]*50
-#use sample of 2000
-
-#use function to read lines from text file
-news<- get.lines(input.info.df,1)
-blogs<- get.lines(input.info.df,2)
-twitter<- get.lines(input.info.df,3)
-
-#create corpus from matrices
-
-news.corpus <- create.corpus(news,"news.sample","en_US.news.txt",
-                             "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-blogs.corpus <- create.corpus(blogs,"blogs.sample", "en_US.blogs.txt",
-                              "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-twitter.corpus <- create.corpus(twitter, "twitter.sampletex", "en_US.twitter.txt",
-                                "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip")
-
-#create one corpus
-total.corpus <- corpus(news.corpus) + corpus(blogs.corpus) + corpus(twitter.corpus)
-
-
-
 ##----------------------------------------------------------------------------
 ## Clean Data/Tokenization/Ngrams
 ##----------------------------------------------------------------------------
@@ -154,14 +104,15 @@ total.tokens <- total.tokens %>%
         tokens_tolower()
 
 num.tokens <- sum(ntoken(total.tokens))
-ngrams.dfm <- dfm(tokens_ngrams(total.tokens,1:5))
-nfeat.ngrams <- nfeat(ngrams.dfm)
 
 ngram.toks <- tokens_ngrams(total.tokens, n=1:5)
 
 ngram.dfm <- ngram.toks %>%
-             dfm() %>%
-             dfm_trim(min_termfreq = 5)
+             dfm()
 
+#trim vocab for low likely ngrams
+ngram.trim <- dfm_trim(ngram.dfm, min_termfreq = 3)
 
-nfeat.ngram <- nfeat(ngram.dfm)
+nfeat.ngram <- nfeat(ngram.trim)
+       
+end <- date()
