@@ -26,11 +26,11 @@
 ##----------------------------------------------------------------------------
 ## Functions
 ##----------------------------------------------------------------------------
-
+       
 #read lines from a text file, sampling them using rbinom
 get.lines <- function(df,type.info) {
         con <- file(as.character(df[type.info,2]),'rb')
-        start <- date()
+        
 
         tmp2 <- "blank"
         
@@ -60,6 +60,8 @@ create.corpus <- function(input,text_name,file,URL){
 ##----------------------------------------------------------------------------
 ## Libraries, data and system
 ##----------------------------------------------------------------------------
+
+start <- date()
 
 session.info.list <- sessionInfo()
 
