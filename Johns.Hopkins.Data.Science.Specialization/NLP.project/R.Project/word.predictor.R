@@ -22,6 +22,7 @@ library(ggplot2)
 library(lexicon)
 library(stringr)
 library(ngram)
+library(qdap)
 
 ##----------------------------------------------------------------------------
 ## Get vocabulary
@@ -43,7 +44,15 @@ if (!exists("ngram.trim")) {
 
 #determine string length
 #input string of words
-sentence <- "Be grateful for the good times and keep the faith during the"
+sentence <- "Go on a romantic date at the"
+sentence <- sentence %>%
+        tokens(remove_punct = TRUE,
+        remove_numbers = TRUE,
+        remove_symbols = TRUE,
+        remove_url = TRUE,
+        remove_twitter = TRUE) %>%
+        tokens_select(stopwords('english'),selection='remove')
+sentence <- paste(sentence[[1]],collapse=" ")
 print(sentence)
 sentence.length <- wordcount(sentence)
 
@@ -69,17 +78,18 @@ while (nfeat(df.select) < 2){
         sentence.w.under <- gsub( "^[^_]*_","",sentence.w.under)
         sentence.prep <- paste("(^",sentence.w.under,"_[a-z]*$)|(^",sentence.w.under,"$)"
                                ,sep = "")
-        #print(sentence)
-        #print(sentence.prep)
+        print(sentence)
+        print(sentence.prep)
 
         df.select <- dfm_select(ngram.trim,pattern = sentence.prep, valuetype = "regex")
 
-        #if wordcount(sentence.w.under) == 1{
+        
+        
+       
+        if (grepl("_",sentence.w.under) == FALSE){
         #create top features subset of one
-        }
-        if (grepl("_",sentence.w.under) == FALSE) {
-
-                print(paste("Error: \'", sentence.w.under, "\' not in vocabulary"))
+        df.select<-df.select <- dfm_select(ngram.trim,pattern = names(topfeatures(ngram.trim,n=1)), valuetype = "fixed")
+        print("break")
                 break
         }
 
@@ -113,14 +123,18 @@ df.select2 <- mutate(df.select2,score = 0.4^(5-ngram.type)*(frequency/max(freque
 
 root.ngram <- filter(df.select2,ngram.type == min(ngram.type))[1,3]
 
-
+if(length(df.select2$ngram) == 1){
+        answer <- df.select2[1,1]
+        print(answer)
+}else{
+        
 df.select2 <- mutate(df.select2,last.word = word(ngram,start=min(ngram.type+1),end = ngram.type))
 #"(\\s[a-z]*){2}$"
 answer <- df.select2 %>%
         filter(ngram.type !=min(ngram.type)) %>%
         filter(score == max(score))
 print(answer[1,5])
-
+}
 #use stupid back off model
 #alpha = 0.4
 #based it on 5-gram model

@@ -69,9 +69,9 @@ if (!exists("news")) {
 dict.profane <- dictionary(list(profanity = profanity_zac_anger))
 
 #create regex expression to exclude
-dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
-                              number = "[0-9]-[0-9]"
-))
+#dict.regex <- dictionary(list(at.mark = "[@!#%&()*+./<=>_]",
+#                              number = "[0-9]-[0-9]"
+#))
 
 #add names - US and stuff
 #See if these others work later
@@ -86,9 +86,12 @@ dict.english <- dictionary(list(grady = grady_augmented
 #remove profane, stopwords and non-words
 total.tokens <- total.corpus %>%
         tokens(remove_punct = TRUE,
-               remove_numbers = TRUE) %>%
-        #tokens_select(stopwords('english'),selection='remove') %>%
-        tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
+               remove_numbers = TRUE,
+               remove_symbols = TRUE,
+               remove_url = TRUE,
+               remove_twitter = TRUE) %>%
+        tokens_select(stopwords('english'),selection='remove') %>%
+        #tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
 
 #remove non-english words
