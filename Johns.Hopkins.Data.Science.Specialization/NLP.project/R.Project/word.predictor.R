@@ -74,6 +74,9 @@ while (nfeat(df.select) < 2){
 
         df.select <- dfm_select(ngram.trim,pattern = sentence.prep, valuetype = "regex")
 
+        #if wordcount(sentence.w.under) == 1{
+        #create top features subset of one
+        }
         if (grepl("_",sentence.w.under) == FALSE) {
 
                 print(paste("Error: \'", sentence.w.under, "\' not in vocabulary"))
