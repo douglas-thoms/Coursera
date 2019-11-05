@@ -133,7 +133,7 @@ blogs.sample.size <- (blogs.sample * input.info.df[2,1])/(blogs.sample + input.i
 twitter.sample <- (0.5 * (1-0.5))/((.05/2.576)^2)
 twitter.sample.size <- (twitter.sample * input.info.df[3,1])/(twitter.sample + input.info.df[3,1] - 1)
 
-sample.rate = 2000/input.info.df[2,1] * 50
+sample.rate = 2000/input.info.df[2,1] * 20
 #use sample of 2000
 
 #use function to read lines from text file

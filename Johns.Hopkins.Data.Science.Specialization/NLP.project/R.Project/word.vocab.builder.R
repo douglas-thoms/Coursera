@@ -15,26 +15,6 @@
 ## Functions
 ##----------------------------------------------------------------------------
 
-#read lines from a text file, sampling them using rbinom
-get.lines <- function(df,type.info) {
-        con <- file(as.character(df[type.info,2]),'rb')
-        x <- 0
-        #tmp2 <- as.character()
-
-        for(i in 1:df[type.info,1]){
-                tmp <- readLines(con, 1, encoding = "UTF-8", skipNul = TRUE)
-
-                if(rbinom(1,1,sample.rate) & length(tmp)){
-                        x <- x + 1
-                        if(x == 1) tmp2 <- tmp else tmp2 <- c(tmp2,tmp)
-
-                }
-
-        }
-        close(con)
-        return(as.character(tmp2))
-}
-
 #creates corpus from large matrix, adds URL and source name is docvars
 create.corpus <- function(input,text_name,file,URL){
 
