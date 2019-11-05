@@ -43,7 +43,7 @@ if (!exists("ngram.trim")) {
 
 #determine string length
 #input string of words
-sentence <- "Be grateful for the good times and keep the faith during the"
+sentence <- "If this isn't the cutest thing you've ever seen, then you must be"
 print(sentence)
 sentence.length <- wordcount(sentence)
 
@@ -67,8 +67,8 @@ sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
 df.select <- dfm_select(ngram.trim,pattern = sentence.prep, valuetype = "regex")
 while (nfeat(df.select) < 2){
         sentence.w.under <- gsub( "^[^_]*_","",sentence.w.under)
-        sentence.prep <- paste("(^",sentence.w.under,"_[a-z]*$)|(^",sentence.w.under,"$)"
-                               ,sep = "")
+        sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
+                               "(","^",sentence.w.under,"$",")",sep = "")
         #print(sentence)
         #print(sentence.prep)
 
@@ -109,7 +109,6 @@ df.select2 <- mutate(df.select2,score = 0.4^(5-ngram.type)*(frequency/max(freque
 
 
 root.ngram <- filter(df.select2,ngram.type == min(ngram.type))[1,3]
-
 
 df.select2 <- mutate(df.select2,last.word = word(ngram,start=min(ngram.type+1),end = ngram.type))
 #"(\\s[a-z]*){2}$"
