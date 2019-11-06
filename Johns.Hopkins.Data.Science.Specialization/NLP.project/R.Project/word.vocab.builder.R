@@ -90,16 +90,12 @@ total.tokens <- total.corpus %>%
                remove_symbols = TRUE,
                remove_url = TRUE,
                remove_twitter = TRUE) %>%
-        tokens_select(stopwords('english'),selection='remove') %>%
+        #tokens_select(stopwords('english'),selection='remove') %>%
         #tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
 
 #remove non-english words
 total.tokens <- tokens_select(total.tokens,dict.english, selection = 'keep', valuetype = "fixed")
-
-
-#tokens("New York City is located in the United States.") %>%
-#tokens_compound(pattern = phrase(c("New York City", "United States")))
 
 #reduce features but uncapitalizing and word stem
 total.tokens <- total.tokens %>%

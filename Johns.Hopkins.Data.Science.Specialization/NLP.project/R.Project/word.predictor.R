@@ -50,8 +50,8 @@ sentence <- sentence %>%
         remove_numbers = TRUE,
         remove_symbols = TRUE,
         remove_url = TRUE,
-        remove_twitter = TRUE) %>%
-        tokens_select(stopwords('english'),selection='remove')
+        remove_twitter = TRUE)# %>%
+        #tokens_select(stopwords('english'),selection='remove')
 sentence <- paste(sentence[[1]],collapse=" ")
 print(sentence)
 sentence.length <- wordcount(sentence)
@@ -88,14 +88,17 @@ while (nfeat(df.select) < 2){
        
         if (grepl("_",sentence.w.under) == FALSE){
         #create top features subset of one
-        df.select<-df.select <- dfm_select(ngram.trim,pattern = names(topfeatures(ngram.trim,n=1)), valuetype = "fixed")
+        df.select <- dfm_select(ngram.trim,pattern = names(topfeatures(ngram.trim,n=1)), valuetype = "fixed")
         print("break")
                 break
         }
 
 }
 
+#remove stop word answers here?
+df.select <- dfm_select(df.select,pattern = names(topfeatures(df.select,n=10)), valuetype = "fixed")
 
+print("pulled expressions")
 
 #else calculate frequency of all groups
 #apply stupid back off
@@ -103,6 +106,7 @@ while (nfeat(df.select) < 2){
 #n words based on ngram
 
 df.select2 <- df.select %>%
+        #here trim according to top 5 10 features
         convert(to = "data.frame") %>%
         select(-document) %>%
         summarise_all(sum) %>%
