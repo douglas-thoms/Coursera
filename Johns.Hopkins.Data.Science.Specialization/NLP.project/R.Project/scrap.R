@@ -1,19 +1,21 @@
-test.corpus <- corpus_sample(total.corpus,size = 100)
+library(dplyr)
 
+x <- c("fish" = 5, "tree" = 6)
+y <- c("fish" = 4, "cheers" =7)
 
+vector <- y
 
-test.dfm <- dfm(test.corpus,
-              tolower = TRUE, stem = FALSE, remove_punct = TRUE,
-              remove = stopwords("english"))
-
-test.dfm <- dfm_trim(test.dfm, min_termfreq = 5)
-
-# hierarchical clustering - get distances on normalized dfm
-tstat_dist <- textstat_dist(test.dfm, margin = "features")
-# hiarchical clustering the distance object
-pres_cluster <- hclust(as.dist(tstat_dist))
-# label with document names
-#pres_cluster$labels <- features(test.dfm)
-# plot as a dendrogram
-plot(pres_cluster, xlab = "", sub = "",
-     main = "Euclidean Distance on Normalized Token Frequency")
+if (!exists("frequency.df"))
+{
+        frequency.df <- data.frame(vector)
+        frequency.df$names <- rownames(frequency.df)
+        frequency.df <- frequency.df %>%
+                select(names, everything())
+} else {
+        temp <- data.frame(vector)
+        temp$names <- rownames(temp)
+        temp <- temp %>%
+                select(names, everything())
+        frequency.df <- full_join(frequency.df,temp, by = "names")
+        frequency.df[is.na(frequency.df)] <- 0
+}
