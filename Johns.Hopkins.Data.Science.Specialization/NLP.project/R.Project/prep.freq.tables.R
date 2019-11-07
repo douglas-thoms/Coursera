@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 ##
-##  File name:  readlines.R
+##  File name:  
 ##  Date:       04NOV2019
 ##
 ##  Get data from text files
@@ -11,23 +11,51 @@
 ##----------------------------------------------------------------------------
 
 ##----------------------------------------------------------------------------
-##----------------------------------------------------------------------------
-##
-##  File name:  word.vocab.builder.R
-##  Date:       04NOV2019
-##
-##  Script to get and clean data.  Outputs ngram.dfm for word.predictor.R
-##  
-##
-##----------------------------------------------------------------------------
-##----------------------------------------------------------------------------
-
-
-##----------------------------------------------------------------------------
 ## Functions
 ##----------------------------------------------------------------------------
 
+get.frequency <- function(file, ngram){
 
+file <- readtext(file,encoding = "UTF-8")
+chunk.corpus <- corpus(file)
+
+
+toks <- chunk.corpus %>%
+        tokens(
+                remove_punct = TRUE,
+                remove_numbers = TRUE,
+                remove_symbols = TRUE,
+                remove_url = TRUE,
+                remove_twitter = TRUE) %>%
+        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") %>%
+        tokens_select(dict.english, selection = 'keep', valuetype = "fixed")
+
+dfm <- dfm(toks, ngrams = ngram)
+
+
+
+dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
+
+vector <- sort(colSums(dfm.trim),decreasing = TRUE)
+
+
+        if (!exists("frequency.df"))
+        {
+                frequency.df <- data.frame(vector,stringsAsFactors = FALSE)
+                frequency.df$names <- rownames(frequency.df)
+                frequency.df <- frequency.df %>%
+                        select(names, everything())
+        } else {
+                temp <- data.frame(vector,stringsAsFactors = FALSE)
+                temp$names <- rownames(temp)
+                temp <- temp %>%
+                        select(names, everything())
+                frequency.df <- full_join(frequency.df,temp, by = "names")
+                frequency.df[is.na(frequency.df)] <- 0
+        }
+
+        return(frequency.df)
+}
 
 ##----------------------------------------------------------------------------
 ## Libraries, data and system
@@ -54,55 +82,24 @@ data(grady_augmented)
 
 dict.profane <- dictionary(list(profanity = profanity_zac_anger))
 dict.english <- dictionary(list(grady = grady_augmented))  
-                        
 
-file <- readtext("data/final/en_US/en_US.twitter.txt",encoding = "UTF-8")
-chunk.corpus <- corpus(file)
+input <- c("data/final/en_US/en_US.blogs.txt",
+             "data/final/en_US/en_US.news.txt",
+             "data/final/en_US/en_US.twitter.txt")
 
+rm(frequency.df)
 
-toks <- chunk.corpus %>%
-               tokens(
-               remove_punct = TRUE,
-               remove_numbers = TRUE,
-               remove_symbols = TRUE,
-               remove_url = TRUE,
-               remove_twitter = TRUE) %>%
-        #tokens_select(stopwords('english'),selection='remove') %>%
-        #tokens_select(dict.regex, selection = 'remove', valuetype = "regex") %>%
-        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") %>%
-        tokens_select(dict.english, selection = 'keep', valuetype = "fixed")
-
-dfm <- dfm(toks, 
-            ngrams = 1,
-           # remove_numbers = TRUE, 
-           # remove_punct = TRUE,
-           # remove_symbols = TRUE,
-           # remove_separators = TRUE,
-           # remove_twitter = TRUE,
-           # remove_hyphens = TRUE,
-           # #remove non-english words
-            )
-
-
-
-dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
-
-vector <- sort(colSums(dfm.trim),decreasing = TRUE)
-
-
-if (!exists("frequency.df"))
-{
-        frequency.df <- data.frame(vector)
-        frequency.df$names <- rownames(frequency.df)
-        frequency.df <- frequency.df %>%
-                select(names, everything())
-} else {
-        temp <- data.frame(vector)
-        temp$names <- rownames(temp)
-        temp <- temp %>%
-                select(names, everything())
-        frequency.df <- full_join(frequency.df,temp, by = "names")
-        frequency.df[is.na(frequency.df)] <- 0
+for(i in 1:3){
+frequency.df <- get.frequency(input[i],2)                  
 }
 
-x <- cbind(frequency.df$names,rowSums(frequency.df[, c(2,3,4)]))
+
+
+#frequency.df <- cbind(frequency.df$names,as.numeric(rowSums(frequency.df[, c(2,3,4)])))
+frequency.df <- data.frame(name = frequency.df$names,frequency = rowSums(frequency.df[, c(2,3,4)]))
+
+saveRDS(frequency.df,"data/bigram.rds")
+
+test <- readRDS("data/bigram.rds")
+
+#keep as separate data frames and access them as necessary, for speed

@@ -22,7 +22,7 @@ library(ggplot2)
 library(lexicon)
 library(stringr)
 library(ngram)
-library(qdap)
+
 
 ##----------------------------------------------------------------------------
 ## Get vocabulary
@@ -56,7 +56,7 @@ sentence <- paste(sentence[[1]],collapse=" ")
 print(sentence)
 sentence.length <- wordcount(sentence)
 
-#qdap - stop words, remove them
+
 
 #if over 4, truncuate to last 4 words
 if (sentence.length >4) sentence <- word(sentence, start = sentence.length-4, end = sentence.length)

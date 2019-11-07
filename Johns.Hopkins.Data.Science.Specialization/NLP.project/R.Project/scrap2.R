@@ -1,43 +1,73 @@
+start <- date()
+session.info.list <- sessionInfo()
+
+library(quanteda)
 library(dplyr)
 library(ggplot2)
+library(lexicon)
+library(stringr)
+library(ngram)
 
-test.corpus <- corpus_sample(total.corpus,size = 1000)
+
+##----------------------------------------------------------------------------
+## Model
+##----------------------------------------------------------------------------
+#Create very small test set initially - only a couple of lines
+
+#determine string length
+#input string of words
+sentence <- "Go on a romantic date at the"
+sentence <- sentence %>%
+        tokens(remove_punct = TRUE,
+               remove_numbers = TRUE,
+               remove_symbols = TRUE,
+               remove_url = TRUE,
+               remove_twitter = TRUE)# %>%
+#tokens_select(stopwords('english'),selection='remove')
+sentence <- paste(sentence[[1]],collapse=" ")
+print(sentence)
+sentence.length <- wordcount(sentence)
 
 
 
-test.dfm <- dfm(test.corpus,
-                tolower = TRUE, stem = FALSE, remove_punct = TRUE,
-                remove = stopwords("english"))
+#if over 4, truncuate to last 4 words
+if (sentence.length >4) sentence <- word(sentence, start = sentence.length-4, end = sentence.length)
 
-test.dfm <- dfm_trim(test.dfm, min_termfreq = 1)
+sentence.w.under <- gsub(" ", "_", sentence)
+#MAKE SIMPLE JUST CUT DOWN TO LAST WORD
+#add in underscore, add wildcard * to last work
+sentence.prep <- paste("(","^",sentence.w.under,"_",")","|",
+                       "(","^",sentence.w.under,"$",")",sep = "")
 
-features_dfm_inaug <- textstat_frequency(test.dfm)
+#regex is (^tell_me_.*)|(^tell_me$)
+#check if ngram is observed
 
-# Sort by reverse frequency order
-features_dfm_inaug$feature <- with(features_dfm_inaug, reorder(feature, -frequency))
+#search for n-1gram with *wildcard, if observed, move on
+#if not drop first word in 4gram
+#while there are less than 2 features bigram will be shortened
 
-a <- ggplot(features_dfm_inaug, aes(x = feature, y = frequency)) +
-        geom_point() + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+#select with grepl
+select.vocab.l <- grepl(sentence.prep,vocabulary$)
+        
+df.select <- dfm_select(ngram.trim,pattern = sentence.prep, valuetype = "regex")
+while (nfeat(df.select) < 2){
+        sentence.w.under <- gsub( "^[^_]*_","",sentence.w.under)
+        sentence.prep <- paste("(^",sentence.w.under,"_[a-z]*$)|(^",sentence.w.under,"$)"
+                               ,sep = "")
+        print(sentence)
+        print(sentence.prep)
+        
+        #select file
 
-plot(a)
+        
+        if (grepl("_",sentence.w.under) == FALSE){
+                #create top features subset of one
 
-#to create percentage graph
-#first create textstate_frequency df, then reverse with  lowest rank at top
-#calculate total words and percentage rows based on that row and lower
+                break
+        }
+        
+}
 
-features_dfm_inaug <- features_dfm_inaug %>% 
-        arrange(rank) %>%
-        mutate(cusum.words = cumsum(frequency)) %>%
-        mutate(feature.counter = 1) %>%
-        mutate(cusum.feature = cumsum(feature.counter)) %>%
-        mutate(total.words = sum(frequency)) %>%
-        mutate(total.words.per = (cusum.words/total.words)*100) %>%
-        arrange(-total.words.per)
-        #row_number())
 
-b <- ggplot(features_dfm_inaug,aes(x=total.words.per,y=cusum.feature)) +
-        geom_point() +
-        scale_x_reverse(name = "Total words(%)")
 
-plot(b)
+
