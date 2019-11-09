@@ -34,7 +34,7 @@ dfm <- dfm(toks, ngrams = ngram)
 
 
 
-dfm.trim <- dfm_trim(dfm, min_termfreq = 2)
+dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
 
 vector <- sort(colSums(dfm.trim),decreasing = TRUE)
 
@@ -90,16 +90,18 @@ input <- c("data/final/en_US/en_US.blogs.txt",
 rm(frequency.df)
 
 for(i in 1:3){
-frequency.df <- get.frequency(input[i],2)                  
+frequency.df <- get.frequency(input[i],1)                  
 }
 
 
 
-#frequency.df <- cbind(frequency.df$names,as.numeric(rowSums(frequency.df[, c(2,3,4)])))
-frequency.df <- data.frame(name = frequency.df$names,frequency = rowSums(frequency.df[, c(2,3,4)]))
 
-saveRDS(frequency.df,"data/bigram.rds")
+frequency.df <- data.frame(name = frequency.df$names,
+                           frequency = rowSums(frequency.df[, c(2,3,4)]),
+                           stringsAsFactors = FALSE)
 
-test <- readRDS("data/bigram.rds")
+saveRDS(frequency.df,"data/unigram.rds")
+
+test <- readRDS("data/unigram.rds")
 
 #keep as separate data frames and access them as necessary, for speed
