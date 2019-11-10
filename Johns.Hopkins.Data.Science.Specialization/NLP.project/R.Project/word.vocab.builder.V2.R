@@ -65,7 +65,7 @@ pentagram <- readRDS("data/pentagram.rds")
 
 
 #input string of words and remove punctuation, etc
-sentence <- "If this isn't the cutest thing you've ever seen, then you must be"
+sentence <- "Be grateful for the good times and keep the faith during the"
 sentence <- sentence %>%
         tokens(remove_punct = TRUE,
                remove_numbers = TRUE,

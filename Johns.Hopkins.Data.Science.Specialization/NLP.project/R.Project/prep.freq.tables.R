@@ -100,8 +100,10 @@ frequency.df <- data.frame(name = frequency.df$names,
                            frequency = rowSums(frequency.df[, c(2,3,4)]),
                            stringsAsFactors = FALSE)
 
-saveRDS(frequency.df,"data/unigram.rds")
+frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
-test <- readRDS("data/unigram.rds")
+saveRDS(frequency.df,"data/unigram.test.rds")
+
+test <- readRDS("data/unigram.test.rds")
 
 #keep as separate data frames and access them as necessary, for speed
