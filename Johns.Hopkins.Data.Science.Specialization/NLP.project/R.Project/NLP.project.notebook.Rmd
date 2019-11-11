@@ -39,14 +39,16 @@ https://www.youtube.com/watch?v=eNLUo3AIvcQ
 https://en.wikipedia.org/wiki/Katz%27s_back-off_model
 http://www.marekrei.com/pub/Machine_Learning_for_Language_Modelling_-_lecture2.pdf
 http://adv-r.had.co.nz/memory.html
-
-
 use kneser-ney or katz
 
 
 Testing Model and Code Rprof()
 Size object.size()
 Profiler to test time
+http://rpubs.com/mszczepaniak/classificationgoodness
+https://github.com/hfoffani/dsci-benchmark
+
+
 Todo list to improve models
 
 Things to modify

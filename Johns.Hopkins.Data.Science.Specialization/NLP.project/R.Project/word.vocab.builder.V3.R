@@ -65,7 +65,7 @@ pentagram <- readRDS("data/pentagram.rds")
 
 
 #input string of words and remove punctuation, etc
-sentence <- "Go on a romantic date at the"
+sentence <- "When you were in Holland you were like 1 inch away from me but you hadn't time to take a"
 
 sentence <- sentence %>%
         tokens(remove_punct = TRUE,
