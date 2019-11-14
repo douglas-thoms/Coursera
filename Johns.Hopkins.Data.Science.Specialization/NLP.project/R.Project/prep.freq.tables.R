@@ -30,9 +30,9 @@ toks <- chunk.corpus %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") %>%
         tokens_select(dict.english, selection = 'keep', valuetype = "fixed")
 
+#add supplement dfm
+
 dfm <- dfm(toks, ngrams = ngram)
-
-
 
 dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
 
@@ -92,9 +92,6 @@ rm(frequency.df)
 for(i in 1:3){
 frequency.df <- get.frequency(input[i],1)                  
 }
-
-
-
 
 frequency.df <- data.frame(name = frequency.df$names,
                            frequency = rowSums(frequency.df[, c(2,3,4)]),

@@ -84,33 +84,6 @@ training.data.loc.2 <- "http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.
 download.unzip(training.data.loc,training.data.file.path)
 download.untar(training.data.loc.2,training.data.file.path.2)
 
-
-
-#set up one for gutenberg partial corpus (manually download) and unzipped manually because of error
+#gutenberg partial corpus (manually download) and unzipped manually because of error
 #https://web.eecs.umich.edu/~lahiri/gutenberg_dataset.html
 
-# #download and unzip file if not present
-# if(!file.exists(training.data.file.path)){
-#         download.file(training.data.loc, training.data.file.path)
-#         
-#         training.data.date <- date()
-#         
-#         
-#         unzip(training.data.file.path, exdir = data.directory)
-#         
-# }
-
-
-
-#                unzip(training.data.file.path, exdir = data.directory)
-
-
-
-
-# fn <- "http://s.wordpress.org/resources/survey/wp2011-survey.tar.gz"
-# download.file(fn,destfile="tmp.tar.gz")
-# untar("tmp.tar.gz",list=TRUE)  ## check contents
-# untar("tmp.tar.gz")
-# ## or, if you just want to extract the target file:
-# untar("tmp.tar.gz",files="wp2011-survey/anon-data.csv")
-# X <- read.csv("wp2011-survey/anon-data.csv")
