@@ -55,13 +55,17 @@ Things to modify
 -ngram length - probably not
 -are words actually in dictionary including full ngram, check
 
-Correct answers
-[1] "You're the reason why I smile everyday. Can you follow me please? It would mean the"
-[1] "world"
-
-[1] "Ohhhhh #PointBreak is on tomorrow. Love that film and haven't seen it in quite some"
-[1] "time now"
-
-[1] "Well I'm pretty sure my granny has some old bagpipes in her garage I'll dust them off and be on my"
-[1] "way starting"
+Potential Additional corpi
+ Google 1T corpus (too big) - 24 gb
+ Heliohost corpus (no longer exists)
+ https://machinelearningmastery.com/datasets-natural-language-processing/
+ GUtenberg whole - too big (40GB)
+ https://webapps.stackexchange.com/questions/12311/how-to-download-all-english-books-from-gutenberg
+ GUtenberg partial
+ https://web.eecs.umich.edu/~lahiri/gutenberg_dataset.html
+ 
+ Links to download
+  http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+  https://www.corpusdata.org/ - fee
+  http://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html
 
