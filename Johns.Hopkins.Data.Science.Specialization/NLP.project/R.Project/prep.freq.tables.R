@@ -44,15 +44,15 @@ vector <- sort(colSums(dfm.trim),decreasing = TRUE)
         if (!exists("frequency.df"))
         {
                 frequency.df <- data.frame(vector,stringsAsFactors = FALSE)
-                frequency.df$names <- rownames(frequency.df)
+                frequency.df$name <- rownames(frequency.df)
                 frequency.df <- frequency.df %>%
-                        select(names, everything())
+                        select(name, everything())
         } else {
                 temp <- data.frame(vector,stringsAsFactors = FALSE)
-                temp$names <- rownames(temp)
+                temp$name <- rownames(temp)
                 temp <- temp %>%
-                        select(names, everything())
-                frequency.df <- full_join(frequency.df,temp, by = "names")
+                        select(name, everything())
+                frequency.df <- full_join(frequency.df,temp, by = "name")
                 frequency.df[is.na(frequency.df)] <- 0
         }
 
@@ -95,14 +95,14 @@ for(i in 1:3){
 frequency.df <- get.frequency(input[i],1)                  
 }
 
-frequency.df <- data.frame(name = frequency.df$names,
+frequency.df <- data.frame(name = frequency.df$name,
                            frequency = rowSums(frequency.df[, c(2,3,4)]),
                            stringsAsFactors = FALSE)
 
-frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
+#frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
-saveRDS(frequency.df,"data/unigram.test.rds")
+saveRDS(frequency.df,"data/unigram.rds")
 
-test <- readRDS("data/unigram.test.rds")
+test <- readRDS("data/unigram.rds")
 
 #keep as separate data frames and access them as necessary, for speed

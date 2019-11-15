@@ -58,25 +58,26 @@ toks <- supp.corpus %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") 
 
 #create ngram
-supp.dfm <- dfm(toks, ngrams = 5)
+supp.dfm <- dfm(toks, ngrams = 3)
 
 #remove lower frequency terms
-supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 2)
+supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 3)
 
 #sum columns and create a vector totalling each factors frequency
 vector <- sort(colSums(supp.dfm.trim),decreasing = TRUE)
 
 #create a dataframe with ngram name and frequency
 frequency.df <- data.frame(vector,stringsAsFactors = FALSE)
-frequency.df$names <- rownames(frequency.df)
+frequency.df$name <- rownames(frequency.df)
 frequency.df <- frequency.df %>%
-        select(names, everything())
+                select(name, everything()) %>%
+                rename(frequency = vector)
 
 #count number of words to feature
-frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
+#frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
 #create RDS file to input later
-saveRDS(frequency.df,"data/pentagram.supp.rds")
+saveRDS(frequency.df,"data/trigram.supp.rds")
 
 #input to test if same as expected
-test <- readRDS("data/pentagram.supp.rds")
+test <- readRDS("data/trigram.supp.rds")
