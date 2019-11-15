@@ -4,8 +4,10 @@
 ##  File name:  
 ##  Date:       04NOV2019
 ##
-##  Get data from text files
-##  
+##  Step 2 in process
+##  Supplemental in process
+##  Input script is download.enter.corpus.R
+##  Create swiftkey ngrams
 ##
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------

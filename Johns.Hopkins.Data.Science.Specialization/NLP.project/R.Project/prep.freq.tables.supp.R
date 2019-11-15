@@ -4,18 +4,22 @@
 ##  File name:  dfm.supplement.R
 ##  Date:       14Nov19
 ##
+##  Step 2a in process
 ##  Supplemental in process
+##  Input script is download.enter.corpus.R
 ##  Create supplemntal ngrams to be combined with swiftkey ngrams
-##
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 
 ##----------------------------------------------------------------------------
 ## Create corpus
 ##----------------------------------------------------------------------------
-require(quanteda)
-require(readtext)
+library(dplyr)
+library(quanteda)
+library(readtext)
 library(lexicon)
+library(stringr)
+library(ngram)
 
 #load profane dataset
 data(profanity_zac_anger)
@@ -54,7 +58,7 @@ toks <- supp.corpus %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") 
 
 #create ngram
-supp.dfm <- dfm(toks, ngrams = 3)
+supp.dfm <- dfm(toks, ngrams = 5)
 
 #remove lower frequency terms
 supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 2)
@@ -72,7 +76,7 @@ frequency.df <- frequency.df %>%
 frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
 #create RDS file to input later
-saveRDS(frequency.df,"data/trigram.supp.rds")
+saveRDS(frequency.df,"data/pentagram.supp.rds")
 
 #input to test if same as expected
-test <- readRDS("data/trigram.supp.rds")
+test <- readRDS("data/pentagram.supp.rds")

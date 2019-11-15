@@ -1,3 +1,20 @@
+#NEXT STEPS 
+#-add supplemental files in input files
+#-simplify this with a function
+
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
+##
+##  File name:  
+##  Date:       04NOV2019
+##
+##  Step 4 in process
+##  Input script is create.variables.R
+##  Create ngram variables in Rstudio environment
+##
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
+
 start <- date()
 session.info.list <- sessionInfo()
 
@@ -45,27 +62,13 @@ retrieve.candidates <- function(ngram.search,ngram.root.search){
 
 
 ##----------------------------------------------------------------------------
-## Load vocab files
-##----------------------------------------------------------------------------
-
-unigram <- readRDS("data/unigram.rds")
-
-bigram <- readRDS("data/bigram.rds")
-
-trigram <- readRDS("data/trigram.rds")
-
-quadgram <- readRDS("data/quadgram.rds")
-
-pentagram <- readRDS("data/pentagram.rds")
-
-##----------------------------------------------------------------------------
 ## Model
 ##----------------------------------------------------------------------------
 #Create very small test set initially - only a couple of lines
 
 
 #input string of words and remove punctuation, etc
-sentence <- "When you were in Holland you were like 1 inch away from me but you hadn't time to take a"
+sentence <- "I like how the same people are in almost all of Adam Sandler's"
 
 sentence <- sentence %>%
         tokens(remove_punct = TRUE,
