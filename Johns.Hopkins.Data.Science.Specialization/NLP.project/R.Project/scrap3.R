@@ -6,7 +6,7 @@ library(stringr)
 #break into 4*3 dataframe, rows quad,tri,bi,uni
 #columns actual ngram, root search, n+1 root search
 
-sentence <- "I like cheese"
+sentence <- "I play halo"
 n.words <- wordcount(sentence)
 sentence <- gsub(" ", "_", sentence)
 
@@ -31,21 +31,47 @@ sentence <- gsub(" ", "_", sentence)
 #get three types of ngrams - preceeding.ngram (* like cheese), preceeding bigram (* like),
 #proceeding.bigram (like *)
 
+#row 1
+#like_cheese
+
+#step 2
+#have preceeding.ngram for regex
+#regex is "*_like_cheese$" for trigram
+
+#step 3
+#remove last word with word count
+#regex is "*_like" for bigram
+
+#step 4
+#remove last word with word count
+#regex is "like_*" for bigram
 
 
-#already cut down to max 4
+        
+        output <- NULL
+        
+        for(i in 1:n.words) {
+                #generate ngrams from blank to pentagram
+                output <- c(output, word(sentence, start = i, end = n.words, sep = "_"))
+        }
+        
+        #create dataframe
+        output <- data.frame(name = output, stringsAsFactors = FALSE)
+        output <- output %>%
+                #regex example is "*_like_cheese$" for trigram
+                mutate(preceeding.ngram.regex = paste("^*_",name,"$",sep=""),
+                       #set up lower ngram name
+                       lower.ngram = word(name, start = 1, sep = "_"),
+                       #regex is "*_like" for bigram
+                       preceeding.lower.ngram = paste("^*_",lower.ngram,"$",sep=""),
+                       #regex is "like_* for bigram
+                       proceeding.lower.ngram = paste("^",lower.ngram,"_{1}",sep=""))
+        
+
+
+
+#already cut down to max 
 
 #first vector - acutal ngram
 
-output <- NULL
 
-for(i in 1:n.words) {
-        
-        output <- c(output, word(sentence, start = i, end = n.words, sep = "_"))
-}
-
-#then use dplyr for other sections
-output <- data.frame(name = output, stringsAsFactors = FALSE)
-output <- output %>%
-        mutate(preceding.word = paste("^",name,"$",sep="")) %>%
-        mutate(combo.search = paste("^",sentence,"_{1}",sep=""))
