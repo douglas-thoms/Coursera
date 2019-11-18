@@ -28,36 +28,98 @@ library(ngram)
 ##----------------------------------------------------------------------------
 ## Function
 ##----------------------------------------------------------------------------
+#this function generates search terms to filter ngram tables to a max of pentagrams
+generate.search.terms <- function(sentence){
 
-retrieve.candidates <- function(ngram.search,ngram.root.search){
+        n.words <- wordcount(sentence)
+        sentence <- gsub(" ", "_", sentence)
+        
+        output <- NULL
+        
+        for(i in 1:n.words) {
+                #generate ngrams from blank to pentagram
+                output <- c(output, word(sentence, start = i, end = n.words, sep = "_"))
+        }
+        
+        #create dataframe
+        output <- data.frame(name = output, stringsAsFactors = FALSE)
+        output <- output %>%
+                #regex example ^friend$
+                mutate(root.search = paste("^",name,"$",sep="")) %>%
+                #regex example "^friend_{1}"
+                mutate(combo.search = paste("^",name,"_{1}",sep=""))
+        
+        #add blank row
+        output <- rbind(output, c("","","",""))
+        
+        return(output)
+}
 
-        #search appropriate data frame
-        if(wordcount(sentence) == 4) {
+retrieve.candidates <- function(name,root.search,combo.search){
+        #get sentence level
+        sentence.length <- wordcount(name, sep = "_")
+        
+        #load appropriate corpus of ngrams
+        if(sentence.length == 4) {
                 ngram.df <- pentagram
                 root.df <- quadgram
                 
-        }else if(wordcount(sentence) == 3) {
+        }else if(sentence.length == 3) {
                 ngram.df <- quadgram
                 root.df <- trigram
                 
-        }else if(wordcount(sentence) == 2) {
+        }else if(sentence.length == 2) {
                 ngram.df <- trigram
                 root.df <- bigram
-        }else if(wordcount(sentence) == 1) {
+        }else if(sentence.length == 1) {
                 ngram.df <- bigram
                 root.df <- unigram
         }else {
                 ngram.df <- unigram
         }
         
-        #search for ngram candidates
-        result.df <- ngram.df %>%
-                filter(grepl(ngram.search,name))
+        #search for ngram candidates on bigrams and up, using stupid backoff recursion
+        if(sentence.length >= 1){
+
+                #filter according to regex
+                result.df <- ngram.df %>%
+                        filter(grepl(combo.search,name))
+                
+                #if found result
+                if(length(result.df$name)){
+                
+                #filter to regex
+                result.root.df <- root.df %>%
+                filter(grepl(root.search,name))
+                
+                #find root frequency
+                root.frequency <- result.root.df$frequency[[1]]
+                
+                #calculate score using stupid backoff model
+                result.df <- result.df %>%
+                        mutate(root.name = name,
+                               root.frequency = root.frequency,
+                               ngram.length = sentence.length + 1,
+                               score = 0.4^(5-ngram.length)*(frequency/root.frequency))
         
-        result.root.df <- root.df %>%
-                filter(grepl(ngram.root.search,name))
+                return(result.df)
+                }
         
-        return(full_join(result.root.df,result.df))
+        #calculate final recursion level for stupid backoff model
+        } else if(sentence.length == 0){
+                #get total corpus size
+                corpus.size <- sum(length(unigram$name),
+                                   length(bigram$name),
+                                   length(trigram$name),
+                                   length(quadgram$name),
+                                   length(pentagram$name))
+                result.df <- ngram.df %>%
+                        mutate(root.name = NA,
+                               root.frequency = corpus.size,
+                               ngram.length = 0,
+                               score = 0.4^(5-ngram.length)*(frequency/root.frequency))
+                
+        }
 }
 
 
@@ -68,14 +130,16 @@ retrieve.candidates <- function(ngram.search,ngram.root.search){
 
 
 #input string of words and remove punctuation, etc
-sentence <- "I like how the same people are in almost all of Adam Sandler's"
+sentence <- "I always go the"
 
 sentence <- sentence %>%
         tokens(remove_punct = TRUE,
                remove_numbers = TRUE,
                remove_symbols = TRUE,
                remove_url = TRUE,
-               remove_twitter = TRUE)# %>%
+               remove_twitter = TRUE
+               ) %>%
+                tokens_tolower()
 #tokens_select(stopwords('english'),selection='remove')
 sentence <- paste(sentence[[1]],collapse=" ")
 print(sentence)
@@ -86,117 +150,36 @@ sentence.length <- wordcount(sentence)
 #if over 4, truncuate to last 4 words
 if (sentence.length >4) sentence <- word(sentence, start = sentence.length-3, end = sentence.length)
 
-iter.counter <-wordcount(sentence)
+#determine number of words
+iterations <-wordcount(sentence)+1
 
-#regex is (^tell_me_.*)|(^tell_me$)
-#check if ngram is observed
+#run function
+search.terms <- generate.search.terms(sentence)
 
-sentence.w.under <- gsub(" ", "_", sentence)
+output.df <- NULL
+for(i in 1:iterations){
 
-#add in underscore, add wildcard * to last word
-#regex example "^friend_{1}"
-ngram.search <- paste("^",sentence.w.under,"_{1}",sep="")
+df <- retrieve.candidates(search.terms[i,1],search.terms[i,2],search.terms[i,3])
+output.df <- rbind(output.df,df)
+}
 
-#get root n.gram
-ngram.root.search <- paste("^",sentence.w.under,"$",sep="")
+#consolidate ngrams with same last words, combine values
+#first create last word column
+output.df <- mutate(output.df,output.word = 
+                            word(output.df$name,
+                                 start=output.df$ngram.length,
+                                 sep = "_"))
 
-output.df <- retrieve.candidates(ngram.search, ngram.root.search)
-
-#get length of ngram
-if(length(output.df$name)) {
-        
-        output.df$ngram.length <- sapply(output.df$name,wordcount,sep = "_")
-
-root.frequency <- output.df %>%
-        arrange(ngram.length) %>%
-        filter(ngram.length == min(ngram.length))
-
-output.df <- output.df %>%
-        filter(ngram.length != min(ngram.length)) %>%
-        mutate(score = 0.4^(5-ngram.length)*(frequency/root.frequency[1,2])) %>%
+#summarise different values according to last word
+final.output.df <- output.df %>%
+        group_by(output.word) %>%
+        summarise(score = sum(score)) %>%
+        ungroup %>%
+        #remove stop words
+        filter(!(output.word %in% stopwords("english"))) %>%
         arrange(desc(score))
-}
 
-for (i in iter.counter:0){
-        
-        print(i)
-        if(i>1){
-                print("other ngram")
-                
-                #demote ngram down one level
-                ngram.search <- gsub( "^[^_]*_","",ngram.search)
-                ngram.search <- paste("^",ngram.search,sep="")
-                
-                ngram.root.search <- gsub( "^[^_]*_","",ngram.root.search)
-                ngram.root.search <- paste("^",ngram.root.search,sep="")
-                print(paste("ngram.root.search is",ngram.root.search))
-                
-                #adjust sentence removing first word to rerun retrieve.candidates function
-                sentence.length <- wordcount(sentence)
-                sentence <- word(sentence,start=2,end=sentence.length)
-                
-                candidates.df <- retrieve.candidates(ngram.search, ngram.root.search)
-                if(length(candidates.df$name)) {
-                        #get length of ngram
-                        candidates.df$ngram.length <- sapply(candidates.df$name,wordcount,sep = "_")
-                        
-                        root.frequency <- candidates.df %>%
-                                arrange(ngram.length) %>%
-                                filter(ngram.length == min(ngram.length))
-                        
-                        #use stupid back off model
-                        #based it on 5-gram model
-                        #alpha = 0.4
-                        #if at least final bigram in model, use following calculation
-                        
-                        candidates.df <- candidates.df %>%
-                                filter(ngram.length != min(ngram.length)) %>%
-                                mutate(score = 0.4^(5-ngram.length)*(frequency/root.frequency[1,2]))
-                                
-                                output.df <- full_join(output.df,candidates.df)
-                        
-                        print(paste("candidates.df observations are",length(candidates.df$name)))
-                }
-        }else if(i==0){
-                print("looking for unigram")
-                
-                #get total corpus size
-                corpus.size <- sum(length(unigram$name),
-                                   length(bigram$name),
-                                   length(trigram$name),
-                                   length(quadgram$name),
-                                   length(pentagram$name))
-                
-                candidates.df <- unigram
-                
-                candidates.df <- retrieve.candidates(ngram.search, ngram.root.search)
-                
-                candidates.df <- candidates.df %>%
-                        mutate(ngram.length = 1) %>%
-                        mutate(score = 0.4^(5-ngram.length)*frequency/corpus.size) %>%
-                        filter(score == max(score))
-                        
-                
-                output.df <- full_join(output.df,candidates.df)
-                
-                #consolidate ngrams with same last words, combine values
-                #first create last word column
-                output.df <- mutate(output.df,output.word = 
-                                            word(output.df$name,
-                                                 start=output.df$ngram.length,
-                                                 sep = "_"))
-                
-                #summarise different values according to last word
-                final.output.df <- output.df %>%
-                                        group_by(output.word) %>%
-                                        summarise(score = sum(score)) %>%
-                                        ungroup %>%
-                                        #remove stop words
-                                        filter(!(output.word %in% stopwords("english"))) %>%
-                                        arrange(desc(score))
-                
-                print(paste("output.df observations are",length(output.df$name)))
-                print(paste("Most likely answer is \'",final.output.df[1,1],"\'.", sep = ""))
-                
-        }
-}
+print(paste("output.df observations are",length(output.df$name)))
+print(paste("Most likely answer is \'",final.output.df[1,1],"\'.", sep = ""))
+
+

@@ -1,89 +1,51 @@
-library(ggplot2)
+library(ngram)
 library(dplyr)
-library(quanteda)
+library(stringr)
 
-dfm <- trigram.dfm
+#start with sentence cleaned
+#break into 4*3 dataframe, rows quad,tri,bi,uni
+#columns actual ngram, root search, n+1 root search
 
-#compare against different sources
-#subset for source
-#dfm <- dfm_subset(words.dfm, source == "en_US.news.txt")
+sentence <- "I like cheese"
+n.words <- wordcount(sentence)
+sentence <- gsub(" ", "_", sentence)
 
-#find top features
-topfeatures <- topfeatures(dfm,n = 40)
+#bigram recursion set up
+#bigram is already set up
+#regex expression is "[\\w]_like$"
 
-dfm <- dfm
-
-textplot_wordcloud(dfm,max_words = 120)
-
-dfm.trunct <- dfm_trim(dfm, min_termfreq = 1)
-
-#get frequency of words
-features <- textstat_frequency(dfm) 
-features.trunct <- textstat_frequency(dfm.trunct)
-
-#see how distribution of features in bar chart - what number of features
-#appear once, twice, etc
-
-distribution.features <- features %>%
-            aggregate(by = list(features$frequency), FUN = length) %>%
-            rename(frequency.of.word = Group.1) %>%
-            rename(number.features = frequency) %>%
-            select(frequency.of.word,number.features)
-
-a <- ggplot(distribution.features, aes(x = number.features, y = frequency.of.word)) +
-        geom_point() + 
-        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-        coord_cartesian(ylim = c(0,50))
-
-plot(a)             
-
-#as can see, majority are one time words and often not real words
-
-head(distribution.features, n = 50)
-
-
-
-# Sort by reverse frequency order
-# features.trunct$feature <- with(features.trunct, reorder(feature, -frequency))
+#### - OK
+# #total frequency of bigrams
+# tot.freq <- sum(bigram$frequency)
+# tot.types <- length(bigram$name)
 # 
-# b <- ggplot(features.trunct, aes(x = feature, y = frequency)) +
-#         geom_point() + 
-#         theme(axis.text.x=element_blank()) #make this blank
-# 
-# plot(b)
-
-#to create percentage graph
-#first create textstate_frequency df, then reverse with  lowest rank at top
-#calculate total words and percentage rows based on that row and lower
-
-features.trunct <- features.trunct %>%
-        arrange(rank) %>%
-        mutate(cusum.words = cumsum(frequency)) %>%
-        mutate(feature.counter = 1) %>%
-        mutate(cusum.feature = cumsum(feature.counter)) %>%
-        mutate(total.words = sum(frequency)) %>%
-        mutate(total.words.per = (cusum.words/total.words)*100) %>%
-        arrange(-total.words.per)
-#row_number())
-
-c <- ggplot(features.trunct,aes(x=total.words.per,y=cusum.feature)) +
-        geom_point() +
-        scale_x_reverse(name = "Total words(%)")
-
-plot(c)
+# pkn <- bigram %>%
+#         filter(grepl(".*_like$",name)) %>%
+#         mutate(pkn = frequency/sum(tot.freq),
+#                pkn.cont = length(name)/tot.types)
+####
 
 
-#create denodram
+
+#trigram recursion
+#get three types of ngrams - preceeding.ngram (* like cheese), preceeding bigram (* like),
+#proceeding.bigram (like *)
 
 
-dfm.trunct2 <- dfm_trim(dfm, min_termfreq = 100)
 
-# hierarchical clustering - get distances on normalized dfm
-tstat_dist <- textstat_dist(dfm.trunct2, margin = "features")
-# hiarchical clustering the distance object
-pres_cluster <- hclust(as.dist(tstat_dist))
-# label with document names
-#pres_cluster$labels <- features(test.dfm)
-# plot as a dendrogram
-plot(pres_cluster, xlab = "", sub = "",
-     main = "Euclidean Distance on Normalized Token Frequency")
+#already cut down to max 4
+
+#first vector - acutal ngram
+
+output <- NULL
+
+for(i in 1:n.words) {
+        
+        output <- c(output, word(sentence, start = i, end = n.words, sep = "_"))
+}
+
+#then use dplyr for other sections
+output <- data.frame(name = output, stringsAsFactors = FALSE)
+output <- output %>%
+        mutate(preceding.word = paste("^",name,"$",sep="")) %>%
+        mutate(combo.search = paste("^",sentence,"_{1}",sep=""))

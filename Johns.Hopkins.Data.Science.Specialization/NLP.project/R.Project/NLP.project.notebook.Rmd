@@ -39,6 +39,8 @@ https://www.youtube.com/watch?v=eNLUo3AIvcQ
 https://en.wikipedia.org/wiki/Katz%27s_back-off_model
 http://www.marekrei.com/pub/Machine_Learning_for_Language_Modelling_-_lecture2.pdf
 http://adv-r.had.co.nz/memory.html
+https://rpubs.com/jbonsak/capstonefinal
+https://rpubs.com/ofr1tz/textprediction
 use kneser-ney or katz
 
 
