@@ -14,7 +14,7 @@ sentence <- gsub(" ", "_", sentence)
 #bigram is already set up
 #regex expression is "[\\w]_like$"
 
-#### - OK
+#### - OK - modelling at final level
 # #total frequency of bigrams
 # tot.freq <- sum(bigram$frequency)
 # tot.types <- length(bigram$name)
@@ -58,13 +58,13 @@ sentence <- gsub(" ", "_", sentence)
         #create dataframe
         output <- data.frame(name = output, stringsAsFactors = FALSE)
         output <- output %>%
-                #regex example is "*_like_cheese$" for trigram
+                #regex example is "*_like_cheese$" for ngram
                 mutate(preceeding.ngram.regex = paste("^*_",name,"$",sep=""),
                        #set up lower ngram name
                        lower.ngram = word(name, start = 1, sep = "_"),
-                       #regex is "*_like" for bigram
+                       #regex is "*_like" for n-1 ngram
                        preceeding.lower.ngram = paste("^*_",lower.ngram,"$",sep=""),
-                       #regex is "like_* for bigram
+                       #regex is "like_* for n-1 ngram
                        proceeding.lower.ngram = paste("^",lower.ngram,"_{1}",sep=""))
         
 
