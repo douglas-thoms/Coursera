@@ -6,7 +6,7 @@ library(stringr)
 #break into 4*3 dataframe, rows quad,tri,bi,uni
 #columns actual ngram, root search, n+1 root search
 
-sentence <- "I play halo"
+sentence <- "I like"
 n.words <- wordcount(sentence)
 sentence <- gsub(" ", "_", sentence)
 
@@ -31,11 +31,14 @@ sentence <- gsub(" ", "_", sentence)
 #get three types of ngrams - preceeding.ngram (* like cheese), preceeding bigram (* like),
 #proceeding.bigram (like *)
 
-#row 1
+#step1
 #like_cheese
+#determine all potential candidates
+#regex is "I_like_* 
 
-#step 2
-#have preceeding.ngram for regex
+#step2
+#find all *_like_cheese candidates
+
 #regex is "*_like_cheese$" for trigram
 
 #step 3
@@ -49,19 +52,26 @@ sentence <- gsub(" ", "_", sentence)
 
         
         output <- NULL
+        ngram.length <- NULL
         
         for(i in 1:n.words) {
                 #generate ngrams from blank to pentagram
-                output <- c(output, word(sentence, start = i, end = n.words, sep = "_"))
+                output <- c(output,word(sentence, start = i, end = n.words, sep = "_"))
+                ngram.length <- c(ngram.length, n.words + 1 - i)
         }
         
         #create dataframe
-        output <- data.frame(name = output, stringsAsFactors = FALSE)
+        output <- data.frame(name = output,
+                             ngram.length = ngram.length, 
+                             stringsAsFactors = FALSE)
+        
         output <- output %>%
                 #regex example is "*_like_cheese$" for ngram
-                mutate(preceeding.ngram.regex = paste("^*_",name,"$",sep=""),
+                mutate(#choose candidates,
+                       candidate.regex = paste("^",name,"_*", sep = ""),
+                       preceeding.ngram.regex = paste("*_",name,"$",sep=""),
                        #set up lower ngram name
-                       lower.ngram = word(name, start = 1, sep = "_"),
+                       lower.ngram = word(name, start = 1, end = ngram.length - 1, sep = ""),
                        #regex is "*_like" for n-1 ngram
                        preceeding.lower.ngram = paste("^*_",lower.ngram,"$",sep=""),
                        #regex is "like_* for n-1 ngram

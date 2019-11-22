@@ -116,8 +116,10 @@ retrieve.candidates <- function(name,root.search,combo.search){
                 result.df <- ngram.df %>%
                         mutate(root.name = NA,
                                root.frequency = corpus.size,
-                               ngram.length = 0,
+                               ngram.length = sentence.length+1,
                                score = 0.4^(5-ngram.length)*(frequency/root.frequency))
+                
+                return(result.df)
                 
         }
 }

@@ -42,6 +42,10 @@ http://adv-r.had.co.nz/memory.html
 https://rpubs.com/jbonsak/capstonefinal
 https://rpubs.com/ofr1tz/textprediction
 use kneser-ney or katz
+https://atrebas.github.io/post/2019-03-03-datatable-dplyr/ - data.table
+https://stackoverflow.com/questions/21435339/data-table-vs-dplyr-can-one-do-something-well-the-other-cant-or-does-poorly/27718317#27718317
+https://raw.githubusercontent.com/rstudio/cheatsheets/master/datatable.pdf
+
 
 
 Testing Model and Code Rprof()
