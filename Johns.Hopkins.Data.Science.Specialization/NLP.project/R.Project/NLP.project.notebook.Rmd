@@ -54,7 +54,6 @@ Profiler to test time
 http://rpubs.com/mszczepaniak/classificationgoodness
 https://github.com/hfoffani/dsci-benchmark
 
-
 Todo list to improve models
 
 Things to modify
