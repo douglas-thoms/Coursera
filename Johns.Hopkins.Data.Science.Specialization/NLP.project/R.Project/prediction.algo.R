@@ -50,7 +50,7 @@ generate.search.terms <- function(sentence){
                 mutate(combo.search = paste("^",name,"_{1}",sep=""))
         
         #add blank row
-        output <- rbind(output, c("","","",""))
+        output <- rbind(output, c("","",""))
         
         return(output)
 }

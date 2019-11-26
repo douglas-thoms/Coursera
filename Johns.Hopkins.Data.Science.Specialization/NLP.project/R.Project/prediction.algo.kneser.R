@@ -63,6 +63,12 @@ generate.search.terms <- function(sentence){
                         #regex is "like_ for n-1 ngram
                         proceeding.lower.ngram = paste("^",lower.ngram.root,"_{1}",sep=""))
         
+        first.recursion.reduction <-word(sentence,start=n.words,sep="_")
+        
+        #add blank row
+        output <- rbind(output, c("","",first.recursion.reduction,
+                                             paste("^",first.recursion.reduction,"_{1}",sep="")))
+        
         return(output)
 }
 
@@ -92,154 +98,196 @@ generate.candidates <- function(search.terms){
                 ngram.df <- bigram
                 lower.ngram <- unigram
         }else {
+                higher.ngram <- bigram
                 ngram.df <- unigram
         }
 
-               
+        if(wordcount(search.terms$name, sep = "_") == 0){
 
-        #get frequency of lower.ngram
-        lower.ngram.freq <- lower.ngram %>% 
-                 filter(grepl(search.terms$lower.ngram.regex,name)) 
+                
+                pkn <- ngram.df %>% 
+                        #find count of predicted ngrams
+                        #find count of lower ngram
+                        mutate(total.ngram.freq = sum(frequency),
+                               pkn = frequency/total.ngram.freq
+                               ) %>%
+                        select(-total.ngram.freq)
         
-        #get number of unique values for preceeding.lower.ngram
-        preceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$preceeding.lower.ngram,lower.ngram$name),]$name)
-        
-        #get number of unique values for proceeding.lower.ngram
-        proceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$proceeding.lower.ngram,lower.ngram$name),]$name)
-        
-        #alternate way to get values
-        #preceeding.lower.ngram <- lower.ngram %>%
-        #        filter(grepl("*_there$",name))
-        #length <- length(preceeding.lower.ngram$name)
+                #get count for preceeding.ngram
+                #*_allunigrams
+                 # pattern <- paste("_",search.terms$name,"$",sep = "")
+                 # candidates.df <- higher.ngram %>% 
+                 #         filter(grepl(pattern,name)) %>%
+                 #         mutate(pkn = frequency/sum(frequency)) %>%
+                 #         arrange(desc(frequency))
+                 
+      
+                        preceeding.ngram <- function(search.term,ngrams){
+                        
+                        search.term <- paste("_",search.term,"$",sep = "")
+                        
+                        test.df <- higher.ngram %>%
+                                filter(grepl(search.term,name))
+                        
+                        return(length(test.df$name)) 
+                }
+                
+                
+                
+                ngrams <- higher.ngram %>%
+                        #how to find this regex
+                        filter(grepl(search.terms$proceeding.lower.ngram,name)) %>%
+                        mutate(name = word(name,start =2, sep="_"))
+                
+                ngrams$unique.preceeding.types <- sapply(ngrams$name,preceeding.ngram,ngrams=ngram.df)
+                
+                pkn.cont <- ngrams %>% 
+                        mutate(pkn.cont = unique.preceeding.types/length(ngram.df$name))
+                
+                print("made it")
+                        
+                return(list(pkn, pkn.cont))
+                        
+        } else {             
 
-        #can I improve this line?
-        lower.ngram.count <- lower.ngram.freq$frequency[[1]]
+                #get frequency of lower.ngram
+                lower.ngram.freq <- lower.ngram %>% 
+                         filter(grepl(search.terms$lower.ngram.regex,name)) 
                 
-       
-
+                #get number of unique values for preceeding.lower.ngram
+                preceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$preceeding.lower.ngram,lower.ngram$name),]$name)
+                
+                #get number of unique values for proceeding.lower.ngram
+                proceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$proceeding.lower.ngram,lower.ngram$name),]$name)
+                
+                #alternate way to get values
+                #preceeding.lower.ngram <- lower.ngram %>%
+                #        filter(grepl("*_there$",name))
+                #length <- length(preceeding.lower.ngram$name)
         
+                #can I improve this line?
+                lower.ngram.count <- lower.ngram.freq$frequency[[1]]
+                        
+                candidates.df <- ngram.df %>% 
+                        #find count of predicted ngrams
+                        filter(grepl(search.terms$candidate.regex,name)) %>%
+                        #find count of lower ngram
+                        mutate(lower.ngram.name = sentence,
+                               lower.ngram.freq = lower.ngram.count,
+                               #find number of type of ngrams, preceeding lower ngram
+                               preceeding.lower.ngram.uni.val = preceeding.lower.ngram.uni.val,
+                               #find number of type ngrams proceeding lower ngram
+                               proceeding.lower.ngram.uni.val = proceeding.lower.ngram.uni.val
+                               )
+                
+                #narrow set of ngrams for preceeding n.gram
+                ngrams <- higher.ngram %>%
+                        filter(grepl(search.terms$preceeding.ngram.regex,name))
         
-        candidates.df <- ngram.df %>% 
-                #find count of predicted ngrams
-                filter(grepl(search.terms$candidate.regex,name)) %>%
-                #find count of lower ngram
-                mutate(lower.ngram.name = sentence,
-                       lower.ngram.freq = lower.ngram.count,
-                       #find number of type of ngrams, preceeding lower ngram
-                       preceeding.lower.ngram.uni.val = preceeding.lower.ngram.uni.val,
-                       #find number of type ngrams proceeding lower ngram
-                       proceeding.lower.ngram.uni.val = proceeding.lower.ngram.uni.val
-                       )
-        
-        #narrow set of ngrams for preceeding n.gram
-        ngrams <- higher.ngram %>%
-                filter(grepl(search.terms$preceeding.ngram.regex,name))
-        
-        #get frequency for preceeding.ngram
-        #create function
-        preceeding.ngram <- function(search.term,ngrams){
-                
-                
-                search.term <- paste("*_",search.term,"$",sep = "")
-                
-                print(search.term)
-                
-                test.df <- ngrams %>%
-                        filter(grepl(search.term,name))
-                
-                return(length(test.df$name)) 
-        }
+                #get frequency for preceeding.ngram
+                preceeding.ngram <- function(search.term,ngrams){
+                        
+                        search.term <- paste("*_",search.term,"$",sep = "")
+                        
+                        print(search.term)
+                        
+                        test.df <- ngrams %>%
+                                filter(grepl(search.term,name))
+                        
+                        return(length(test.df$name)) 
+                }
         
         candidates.df$test <- sapply(candidates.df$name,preceeding.ngram,ngrams=ngrams)
         
         return(candidates.df)
-}
-
-retrieve.candidates <- function(name,preceeding.ngram.regex,preceeding.lower.ngram.regex,
-                                proceeding.lower.ngram.regex){
-        #get sentence level
-        sentence.length <- wordcount(name, sep = "_")
-        
-        #load appropriate corpus of ngrams
-        if(sentence.length == 4) {
-                ngram.df <- pentagram
-                lower.ngram <- quadgram
-                
-        }else if(sentence.length == 3) {
-                ngram.df <- quadgram
-                lower.ngram <- trigram
-                
-        }else if(sentence.length == 2) {
-                ngram.df <- trigram
-                lower.ngram <- bigram
-        }else if(sentence.length == 1) {
-                ngram.df <- bigram
-                lower.ngram <- unigram
-        }else {
-                ngram.df <- unigram
-        }
-        
-        #search for ngram candidates on bigrams and up, using stupid backoff recursion
-        if(sentence.length >= 1){
-
-                #filter according to regex
-                num.type.preceeding.ngram <- ngram.df %>% filter(grepl(preceeding.ngram.regex,name)) 
-                num.type.preceeding.lower.ngram <- ngram.df %>% filter(grepl(preceeding.lower.ngram.regex,name)) 
-                num.type.proceeding.lower.ngram <- ngram.df %>% filter(grepl(proceeding.lower.ngram.regex,name)) 
-                
-                pkn <- c("num.type.preceeding.ngram" = length(num.type.preceeding.ngram$name),
-                         "num.type.preceeding.lower.ngram" = length(num.type.preceeding.lower.ngram$name),
-                         "num.type.proceeding.lower.ngram" = length(num.type.proceeding.lower.ngram$name))
-                
-                #calculate length of stuff
-                
-                #if found result
-                if(length(result.df$name)){
-                
-                #filter to regex
-                result.root.df <- root.df %>%
-                filter(grepl(root.search,name))
-                
-                #find root frequency
-                root.frequency <- result.root.df$frequency[[1]]
-                
-                #calculate score using stupid backoff model
-                result.df <- result.df %>%
-                        mutate(root.name = name,
-                               root.frequency = root.frequency,
-                               ngram.length = sentence.length + 1,
-                               score = 0.4^(5-ngram.length)*(frequency/root.frequency))
-        
-                return(result.df)
-                }
-        
-        #calculate final recursion level for stupid backoff model
-        } else if(sentence.length == 0){
-                #get total corpus size
-                corpus.size <- sum(length(unigram$name),
-                                   length(bigram$name),
-                                   length(trigram$name),
-                                   length(quadgram$name),
-                                   length(pentagram$name))
-                result.df <- ngram.df %>%
-                        mutate(root.name = NA,
-                               root.frequency = corpus.size,
-                               ngram.length = 0,
-                               score = 0.4^(5-ngram.length)*(frequency/root.frequency))
-                
-                #### - OK - modelling at final level
-                # #total frequency of bigrams
-                # tot.freq <- sum(bigram$frequency)
-                # tot.types <- length(bigram$name)
-                # 
-                # pkn <- bigram %>%
-                #         filter(grepl(".*_like$",name)) %>%
-                #         mutate(pkn = frequency/sum(tot.freq),
-                #                pkn.cont = length(name)/tot.types)
-                ####
-                
         }
 }
+
+# retrieve.candidates <- function(name,preceeding.ngram.regex,preceeding.lower.ngram.regex,
+#                                 proceeding.lower.ngram.regex){
+#         #get sentence level
+#         sentence.length <- wordcount(name, sep = "_")
+#         
+#         #load appropriate corpus of ngrams
+#         if(sentence.length == 4) {
+#                 ngram.df <- pentagram
+#                 lower.ngram <- quadgram
+#                 
+#         }else if(sentence.length == 3) {
+#                 ngram.df <- quadgram
+#                 lower.ngram <- trigram
+#                 
+#         }else if(sentence.length == 2) {
+#                 ngram.df <- trigram
+#                 lower.ngram <- bigram
+#         }else if(sentence.length == 1) {
+#                 ngram.df <- bigram
+#                 lower.ngram <- unigram
+#         }else {
+#                 ngram.df <- unigram
+#         }
+#         
+#         #search for ngram candidates on bigrams and up, using stupid backoff recursion
+#         if(sentence.length >= 1){
+# 
+#                 #filter according to regex
+#                 num.type.preceeding.ngram <- ngram.df %>% filter(grepl(preceeding.ngram.regex,name)) 
+#                 num.type.preceeding.lower.ngram <- ngram.df %>% filter(grepl(preceeding.lower.ngram.regex,name)) 
+#                 num.type.proceeding.lower.ngram <- ngram.df %>% filter(grepl(proceeding.lower.ngram.regex,name)) 
+#                 
+#                 pkn <- c("num.type.preceeding.ngram" = length(num.type.preceeding.ngram$name),
+#                          "num.type.preceeding.lower.ngram" = length(num.type.preceeding.lower.ngram$name),
+#                          "num.type.proceeding.lower.ngram" = length(num.type.proceeding.lower.ngram$name))
+#                 
+#                 #calculate length of stuff
+#                 
+#                 #if found result
+#                 if(length(result.df$name)){
+#                 
+#                 #filter to regex
+#                 result.root.df <- root.df %>%
+#                 filter(grepl(root.search,name))
+#                 
+#                 #find root frequency
+#                 root.frequency <- result.root.df$frequency[[1]]
+#                 
+#                 #calculate score using stupid backoff model
+#                 result.df <- result.df %>%
+#                         mutate(root.name = name,
+#                                root.frequency = root.frequency,
+#                                ngram.length = sentence.length + 1,
+#                                score = 0.4^(5-ngram.length)*(frequency/root.frequency))
+#         
+#                 return(result.df)
+#                 }
+#         
+#         #calculate final recursion level for stupid backoff model
+#         } else if(sentence.length == 0){
+#                 #get total corpus size
+#                 corpus.size <- sum(length(unigram$name),
+#                                    length(bigram$name),
+#                                    length(trigram$name),
+#                                    length(quadgram$name),
+#                                    length(pentagram$name))
+#                 result.df <- ngram.df %>%
+#                         mutate(root.name = NA,
+#                                root.frequency = corpus.size,
+#                                ngram.length = 0,
+#                                score = 0.4^(5-ngram.length)*(frequency/root.frequency))
+#                 
+#                 #### - OK - modelling at final level
+#                 # #total frequency of bigrams
+#                 # tot.freq <- sum(bigram$frequency)
+#                 # tot.types <- length(bigram$name)
+#                 # 
+#                 # pkn <- bigram %>%
+#                 #         filter(grepl(".*_like$",name)) %>%
+#                 #         mutate(pkn = frequency/sum(tot.freq),
+#                 #                pkn.cont = length(name)/tot.types)
+#                 ####
+#                 
+#         }
+# }
 
 
 ##----------------------------------------------------------------------------
@@ -275,7 +323,12 @@ iterations <-wordcount(sentence)+1
 #generate search terms
 search.terms <- generate.search.terms(sentence)
 
-candidates.df <- generate.candidates(search.terms[1,])
+output.df <- NULL
+pkn.cont <- NULL
+df <- generate.candidates(search.terms[4,])
+output.df <- rbind(output.df,df[[1]])
+pkn.cont <- df[[2]]
+
 
 
 #NEED FUNCTION
@@ -289,15 +342,10 @@ candidates.df <- generate.candidates(search.terms[1,])
 
 #step 2 - collects all terms
 
-
-
-
-
-output.df <- NULL
 for(i in 1:iterations){
 
 df <- retrieve.candidates(search.terms[i,1],search.terms[i,2],search.terms[i,3])
-output.df <- rbind(output.df,df)
+output.df <- rbind(output.df,df[[1]])
 }
 
 #consolidate ngrams with same last words, combine values
