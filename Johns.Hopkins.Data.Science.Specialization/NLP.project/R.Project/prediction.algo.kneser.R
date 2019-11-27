@@ -75,7 +75,7 @@ generate.search.terms <- function(sentence){
 #generate data frame of candidates and run generate.search.terms on each
 #step 1, find proper ngram vocab based on sentence length +1
 #step 2 filter
-generate.candidates <- function(search.terms){
+generate.candidates <- function(search.terms,output.df){
         #get sentence level
         
         #load appropriate corpus of ngrams
@@ -118,13 +118,13 @@ generate.candidates <- function(search.terms){
                 
                 ngrams$unique.preceeding.types <- sapply(ngrams$name,preceeding.ngram,ngrams=ngram.df)
                 
-                pkn.cont <- ngrams %>% 
+                ngrams <- ngrams %>% 
                         mutate(pkn.cont = unique.preceeding.types/length(ngram.df$name),
                                pkn = 0)
                 
                 print("first round")
                         
-                return(pkn.cont)
+                return(ngrams)
                         
         } else if(n.words - wordcount(search.terms$name, sep = "_") > 1){
                 
@@ -180,7 +180,7 @@ generate.candidates <- function(search.terms){
                 
                 pkn.cont <- ngrams %>% 
                         mutate(pkn.cont = unique.preceeding.types/length(ngram.df$name),
-                               pkn = 0)
+                               pkn = pkn.cont)
                 
                 print("final")
                 
@@ -297,10 +297,9 @@ output.df <- NULL
 pkn.cont <- NULL
 for(i in iterations:1){
         
-df <- generate.candidates(search.terms[i,])
-output.df <- rbind(output.df,df)
+output.df <- generate.candidates(search.terms[i,],output.df)
 print(i)
-output.df <- output.df %>% transform(pkn = if_else(pkn.cont != 0, pkn.cont,pkn))
+#output.df <- output.df %>% transform(pkn = if_else(pkn.cont != 0, pkn.cont,pkn))
 }
 
 
