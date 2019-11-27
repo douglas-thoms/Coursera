@@ -103,8 +103,6 @@ generate.candidates <- function(search.terms){
         }
 
         if(wordcount(search.terms$name, sep = "_") == 0){
-
-                 
       
                         preceeding.ngram <- function(search.term,ngrams){
                         
@@ -142,14 +140,23 @@ generate.candidates <- function(search.terms){
                 
                 ngrams <- ngram.df
                 
+                ngrams$ngram.length <- sapply(ngrams$name, wordcount, sep = "_")
+ 
                 ngrams$unique.preceeding.types <- sapply(ngrams$name,preceeding.ngram,ngrams=ngram.df)
                 
                 pkn.cont <- ngrams %>% 
                         #need to update calculations to match formula
                         mutate(pkn.cont = unique.preceeding.types/length(ngram.df$name),
-                               pkn = 0)
+                               lower.regex = gsub("[a-zA-Z]*_{1}","",name),
+                               pkn = freq + output.df[grepl(lower.regex,output.df$name), 4]
+                               )
                 
                 print("middle")
+                
+                #use these to add pkn.cont value
+                #y <- mutate(output.df, fr = output.df[grepl("_are_you_today",output.df$name), 4])
+                #y <- mutate(df, fr = output.df[1,5]+output.df[1,2])
+                #y <- mutate(output.df, fr = output.df[output.df$name == "fish", 4])
                 
                 return(pkn.cont)
                 
