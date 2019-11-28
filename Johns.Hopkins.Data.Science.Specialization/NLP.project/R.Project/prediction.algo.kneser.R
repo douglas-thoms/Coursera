@@ -122,10 +122,10 @@ generate.candidates <- function(search.terms){
                 
                 ngrams <- ngrams %>% 
                         mutate(d = 0,
-                               unknow_smoothing = 0,
                                lower.regex = NA,
+                               unknow_smoothing = 0,
                                pkn.cont = numer/denom,
-                               pkn = freq/sum(freq))
+                               pkn = frequency/sum(frequency))
                 
                 print("first round")
                         
@@ -171,10 +171,10 @@ generate.candidates <- function(search.terms){
                         #need to update calculations to match formula
                         mutate(#NEED TO FIX
                                d = 1,
-                               unknow_smoothing = 0,
                                lower.regex = gsub("[a-zA-Z]*_{1}","",name),
-                               pkn = (pmax(freq,0)/root.freq) + (d/denom)*output.df[grepl(lower.regex,output.df$name), 4],
-                               pkn.cont =  (max(numer,0)/denom) + (d/denom)*output.df[grepl(lower.regex,output.df$name), 4]
+                               unknow_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,output.df$name), 4],
+                               pkn = (pmax(frequency,0)/root.freq),
+                               pkn.cont =  (max(numer,0)/denom)
                                )
                 
                 print("middle")
@@ -272,7 +272,7 @@ generate.candidates <- function(search.terms){
 
 
 #input string of words and remove punctuation, etc
-sentence <- "Hello, how are you"
+sentence <- "are the two arabian"
 
 sentence <- sentence %>%
         tokens(remove_punct = TRUE,
@@ -302,23 +302,23 @@ iterations <-n.words + 1
 #generate search terms
 search.terms <- generate.search.terms(sentence)
 
-#NEEDcreate tokens of small parapgragh
-#sample data to make it more mangeable building
-unigram <- data.frame(name = c("today","there","fish","fowl","you"),
-                      freq = c(5,2,1,1,4),
-                      stringsAsFactors = FALSE)
-bigram <- data.frame(name = c("you_today","you_there","you_fish", "hey_you","are_you"),
-                      freq = c(5,2,1,3,1),
-                      stringsAsFactors = FALSE)
-trigram <- data.frame(name = c("are_you_today","are_you_there"),
-                       freq = c(5,2),
-                       stringsAsFactors = FALSE)
-quadgram <- data.frame(name = c("how_are_you_today","how_are_you_there"),
-                        freq = c(5,2),
-                        stringsAsFactors = FALSE)
-pentagram <- data.frame(name = c("Hello_how_are_you_today","Hello_how_are_you_there"),
-                        freq = c(5,2),
-                        stringsAsFactors = FALSE)
+# #NEEDcreate tokens of small parapgragh
+# #sample data to make it more mangeable building
+# unigram <- data.frame(name = c("today","there","fish","fowl","you"),
+#                       freq = c(5,2,1,1,4),
+#                       stringsAsFactors = FALSE)
+# bigram <- data.frame(name = c("you_today","you_there","you_fish", "hey_you","are_you"),
+#                       freq = c(5,2,1,3,1),
+#                       stringsAsFactors = FALSE)
+# trigram <- data.frame(name = c("are_you_today","are_you_there"),
+#                        freq = c(5,2),
+#                        stringsAsFactors = FALSE)
+# quadgram <- data.frame(name = c("how_are_you_today","how_are_you_there"),
+#                         freq = c(5,2),
+#                         stringsAsFactors = FALSE)
+# pentagram <- data.frame(name = c("Hello_how_are_you_today","Hello_how_are_you_there"),
+#                         freq = c(5,2),
+#                         stringsAsFactors = FALSE)
 
 output.df <- NULL
 pkn.cont <- NULL
