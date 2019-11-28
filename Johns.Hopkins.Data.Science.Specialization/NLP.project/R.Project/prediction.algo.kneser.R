@@ -117,13 +117,14 @@ generate.candidates <- function(search.terms){
                         #2) only bigrams related to larger ngrams
                 
                 ngrams <- ngram.df
+                ngrams$ngram.length <- sapply(ngrams$name,wordcount,sep="_")
                 ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams=higher.ngram)
                 denom <- length(ngram.df$name)
                 
                 ngrams <- ngrams %>% 
                         mutate(d = 0,
                                lower.regex = NA,
-                               unknow_smoothing = 0,
+                               unknown_smoothing = 0,
                                pkn.cont = numer/denom,
                                pkn = frequency/sum(frequency))
                 
@@ -148,6 +149,8 @@ generate.candidates <- function(search.terms){
                 
                 #get ngrams following preceeding word
                 ngrams <- ngram.df
+                #NEED do I need to filter out only ngrams that can match the term
+                ngrams$ngram.length <- sapply(ngrams$name,wordcount,sep="_")
                 ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams = higher.ngram)
                 denom <- preceeding.ngram(search.terms$name, ngrams = ngram.df)
                 
@@ -165,16 +168,17 @@ generate.candidates <- function(search.terms){
                 proceeding.type <- proceeding.ngram(search.terms$name,ngrams = ngram.df)
                 
                 
-                root.freq <- filter(unigram,unigram$name == search.terms$name)[[2]]
+                root.freq <- filter(lower.ngram,lower.ngram$name == search.terms$name)[[2]]
+                pkn.cont <- filter(output.df,ngram.length == search.terms$ngram.length)
                 
                 ngrams <- ngrams %>% 
                         #need to update calculations to match formula
-                        mutate(#NEED TO FIX
+                        mutate(
                                d = 1,
-                               lower.regex = gsub("[a-zA-Z]*_{1}","",name),
-                               unknow_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,output.df$name), 4],
-                               pkn = (pmax(frequency,0)/root.freq),
-                               pkn.cont =  (max(numer,0)/denom)
+                               lower.regex = gsub("^[a-zA-Z]*_{1}","",name),
+                               unknown_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,pkn.cont$name), 9],
+                               pkn = (pmax(frequency,0)/root.freq) + unknown_smoothing,
+                               pkn.cont =  (max(numer,0)/denom) + unknown_smoothing
                                )
                 
                 print("middle")

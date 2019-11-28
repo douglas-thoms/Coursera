@@ -50,7 +50,7 @@ toks <- supp.corpus %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") 
 
 #create ngram
-supp.dfm <- dfm(toks, ngrams = 5)
+supp.dfm <- dfm(toks, ngrams = 1)
 
 #remove lower frequency terms
 supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 1)
@@ -69,7 +69,7 @@ frequency.df <- frequency.df %>%
 #frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
 #create RDS file to input later
-saveRDS(frequency.df,"data/pentagram.mini.rds")
+saveRDS(frequency.df,"data/unigram.mini.rds")
 
 #input to test if same as expected
-test <- readRDS("data/pentagram.mini.rds")
+test <- readRDS("data/unigram.mini.rds")
