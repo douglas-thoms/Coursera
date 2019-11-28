@@ -34,19 +34,23 @@ generate.search.terms <- function(sentence){
 
         output <- NULL
         ngram.length <- NULL
+        filter <- NULL
         
         for(i in 1:n.words) {
                 #generate ngrams from blank to pentagram
                 output <- c(output,word(sentence, start = i, end = n.words, sep = "_"))
                 ngram.length <- c(ngram.length, n.words + 1 - i)
+                filter <- c(filter,paste("^",word(sentence, start = i, end = n.words, sep = "_"),"_{1}",sep=""))
         }
         
         output <- c(output,"")
         ngram.length <- c(ngram.length,0)
+        filter <- c(filter,"")
         
         #create dataframe
         output <- data.frame(name = output,
                              ngram.length = ngram.length, 
+                             filter = filter,
                              stringsAsFactors = FALSE)
         
         # output <- output %>%
@@ -149,7 +153,7 @@ generate.candidates <- function(search.terms){
                 
                 #get ngrams following preceeding word
                 ngrams <- ngram.df
-                #NEED do I need to filter out only ngrams that can match the term
+                
                 ngrams$ngram.length <- sapply(ngrams$name,wordcount,sep="_")
                 ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams = higher.ngram)
                 denom <- preceeding.ngram(search.terms$name, ngrams = ngram.df)
@@ -167,16 +171,16 @@ generate.candidates <- function(search.terms){
                 #start here - same for all rows
                 proceeding.type <- proceeding.ngram(search.terms$name,ngrams = ngram.df)
                 
-                
                 root.freq <- filter(lower.ngram,lower.ngram$name == search.terms$name)[[2]]
                 pkn.cont <- filter(output.df,ngram.length == search.terms$ngram.length)
                 
                 ngrams <- ngrams %>% 
-                        #need to update calculations to match formula
+                        #NEED filter out non-candidates that don't match
+                        filter(grepl(search.terms$filter,name)) %>%
                         mutate(
                                d = 1,
                                lower.regex = gsub("^[a-zA-Z]*_{1}","",name),
-                               unknown_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,pkn.cont$name), 9],
+                               unknown_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,pkn.cont$name), 8],
                                pkn = (pmax(frequency,0)/root.freq) + unknown_smoothing,
                                pkn.cont =  (max(numer,0)/denom) + unknown_smoothing
                                )
