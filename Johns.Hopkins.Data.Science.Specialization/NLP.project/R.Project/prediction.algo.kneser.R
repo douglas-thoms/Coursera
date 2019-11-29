@@ -179,11 +179,16 @@ generate.candidates <- function(search.terms){
                 root.freq <- filter(lower.ngram,lower.ngram$name == search.terms$name)[[2]]
                 pkn.cont <- filter(output.df,ngram.length == search.terms$ngram.length)
                 
+                n1 <- filter(ngram.df,frequency == 1)
+                n1 <- length(n1$name)
+                n2 <- filter(ngram.df,frequency == 2)
+                n2 <- length(n2$name)
+                
                 ngrams <- ngrams %>% 
                         #NEED filter out non-candidates that don't match
                         filter(grepl(search.terms$filter,name)) %>%
                         mutate(
-                               d = 1,
+                               d = n1/(n1 + 2*n2),
                                lower.regex = paste("^",sub("^[a-zA-Z]*_{1}","",name),"$",sep = "")
                                )
                 
@@ -192,8 +197,6 @@ generate.candidates <- function(search.terms){
                                                 prev.pkn.cont <- pkn.cont[grepl(lower.regex,pkn.cont$name), 9]
                                                 
                                                 return(prev.pkn.cont)
-                                              
-                        
                                                 }
                 
                 ngrams$prev.pkn.cont <- sapply(ngrams$lower.regex,find.prev.pkn.cont,pkn.cont = pkn.cont)
@@ -391,6 +394,37 @@ search.terms <- generate.search.terms(sentence)
 # pentagram <- data.frame(name = c("Hello_how_are_you_today","Hello_how_are_you_there"),
 #                         freq = c(5,2),
 #                         stringsAsFactors = FALSE)
+
+
+#calculate d value
+
+# total.ngrams <- rbind(unigram,bigram,trigram,quadgram,pentagram)
+# 
+# n1 <- total.ngrams %>%
+#         filter(frequency == 1)
+# 
+# n1 <- length(n1$name)
+# 
+# n2 <- total.ngrams %>%
+#         filter(frequency == 2)
+# 
+# n2 <- length(n2$name)
+# 
+# n3 <- total.ngrams %>%
+#         filter(frequency == 3)
+# 
+# n3 <- length(n3$name)
+# 
+# n4 <- total.ngrams %>%
+#         filter(frequency == 4)
+# 
+# n4 <- length(n4$name)
+# 
+# y <- n1/(n1+2*n2)
+# d0 <- 0
+# d1 <- 1-2*y*(n2/n1)
+# d2 <- 2-3*y*(n3/n2)
+# d3 <- 3-4*y*(n4/n3)
 
 output.df <- NULL
 pkn.cont <- NULL
