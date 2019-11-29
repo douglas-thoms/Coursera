@@ -128,9 +128,12 @@ generate.candidates <- function(search.terms){
                 ngrams <- ngrams %>% 
                         mutate(d = 0,
                                lower.regex = NA,
+                               prev.pkn.cont = 0,
                                unknown_smoothing = 0,
-                               pkn.cont = numer/denom,
-                               pkn = frequency/sum(frequency))
+                               pkn = frequency/sum(frequency),
+                               pkn.cont = numer/denom
+                               
+                               )
                 
                 print("first round")
                         
@@ -158,6 +161,8 @@ generate.candidates <- function(search.terms){
                 ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams = higher.ngram)
                 denom <- preceeding.ngram(search.terms$name, ngrams = ngram.df)
                 
+                
+                
                 proceeding.ngram <- function(search.term,ngrams){
                         
                         search.term <- paste("^",search.term,"_{1}",sep = "")
@@ -179,10 +184,25 @@ generate.candidates <- function(search.terms){
                         filter(grepl(search.terms$filter,name)) %>%
                         mutate(
                                d = 1,
-                               lower.regex = sub("^[a-zA-Z]*_{1}","",name),
-                               unknown_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,pkn.cont$name), 8],
-                               pkn = (pmax(frequency,0)/root.freq) + unknown_smoothing,
-                               pkn.cont =  (max(numer,0)/denom) + unknown_smoothing
+                               lower.regex = paste("^",sub("^[a-zA-Z]*_{1}","",name),"$",sep = "")
+                               )
+                
+                find.prev.pkn.cont <- function(lower.regex, pkn.cont){
+                                               
+                                                prev.pkn.cont <- pkn.cont[grepl(lower.regex,pkn.cont$name), 9]
+                                                
+                                                return(prev.pkn.cont)
+                                              
+                        
+                                                }
+                
+                ngrams$prev.pkn.cont <- sapply(ngrams$lower.regex,find.prev.pkn.cont,pkn.cont = pkn.cont)
+               
+                ngrams <- ngrams %>%  
+                        mutate(
+                               unknown_smoothing = d*proceeding.type/denom*(d/denom)*prev.pkn.cont,
+                               pkn =  pmax(frequency,0)/root.freq + unknown_smoothing,
+                               pkn.cont = pmax(numer,0)/denom + unknown_smoothing
                                )
                 
                 print("middle")
@@ -197,79 +217,123 @@ generate.candidates <- function(search.terms){
         }
         
         else {             
-
                 preceeding.ngram <- function(search.term,ngrams){
                         
                         search.term <- paste("_",search.term,"$",sep = "")
-                        
-                        test.df <- higher.ngram %>%
-                                filter(grepl(search.term,name))
-                        
-                        return(length(test.df$name)) 
-                }
-                
-                ngrams <- ngram.df
-                
-                ngrams$unique.preceeding.types <- sapply(ngrams$name,preceeding.ngram,ngrams=ngram.df)
-                
-                pkn.cont <- ngrams %>% 
-                        mutate(pkn.cont = unique.preceeding.types/length(ngram.df$name),
-                               pkn = pkn.cont)
-                
-                print("final")
-                
-                return(pkn.cont)
-                
-                #get frequency of lower.ngram
-                lower.ngram.freq <- lower.ngram %>% 
-                         filter(grepl(search.terms$lower.ngram.regex,name)) 
-                
-                #get number of unique values for preceeding.lower.ngram
-                preceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$preceeding.lower.ngram,lower.ngram$name),]$name)
-                
-                #get number of unique values for proceeding.lower.ngram
-                proceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$proceeding.lower.ngram,lower.ngram$name),]$name)
-                
-                #alternate way to get values
-                #preceeding.lower.ngram <- lower.ngram %>%
-                #        filter(grepl("*_there$",name))
-                #length <- length(preceeding.lower.ngram$name)
-        
-                #can I improve this line?
-                lower.ngram.count <- lower.ngram.freq$frequency[[1]]
-                        
-                candidates.df <- ngram.df %>% 
-                        #find count of predicted ngrams
-                        filter(grepl(search.terms$candidate.regex,name)) %>%
-                        #find count of lower ngram
-                        mutate(lower.ngram.name = sentence,
-                               lower.ngram.freq = lower.ngram.count,
-                               #find number of type of ngrams, preceeding lower ngram
-                               preceeding.lower.ngram.uni.val = preceeding.lower.ngram.uni.val,
-                               #find number of type ngrams proceeding lower ngram
-                               proceeding.lower.ngram.uni.val = proceeding.lower.ngram.uni.val
-                               )
-                
-                #narrow set of ngrams for preceeding n.gram
-                ngrams <- higher.ngram %>%
-                        filter(grepl(search.terms$preceeding.ngram.regex,name))
-        
-                #get frequency for preceeding.ngram
-                preceeding.ngram <- function(search.term,ngrams){
-                        
-                        search.term <- paste("*_",search.term,"$",sep = "")
-                        
-                        print(search.term)
                         
                         test.df <- ngrams %>%
                                 filter(grepl(search.term,name))
                         
                         return(length(test.df$name)) 
                 }
-        
-        candidates.df$test <- sapply(candidates.df$name,preceeding.ngram,ngrams=ngrams)
-        
-        return(candidates.df)
+                
+                
+                #ngrams$ngram.length <- sapply(ngrams$name, wordcount, sep = "_")
+                
+                #get ngrams following preceeding word
+                ngrams <- ngram.df
+                
+                ngrams$ngram.length <- sapply(ngrams$name,wordcount,sep="_")
+                ngrams$numer <- 0
+                denom <- preceeding.ngram(search.terms$name, ngrams = ngram.df)
+                
+                proceeding.ngram <- function(search.term,ngrams){
+                        
+                        search.term <- paste("^",search.term,"_{1}",sep = "")
+                        
+                        test.df <- ngrams %>%
+                                filter(grepl(search.term,name))
+                        
+                        return(length(test.df$name)) 
+                }
+                
+                #start here - same for all rows
+                proceeding.type <- proceeding.ngram(search.terms$name,ngrams = ngram.df)
+                
+                root.freq <- filter(lower.ngram,lower.ngram$name == search.terms$name)[[2]]
+                pkn.cont <- filter(output.df,ngram.length == search.terms$ngram.length)
+                
+                ngrams <- ngrams %>% 
+                        #NEED filter out non-candidates that don't match
+                        filter(grepl(search.terms$filter,name)) %>%
+                        mutate(
+                                d = 1,
+                                lower.regex = paste("^",sub("^[a-zA-Z]*_{1}","",name),"$",sep = "")
+                        )
+                
+                find.prev.pkn.cont <- function(lower.regex, pkn.cont){
+                        
+                        prev.pkn.cont <- pkn.cont[grepl(lower.regex,pkn.cont$name), 9]
+                        
+                        return(prev.pkn.cont)
+                        
+                }
+                
+                ngrams$prev.pkn.cont <- sapply(ngrams$lower.regex,find.prev.pkn.cont,pkn.cont = pkn.cont)
+                
+                ngrams <- ngrams %>%  
+                        mutate(
+                                unknown_smoothing = d*proceeding.type/denom*(d/denom)*prev.pkn.cont,
+                                pkn = pmax(frequency,0)/root.freq + unknown_smoothing,
+                                pkn.cont = 0
+                               )
+                
+                print("final")
+                
+                return(ngrams)
+                
+                
+                
+        #         #get frequency of lower.ngram
+        #         lower.ngram.freq <- lower.ngram %>% 
+        #                  filter(grepl(search.terms$lower.ngram.regex,name)) 
+        #         
+        #         #get number of unique values for preceeding.lower.ngram
+        #         preceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$preceeding.lower.ngram,lower.ngram$name),]$name)
+        #         
+        #         #get number of unique values for proceeding.lower.ngram
+        #         proceeding.lower.ngram.uni.val <-length(lower.ngram[grepl(search.terms$proceeding.lower.ngram,lower.ngram$name),]$name)
+        #         
+        #         #alternate way to get values
+        #         #preceeding.lower.ngram <- lower.ngram %>%
+        #         #        filter(grepl("*_there$",name))
+        #         #length <- length(preceeding.lower.ngram$name)
+        # 
+        #         #can I improve this line?
+        #         lower.ngram.count <- lower.ngram.freq$frequency[[1]]
+        #                 
+        #         candidates.df <- ngram.df %>% 
+        #                 #find count of predicted ngrams
+        #                 filter(grepl(search.terms$candidate.regex,name)) %>%
+        #                 #find count of lower ngram
+        #                 mutate(lower.ngram.name = sentence,
+        #                        lower.ngram.freq = lower.ngram.count,
+        #                        #find number of type of ngrams, preceeding lower ngram
+        #                        preceeding.lower.ngram.uni.val = preceeding.lower.ngram.uni.val,
+        #                        #find number of type ngrams proceeding lower ngram
+        #                        proceeding.lower.ngram.uni.val = proceeding.lower.ngram.uni.val
+        #                        )
+        #         
+        #         #narrow set of ngrams for preceeding n.gram
+        #         ngrams <- higher.ngram %>%
+        #                 filter(grepl(search.terms$preceeding.ngram.regex,name))
+        # 
+        #         #get frequency for preceeding.ngram
+        #         preceeding.ngram <- function(search.term,ngrams){
+        #                 
+        #                 search.term <- paste("*_",search.term,"$",sep = "")
+        #                 
+        #                 print(search.term)
+        #                 
+        #                 test.df <- ngrams %>%
+        #                         filter(grepl(search.term,name))
+        #                 
+        #                 return(length(test.df$name)) 
+        #         }
+        # 
+        # candidates.df$test <- sapply(candidates.df$name,preceeding.ngram,ngrams=ngrams)
+        # 
+        # return(candidates.df)
         }
 }
 
@@ -280,7 +344,7 @@ generate.candidates <- function(search.terms){
 
 
 #input string of words and remove punctuation, etc
-sentence <- "are the two arabian"
+sentence <- "the film is"
 
 sentence <- sentence %>%
         tokens(remove_punct = TRUE,
@@ -338,13 +402,8 @@ print(i)
 #output.df <- output.df %>% transform(pkn = if_else(pkn.cont != 0, pkn.cont,pkn))
 }
 
+print("got here")
 
-
-for(i in 1:iterations){
-
-df <- retrieve.candidates(search.terms[i,1],search.terms[i,2],search.terms[i,3])
-output.df <- rbind(output.df,df[[1]])
-}
 
 #consolidate ngrams with same last words, combine values
 #first create last word column
@@ -356,11 +415,11 @@ output.df <- mutate(output.df,output.word =
 #summarise different values according to last word
 final.output.df <- output.df %>%
         group_by(output.word) %>%
-        summarise(score = sum(score)) %>%
+        summarise(pkn = sum(pkn)) %>%
         ungroup %>%
         #remove stop words
         filter(!(output.word %in% stopwords("english"))) %>%
-        arrange(desc(score))
+        arrange(desc(pkn))
 
 print(paste("output.df observations are",length(output.df$name)))
 print(paste("Most likely answer is \'",final.output.df[1,1],"\'.", sep = ""))
