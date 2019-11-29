@@ -253,6 +253,11 @@ generate.candidates <- function(search.terms){
                 #start here - same for all rows
                 proceeding.type <- proceeding.ngram(search.terms$name,ngrams = ngram.df)
                 
+                n1 <- filter(ngram.df,frequency == 1)
+                n1 <- length(n1$name)
+                n2 <- filter(ngram.df,frequency == 2)
+                n2 <- length(n2$name)
+                
                 root.freq <- filter(lower.ngram,lower.ngram$name == search.terms$name)[[2]]
                 pkn.cont <- filter(output.df,ngram.length == search.terms$ngram.length)
                 
@@ -260,7 +265,7 @@ generate.candidates <- function(search.terms){
                         #NEED filter out non-candidates that don't match
                         filter(grepl(search.terms$filter,name)) %>%
                         mutate(
-                                d = 1,
+                                d = n1/(n1 + 2*n2),
                                 lower.regex = paste("^",sub("^[a-zA-Z]*_{1}","",name),"$",sep = "")
                         )
                 
