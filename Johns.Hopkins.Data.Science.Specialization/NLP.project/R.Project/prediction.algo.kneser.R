@@ -179,7 +179,7 @@ generate.candidates <- function(search.terms){
                         filter(grepl(search.terms$filter,name)) %>%
                         mutate(
                                d = 1,
-                               lower.regex = gsub("^[a-zA-Z]*_{1}","",name),
+                               lower.regex = sub("^[a-zA-Z]*_{1}","",name),
                                unknown_smoothing = d*proceeding.type/denom*(d/denom)*output.df[grepl(lower.regex,pkn.cont$name), 8],
                                pkn = (pmax(frequency,0)/root.freq) + unknown_smoothing,
                                pkn.cont =  (max(numer,0)/denom) + unknown_smoothing
