@@ -122,12 +122,15 @@ generate.candidates <- function(search.terms){
                 
                 ngrams <- ngram.df
                 ngrams$ngram.length <- sapply(ngrams$name,wordcount,sep="_")
-                #try summarize, aggrgate as alternative - eliminate front word
-                #a <- aggregate(number ~ name, data = z, sum)
-                #z <- data.frame(name = x, number = 1)
-                #z <- transform(test,name = sub("^[a-zA-Z]*_{1}","",name))
-                #need to connect back to ngrams as numer - try join or merge
-                ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams=higher.ngram)
+                #create.numer.name to match numer values
+                df <- higher.ngram %>%
+                        transform(name =  sub("^[a-zA-Z]*_{1}","",name),
+                               number = 1)
+                
+                df <- aggregate(number ~ name, data = df, sum)
+                df <- rename(df,numer = number)
+
+                ngrams <- merge(ngrams,df)
                 denom <- length(ngram.df$name)
                 
                 ngrams <- ngrams %>% 
