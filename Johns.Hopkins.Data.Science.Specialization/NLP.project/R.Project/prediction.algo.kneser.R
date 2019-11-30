@@ -126,7 +126,7 @@ generate.candidates <- function(search.terms){
                 #a <- aggregate(number ~ name, data = z, sum)
                 #z <- data.frame(name = x, number = 1)
                 #z <- transform(test,name = sub("^[a-zA-Z]*_{1}","",name))
-                #need to connect back to ngrams as numer
+                #need to connect back to ngrams as numer - try join or merge
                 ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams=higher.ngram)
                 denom <- length(ngram.df$name)
                 
