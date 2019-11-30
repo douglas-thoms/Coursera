@@ -35,22 +35,26 @@ generate.search.terms <- function(sentence){
         output <- NULL
         ngram.length <- NULL
         filter <- NULL
+        filter2 <- NULL
         
         for(i in 1:n.words) {
                 #generate ngrams from blank to pentagram
                 output <- c(output,word(sentence, start = i, end = n.words, sep = "_"))
                 ngram.length <- c(ngram.length, n.words + 1 - i)
                 filter <- c(filter,paste("^",word(sentence, start = i, end = n.words, sep = "_"),"_{1}",sep=""))
+                filter2 <- c(filter2,paste("_",word(sentence, start = i, end = n.words, sep = "_"),"_{1}",sep=""))
         }
         
         output <- c(output,"")
         ngram.length <- c(ngram.length,0)
         filter <- c(filter,"")
+        filter2 <- c(filter2,"")
         
         #create dataframe
         output <- data.frame(name = output,
                              ngram.length = ngram.length, 
                              filter = filter,
+                             filter2 = filter2,
                              stringsAsFactors = FALSE)
         
         # output <- output %>%
@@ -164,9 +168,21 @@ generate.candidates <- function(search.terms){
                 
                 #get ngrams following preceeding word
                 ngrams <- ngram.df
+                ngrams <- ngrams %>% 
+                        filter(grepl(search.terms$filter,name))
                 
                 ngrams$ngram.length <- sapply(ngrams$name,wordcount,sep="_")
-                ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams = higher.ngram)
+                #ngrams$numer <- sapply(ngram.df$name,preceeding.ngram,ngrams = higher.ngram)
+                #create.numer.name to match numer values
+                df <- higher.ngram %>%
+                        filter(grepl(search.terms$filter2,name)) %>%
+                        transform(name =  sub("^[a-zA-Z]*_{1}","",name),
+                                  number = 1)
+                
+                df <- aggregate(number ~ name, data = df, sum)
+                df <- rename(df,numer = number)
+                
+                ngrams <- merge(ngrams,df)
                 denom <- preceeding.ngram(search.terms$name, ngrams = ngram.df)
                 
                 
@@ -193,10 +209,10 @@ generate.candidates <- function(search.terms){
                 n2 <- length(n2$name)
                 
                 ngrams <- ngrams %>% 
-                        #NEED filter out non-candidates that don't match
-                        filter(grepl(search.terms$filter,name)) %>%
+                        
+                        #right now d doesn't calculate because removed all 1 frequency, 2 frequency ngrams
                         mutate(
-                               d = n1/(n1 + 2*n2),
+                               d = 1, # n1/(n1 + 2*n2),
                                lower.regex = paste("^",sub("^[a-zA-Z]*_{1}","",name),"$",sep = "")
                                )
                 
