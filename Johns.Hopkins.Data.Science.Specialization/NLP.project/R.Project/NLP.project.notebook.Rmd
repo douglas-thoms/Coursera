@@ -73,4 +73,23 @@ Potential Additional corpi
   http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
   https://www.corpusdata.org/ - fee
   http://kdd.ics.uci.edu/databases/reuters21578/reuters21578.html
+  
+ Optimizing
+ Generate all options for a set like "I like __" - then only choose top  options
+ first - remove all ngrams beside unigrams with cout less than 4
+ Pseudo code - 
+ 1. take n-1 gram (say 4gram) and use to generate scores for each line
+ 2. take top five predictions
+ 3. loop to next line
 
+so these are all competing for same score
+I like to eat fish- score 6
+like to eat
+to eat cheese - sc0re 4
+
+I want to eat brocolli - score 4
+want to eat
+to eat cheese - score 4
+
+
+all of these are competing

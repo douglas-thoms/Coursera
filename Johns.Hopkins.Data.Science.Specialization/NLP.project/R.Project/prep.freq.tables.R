@@ -36,7 +36,7 @@ toks <- chunk.corpus %>%
 
 dfm <- dfm(toks, ngrams = ngram)
 
-dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
+dfm.trim <- dfm_trim(dfm, min_termfreq = 1)
 
 vector <- sort(colSums(dfm.trim),decreasing = TRUE)
 
