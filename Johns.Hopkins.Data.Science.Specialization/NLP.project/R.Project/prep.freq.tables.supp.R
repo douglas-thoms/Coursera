@@ -61,7 +61,7 @@ toks <- supp.corpus %>%
 supp.dfm <- dfm(toks, ngrams = 5)
 
 #remove lower frequency terms
-supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 4)
+supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 1)
 
 #sum columns and create a vector totalling each factors frequency
 vector <- sort(colSums(supp.dfm.trim),decreasing = TRUE)
