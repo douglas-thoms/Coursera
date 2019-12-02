@@ -36,7 +36,7 @@ toks <- chunk.corpus %>%
 
 dfm <- dfm(toks, ngrams = ngram)
 
-dfm.trim <- dfm_trim(dfm, min_termfreq = 1)
+dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
 
 vector <- sort(colSums(dfm.trim),decreasing = TRUE)
 
@@ -92,7 +92,7 @@ input <- c("data/final/en_US/en_US.blogs.txt",
 rm(frequency.df)
 
 for(i in 1:3){
-frequency.df <- get.frequency(input[i],1)                  
+frequency.df <- get.frequency(input[i],5)      #need to do 3,4 still            
 }
 
 frequency.df <- data.frame(name = frequency.df$name,
@@ -101,8 +101,8 @@ frequency.df <- data.frame(name = frequency.df$name,
 
 #frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
-saveRDS(frequency.df,"data/unigram.rds")
+saveRDS(frequency.df,"data/pentagram.rds")
 
-test <- readRDS("data/unigram.rds")
+test <- readRDS("data/pentagram.rds")
 
 #keep as separate data frames and access them as necessary, for speed
