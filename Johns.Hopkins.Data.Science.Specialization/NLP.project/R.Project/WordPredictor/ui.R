@@ -6,6 +6,7 @@
 # 
 #    http://shiny.rstudio.com/
 #
+# https://shiny.rstudio.com/articles/layout-guide.html
 
 #https://shiny.rstudio.com/articles/tabsets.html
 
@@ -18,19 +19,20 @@ shinyUI(fluidPage(
   titlePanel("WordPredictor"),
   
   # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-            h4(<"Instructions"), #bold this
-               sliderInput("bins",
-                           "Number of bins:",
-                           min = 1,
-                           max = 50,
-                           value = 30)
-    ),
+  fluidRow(
+          column(3,
+                 h4("Put a string of words in and get a sentence.") #bold this
+          ),
     
     # Show a plot of the generated distribution
-    mainPanel(
-       plotOutput("distPlot")
-    )
-  )
-))
+    column(9,
+            tabsetPanel(
+                    tabPanel("Word Predictor", dataTableOutput("final.results"),h5(textInput("entry.sentence","Predicted sentence is:"))),
+                    tabPanel("About", h4("Uses Stupid Back-Off Algorithm: Put a string of words in and get a sentence.<br>
+                                         Gutenberg credit here"))
+            )
+            )
+)
+)
+)
+
