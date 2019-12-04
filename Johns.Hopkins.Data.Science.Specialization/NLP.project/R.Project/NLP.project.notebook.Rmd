@@ -93,3 +93,5 @@ to eat cheese - score 4
 
 
 all of these are competing
+
+use LUT to create index tables to pull up a range of words and their score based on prediction

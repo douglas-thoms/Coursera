@@ -31,14 +31,14 @@ home.directory <- getwd()
 data.directory <- paste(home.directory,"data", sep = "/")
 
 #standford movies - multiple text files
-data.dir <- paste(data.directory,"aclImdb/train",                                                          
+data.dir <- paste(data.directory,"aclImdb/train",
                  sep = "/")
 #read text of movie reviews
 stanford.movies <- readtext(paste0(data.dir, "/*/*.txt"), encoding = "UTF-8")
 
 
 #gutenberg partial - multiple text files
-data.dir <- paste(data.directory,"Gutenberg/txt",                                                          
+data.dir <- paste(data.directory,"Gutenberg/txt",
                   sep = "/")
 
 #read partial text of guttenberg
@@ -55,10 +55,10 @@ toks <- supp.corpus %>%
                 remove_symbols = TRUE,
                 remove_url = TRUE,
                 remove_twitter = TRUE) %>%
-        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") 
+        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
 
 #create ngram
-supp.dfm <- dfm(toks, ngrams = 3)
+supp.dfm <- dfm(toks, ngrams = 4) #need 1,3,4
 
 #remove lower frequency terms
 supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 4)
@@ -77,7 +77,14 @@ frequency.df <- frequency.df %>%
 #frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
 #create RDS file to input later
+<<<<<<< HEAD
 saveRDS(frequency.df,"data/trigram.supp.rds")
 
 #input to test if same as expected
 test <- readRDS("data/trigram.supp.rds")
+=======
+saveRDS(frequency.df,"data/quadgram.supp.rds")
+
+#input to test if same as expected
+test <- readRDS("data/quadgram.supp.rds")
+>>>>>>> 45dacba45b990f930cd5001837ab6ef364c905d9
