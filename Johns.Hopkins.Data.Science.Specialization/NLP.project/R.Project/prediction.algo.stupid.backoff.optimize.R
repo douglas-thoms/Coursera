@@ -1,129 +1,69 @@
-#NEXT STEPS 
-#-add supplemental files in input files
-#-simplify this with a function
-
-##----------------------------------------------------------------------------
-##----------------------------------------------------------------------------
-##
-##  File name:  
-##  Date:       04NOV2019
-##
-##  Step 4 in process
-##  Input script is create.variables.R
-##  Create ngram variables in Rstudio environment
-##
-##----------------------------------------------------------------------------
-##----------------------------------------------------------------------------
-
-start <- date()
-session.info.list <- sessionInfo()
-
-library(quanteda)
-library(dplyr)
-library(ggplot2)
-library(lexicon)
-library(stringr)
+library(data.table)
 library(ngram)
+library(stringr)
 library(purrr)
+library(dplyr)
 
-##----------------------------------------------------------------------------
-## Function
-##----------------------------------------------------------------------------
+entry <- "arabian knights"
 
-retrieve.candidates <- function(name,ngram.length.predicted){
-  
-        #load appropriate corpus of ngrams
-        if(ngram.length.predicted == 5) {
-                #ngram.df <- pentagram
-                root.df <- quadgram
-                
-        }else if(ngram.length.predicted == 4) {
-                #ngram.df <- quadgram
-                root.df <- trigram
-                
-        }else if(ngram.length.predicted == 3) {
-                #ngram.df <- trigram
-                root.df <- bigram
-        }else if(ngram.length.predicted == 2) {
-                #ngram.df <- bigram
-                root.df <- unigram
-        }else {
-                #ngram.df <- unigram
-        }
-        
-        #replace grepl with subset or filter
-        #rename is fast, so rename to root, then innerjoin or merge
-        #sub pentagram %>% mutate(root.name = sub("_*[a-zA-Z0-9]*$","",name))
-        #need to review innerjoin, merge to see if works as expected
-        #search for ngram candidates on bigrams and up, using stupid backoff recursion
-        if(ngram.length.predicted >= 2){
-                
-                #create dataframe from input sentences
-                ngram.df <- name
-                
-                root.df <- root.df %>%
-                        rename(root.name = name,
-                               root.frequency = frequency)
+#prep search terms
 
-                
-                result.df <- merge(ngram.df,root.df)
+entry.cleaned <- entry %>%
+        tokens(remove_punct = TRUE,
+               remove_numbers = TRUE,
+               remove_symbols = TRUE,
+               remove_url = TRUE,
+               remove_twitter = TRUE
+        ) %>%
+        tokens_tolower()
+#tokens_select(stopwords('english'),selection='remove')
+entry.cleaned <- paste(entry.cleaned[[1]],collapse=" ")
+print(entry.cleaned)
 
-                result.df <- result.df %>%
-                        mutate(coefficient = 0.4^(5-ngram.length.predicted),
-                               score = coefficient*(frequency/root.frequency))
-                        #eventually need to remove top 5
-        
-                return(result.df)
-                
-        
-        #calculate final recursion level for stupid backoff model
-        } else if(ngram.length.predicted == 1){
-                #get total corpus size
-                corpus.size <- sum(length(unigram$name),
-                                   length(bigram$name),
-                                   length(trigram$name),
-                                   length(quadgram$name),
-                                   length(pentagram$name))
-                result.df <- name %>%
-                        mutate(root.name = NA,
-                               root.frequency = corpus.size,
-                               #ngram.length = ngram.length,
-                               coefficient = 0.4^(5-ngram.length.predicted),
-                               score = coefficient*(frequency/root.frequency)) %>%
-                        select(root.name,name,frequency,root.frequency,coefficient,score)
-                
-                
-                return(result.df)
-                
-        }
+#determine string length
+entry.cleaned.length <- wordcount(entry.cleaned)
+
+#if over 4, truncuate to last 4 words
+if (entry.cleaned.length >4) {
+        entry.cleaned <- word(entry.cleaned, start = entry.cleaned.length-3, end = entry.cleaned.length)
+        entry.cleaned.length <- 4
+}
+
+entry.cleaned <- gsub(" ", "_", entry.cleaned)
+
+#create loop to break into search terms
+
+output <- NULL
+
+for(i in 1:entry.cleaned.length) {
+        #generate ngrams from blank to pentagram
+        output <- c(output, word(entry.cleaned, start = i, end = entry.cleaned.length, sep = "_"))
+}
+
+output <- c(output,NA)
+
+#set up final.values as data.table
+final.values <- data.table(final.values)
+setkey(final.values, root.name)
+
+
+predictions <- NULL
+for(i in 1:entry.cleaned.length+1){
+
+    df <- final.values[.(output[i]), nomatch = 0L]
+    predictions <- rbind(predictions,df)
+
 }
 
 
-##----------------------------------------------------------------------------
-## Model
-##----------------------------------------------------------------------------
-
-#take vector of same n-grams in underscore format
-#Create very small test set initially - only a couple of lines
-
-ngram.sources <- list(unigram,bigram,trigram,quadgram,pentagram)
-
-final.values <- NULL
-
-for(i in 1:5){
-        
-        ngram.length.predicted <- i
-        
-        #enter vector of ngram to calculate it scores
-             
-        #use purr to avoid loop and count ngram.length
-        
-        score.table <- ngram.sources[[i]]
-        
-        score.table$root.name <- map_chr(score.table$name,sub,pattern = "_*[a-zA-Z0-9]*$", replacement = "")
-        
-        
-        #output needs to be predicted phrase, frequency, score
-        df <- retrieve.candidates(score.table, ngram.length.predicted = ngram.length.predicted)
-        final.values <- rbind(final.values,df)
-}
+#get last word
+predictions <- predictions %>%
+                mutate(new.word = map_chr(name,word, start = -1, sep = "_")) %>%
+                group_by(new.word) %>%
+                summarise(score = sum(score)) %>%
+                ungroup %>%
+                #remove stop words
+                filter(!(new.word %in% stopwords("english"))) %>%
+                arrange(desc(score)) %>%
+                mutate(predicted.sentence = paste(entry,new.word))
+               
