@@ -3,11 +3,11 @@ library(ngram)
 library(stringr)
 library(purrr)
 library(dplyr)
+library(quanteda)
 
 entry <- "arabian knights"
 
 #prep search terms
-
 entry.cleaned <- entry %>%
         tokens(remove_punct = TRUE,
                remove_numbers = TRUE,
@@ -29,10 +29,10 @@ if (entry.cleaned.length >4) {
         entry.cleaned.length <- 4
 }
 
+#changes blank spaces to hyphen to match look up tables
 entry.cleaned <- gsub(" ", "_", entry.cleaned)
 
-#create loop to break into search terms
-
+#create loop to break entry sentence into ngram to unigram
 output <- NULL
 
 for(i in 1:entry.cleaned.length) {
@@ -41,10 +41,6 @@ for(i in 1:entry.cleaned.length) {
 }
 
 output <- c(output,NA)
-
-#set up final.values as data.table
-final.values <- data.table(final.values)
-setkey(final.values, root.name)
 
 
 predictions <- NULL

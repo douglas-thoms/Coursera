@@ -126,8 +126,7 @@ for(i in 1:5){
         final.values <- rbind(final.values,df)
 }
 
-#https://appsilon.com/fast-data-lookups-in-r-dplyr-vs-data-table/?nabe=4634331497365504:1&utm_referrer=https%3A%2F%2Fwww.google.com%2F
-#use data.table index
 
-#key_to_lookup <- select_random_key()
-#time(data_table[.(key_to_lookup), nomatch = 0L])
+#set up final.values as data.table
+final.values <- data.table(final.values)
+setkey(final.values, root.name)

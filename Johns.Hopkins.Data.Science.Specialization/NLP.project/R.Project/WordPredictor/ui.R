@@ -27,9 +27,17 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     column(9,
             tabsetPanel(
-                    tabPanel("Word Predictor", dataTableOutput("final.results"),h5(textInput("entry.sentence","Predicted sentence is:"))),
-                    tabPanel("About", h4("Uses Stupid Back-Off Algorithm: Put a string of words in and get a sentence.<br>
-                                         Gutenberg credit here"))
+                    tabPanel("Word Predictor",
+                             h5(textInput("entry.sentence","Enter sentence:")),
+                             h5(textInput("number.prediction","Number of predictions:","5")),
+                             br(),
+                             DT::dataTableOutput("final.results")),
+                    
+                    tabPanel("About", h4(strong("Uses Stupid Back-Off Algorithm: Put a string of words in and get a sentence.")),
+                                        br(), 
+                                        h4("Gutenberg credit here"),
+                                        br(),
+                                        h4("corpus explanation"))
             )
             )
 )
