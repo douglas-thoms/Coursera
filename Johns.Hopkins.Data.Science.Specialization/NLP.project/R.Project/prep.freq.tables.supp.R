@@ -55,13 +55,14 @@ toks <- supp.corpus %>%
                 remove_symbols = TRUE,
                 remove_url = TRUE,
                 remove_twitter = TRUE) %>%
-        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")
+        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed")  %>%
+        tokens_select(c("*_*", "br"), valuetype ="glob", selection = "remove", case_insensitive = FALSE)
 
 #create ngram
-supp.dfm <- dfm(toks, ngrams = 4) #need 1,3,4
+supp.dfm <- dfm(toks, ngrams = 1)
 
 #remove lower frequency terms
-supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 4)
+supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 1)
 
 #sum columns and create a vector totalling each factors frequency
 vector <- sort(colSums(supp.dfm.trim),decreasing = TRUE)
@@ -77,14 +78,7 @@ frequency.df <- frequency.df %>%
 #frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
 #create RDS file to input later
-<<<<<<< HEAD
-saveRDS(frequency.df,"data/trigram.supp.rds")
+saveRDS(frequency.df,"data/unigram.supp.rds")
 
 #input to test if same as expected
-test <- readRDS("data/trigram.supp.rds")
-=======
-saveRDS(frequency.df,"data/quadgram.supp.rds")
-
-#input to test if same as expected
-test <- readRDS("data/quadgram.supp.rds")
->>>>>>> 45dacba45b990f930cd5001837ab6ef364c905d9
+test <- readRDS("data/unigram.supp.rds")

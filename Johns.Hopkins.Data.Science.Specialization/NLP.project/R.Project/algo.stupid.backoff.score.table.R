@@ -67,9 +67,14 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                 result.df <- merge(ngram.df,root.df)
 
                 result.df <- result.df %>%
-                        mutate(coefficient = 0.4^(5-ngram.length.predicted),
-                               score = coefficient*(frequency/root.frequency))
-                        #eventually need to remove top 5
+                        mutate(coefficient = 0.2^(5-ngram.length.predicted),
+                               score = coefficient*(frequency/root.frequency)) %>%
+                        #keep only top ten scoring per root.name
+                        arrange(root.name,desc(score)) #%>%
+                        #group_by(root.name) %>%
+                        #slice(1:5) %>%
+                        #ungroup()
+                        
         
                 return(result.df)
                 
@@ -86,10 +91,11 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                         mutate(root.name = NA,
                                root.frequency = corpus.size,
                                #ngram.length = ngram.length,
-                               coefficient = 0.4^(5-ngram.length.predicted),
+                               coefficient = 0.2^(5-ngram.length.predicted),
                                score = coefficient*(frequency/root.frequency)) %>%
-                        select(root.name,name,frequency,root.frequency,coefficient,score)
-                
+                        select(root.name,name,frequency,root.frequency,coefficient,score) %>%
+                        arrange(desc(score)) %>%
+                        slice(1:500)
                 
                 return(result.df)
                 

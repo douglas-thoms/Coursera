@@ -47,10 +47,11 @@ toks <- supp.corpus %>%
                 remove_symbols = TRUE,
                 remove_url = TRUE,
                 remove_twitter = TRUE) %>%
-        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") 
+        tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") %>%
+        tokens_select(c("*_*", "br"), valuetype ="glob", selection = "remove", case_insensitive = FALSE)
 
 #create ngram
-supp.dfm <- dfm(toks, ngrams = 1)
+supp.dfm <- dfm(toks, ngrams = 5)
 
 #remove lower frequency terms
 supp.dfm.trim <- dfm_trim(supp.dfm, min_termfreq = 1)
@@ -69,7 +70,7 @@ frequency.df <- frequency.df %>%
 #frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
 
 #create RDS file to input later
-saveRDS(frequency.df,"data/unigram.mini.rds")
+saveRDS(frequency.df,"data/pentagram.mini.rds")
 
 #input to test if same as expected
-test <- readRDS("data/unigram.mini.rds")
+test <- readRDS("data/pentagram.mini.rds")

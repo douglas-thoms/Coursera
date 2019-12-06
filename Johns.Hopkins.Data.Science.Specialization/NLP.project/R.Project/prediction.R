@@ -5,7 +5,7 @@ library(purrr)
 library(dplyr)
 library(quanteda)
 
-entry <- "arabian knights"
+entry <- "here is a"
 
 #prep search terms
 entry.cleaned <- entry %>%

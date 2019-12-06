@@ -34,6 +34,7 @@ shinyUI(fluidPage(
             tabsetPanel(
                     tabPanel("Word Predictor",
                              p(textInput("entry.sentence","Enter sentence:", "There are")),
+                             #create scroll down button to choose 3-5 predictions
                              p(textInput("number.prediction","Number of predictions:","5")),
                              br(),
                              DT::dataTableOutput("final.results")),

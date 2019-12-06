@@ -26,6 +26,7 @@ shinyServer(function(input, output) {
         
   output$final.results <- DT::renderDataTable({
           
+          #see if issue here
           #if loop that waits for complete words based on space
           if(str_sub(input$entry.sentence, start = -1) == " "){
                 #need a loop in here so only reacts on blank white space
