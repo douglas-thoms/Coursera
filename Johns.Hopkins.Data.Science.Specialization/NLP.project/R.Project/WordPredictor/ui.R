@@ -12,32 +12,44 @@
 
 library(shiny)
 
+#NEXT FIGURE OUT FONT SIZE
+
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("WordPredictor"),
+  titlePanel(
+          h1("WordPredictor", align = "center")
+          ),
   
   # Sidebar with a slider input for number of bins 
   fluidRow(
           column(3,
-                 h4("Put a string of words in and get a sentence.") #bold this
+                 p("The widget predicts the next word of a sentence."),
+                 p("Enter a sentence to see the predicted words.")
           ),
     
     # Show a plot of the generated distribution
     column(9,
             tabsetPanel(
                     tabPanel("Word Predictor",
-                             h5(textInput("entry.sentence","Enter sentence:")),
-                             h5(textInput("number.prediction","Number of predictions:","5")),
+                             p(textInput("entry.sentence","Enter sentence:", "There are")),
+                             p(textInput("number.prediction","Number of predictions:","5")),
                              br(),
                              DT::dataTableOutput("final.results")),
                     
-                    tabPanel("About", h4(strong("Uses Stupid Back-Off Algorithm: Put a string of words in and get a sentence.")),
-                                        br(), 
-                                        h4("Gutenberg credit here"),
-                                        br(),
-                                        h4("corpus explanation"))
+                    tabPanel("About", div(p('This widget predicts words using the ', 
+                                            a(href = 'https://www.aclweb.org/anthology/D07-1090.pdf', 
+                                              'Stupid Back-Off Algorithm', .noWS = "outside"), 
+                                            '.  The sample data (corpus) is a 
+                                            collection of the following sources:', 
+                                            .noWS = c("after-begin", "before-end"))),
+                             tags$ul(
+                                     tags$li("Gutenberg credit here"), 
+                                     tags$li("Stanford Movies"), 
+                                     tags$li("Swiftkey")
+                                     )
+                    )       
             )
             )
 )
