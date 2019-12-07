@@ -83,7 +83,7 @@ shinyServer(function(input, output) {
                           summarise(score = sum(score)) %>%
                           ungroup %>%
                           #remove stop words
-                          filter(!(new.word %in% stopwords("english"))) %>%
+                          #filter(!(new.word %in% stopwords("english"))) %>%
                           arrange(desc(score)) %>%
                           mutate(predicted.sentence = paste(input$entry.sentence,new.word)) %>%
                           slice(1:input$number.prediction) %>%

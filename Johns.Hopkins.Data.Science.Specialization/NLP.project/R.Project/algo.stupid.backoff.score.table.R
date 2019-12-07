@@ -67,7 +67,7 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                 result.df <- merge(ngram.df,root.df)
 
                 result.df <- result.df %>%
-                        mutate(coefficient = 0.2^(5-ngram.length.predicted),
+                        mutate(coefficient = 0.15^(5-ngram.length.predicted),
                                score = coefficient*(frequency/root.frequency)) %>%
                         #keep only top ten scoring per root.name
                         arrange(root.name,desc(score)) #%>%
@@ -91,8 +91,10 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                         mutate(root.name = NA,
                                root.frequency = corpus.size,
                                #ngram.length = ngram.length,
-                               coefficient = 0.2^(5-ngram.length.predicted),
+                               coefficient = 0.15^(5-ngram.length.predicted),
                                score = coefficient*(frequency/root.frequency)) %>%
+                               #filter out 1 frequency unigrams - probably not real words
+                        filter(frequency != 1) %>%
                         select(root.name,name,frequency,root.frequency,coefficient,score) %>%
                         arrange(desc(score)) %>%
                         slice(1:500)

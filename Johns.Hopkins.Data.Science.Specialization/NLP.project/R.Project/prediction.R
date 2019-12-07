@@ -5,7 +5,7 @@ library(purrr)
 library(dplyr)
 library(quanteda)
 
-entry <- "here is a"
+entry <- "I was walking down the"
 
 #prep search terms
 entry.cleaned <- entry %>%
@@ -59,7 +59,7 @@ predictions <- predictions %>%
                 summarise(score = sum(score)) %>%
                 ungroup %>%
                 #remove stop words
-                filter(!(new.word %in% stopwords("english"))) %>%
+                #filter(!(new.word %in% stopwords("english"))) %>%
                 arrange(desc(score)) %>%
                 mutate(predicted.sentence = paste(entry,new.word))
                
