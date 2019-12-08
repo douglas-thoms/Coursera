@@ -18,11 +18,8 @@ library(quanteda)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-  
-  # url <- a("Google Homepage", href="https://www.google.com/")
-  # output$tab <- renderUI({
-  #               tagList("URL link:", url)
-  #               })
+        
+        #rm(list=setdiff(ls(), "final.values"))
         
   output$final.results <- DT::renderDataTable({
           

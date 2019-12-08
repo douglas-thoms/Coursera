@@ -190,7 +190,7 @@ benchmark <- compiler::cmpfun(function(FUN, ..., sent.list, ext.output=T) {
                                      paste0(pkg$Package, ' (v', pkg$Version, ')')
                                  }), 
                           collapse = ', ')
-                   ))
+                   ))   
     }
 }, options=list(optimize =3))
 
@@ -205,7 +205,7 @@ benchmark <- compiler::cmpfun(function(FUN, ..., sent.list, ext.output=T) {
 
 # As an example, we create a very simple baseline algorithm which always returns
 # the three most frequent English words.
-predict.baseline <- function(x){c('the', 'on', 'a')}
+predict.baseline <- function(x){prediction.function(x)}
 
 
 
