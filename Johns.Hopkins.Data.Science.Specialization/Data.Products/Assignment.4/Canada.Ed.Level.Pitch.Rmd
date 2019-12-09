@@ -86,6 +86,6 @@ So, if 10 people's highest education level is a bachelor's degree and the area p
 https://douglas-thoms.shinyapps.io/Canada-Education-Level/  
 
 
-![Education Levels of Canada](image.png)  
+![Education Levels in Canada](image.png)  
   
 
