@@ -20,11 +20,14 @@ library(quanteda)
 shinyServer(function(input, output) {
         
         #rm(list=setdiff(ls(), "final.values"))
+<<<<<<< HEAD
         
         file <- ("data/score.table.rds")
         con <- gzfile(file)
         score.table <- readRDS(con)
         close(con)
+=======
+>>>>>>> 2621595722c7b7ebdb5b5ce6fb2464da05a9fbe2
         
   output$final.results <- DT::renderDataTable({
           
