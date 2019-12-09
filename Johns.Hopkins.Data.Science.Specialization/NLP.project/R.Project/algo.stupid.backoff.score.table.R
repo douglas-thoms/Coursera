@@ -70,10 +70,10 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                         mutate(coefficient = 0.15^(5-ngram.length.predicted),
                                score = coefficient*(frequency/root.frequency)) %>%
                         #keep only top ten scoring per root.name
-                        arrange(root.name,desc(score)) #%>%
-                        #group_by(root.name) %>%
-                        #slice(1:5) %>%
-                        #ungroup()
+                        arrange(root.name,desc(score)) %>%
+                        group_by(root.name) %>%
+                        slice(1:5) %>%
+                        ungroup()
                         
         
                 return(result.df)
@@ -97,7 +97,7 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                         filter(frequency != 1) %>%
                         select(root.name,name,frequency,root.frequency,coefficient,score) %>%
                         arrange(desc(score)) %>%
-                        slice(1:500)
+                        slice(1:200)
                 
                 return(result.df)
                 
@@ -137,4 +137,7 @@ for(i in 1:5){
 
 #set up final.values as data.table
 final.values <- data.table(final.values)
+setkey(final.values, frequency)
+final.values <- final.values[frequency >=12]
+final.values[, `:=` (frequency = NULL,root.frequency = NULL, coefficient = NULL)]
 setkey(final.values, root.name)

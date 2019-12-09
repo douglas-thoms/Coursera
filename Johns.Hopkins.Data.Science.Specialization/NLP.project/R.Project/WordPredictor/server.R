@@ -18,11 +18,13 @@ library(quanteda)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
-  
-  # url <- a("Google Homepage", href="https://www.google.com/")
-  # output$tab <- renderUI({
-  #               tagList("URL link:", url)
-  #               })
+        
+        #rm(list=setdiff(ls(), "final.values"))
+        
+        file <- ("data/score.table.rds")
+        con <- gzfile(file)
+        score.table <- readRDS(con)
+        close(con)
         
   output$final.results <- DT::renderDataTable({
           
@@ -70,7 +72,7 @@ shinyServer(function(input, output) {
                   predictions <- NULL
                   for(i in 1:entry.cleaned.length+1){
                           
-                          df <- final.values[.(output[i]), nomatch = 0L]
+                          df <- score.table[.(output[i]), nomatch = 0L]
                           predictions <- rbind(predictions,df)
                           
                   }

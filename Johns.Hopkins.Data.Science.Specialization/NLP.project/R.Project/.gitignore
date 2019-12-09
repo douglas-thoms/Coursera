@@ -11,3 +11,6 @@
 
 #Ignore R-markup cache files
 /Capstone.Milestone.Report_cache
+
+#Ignore data file 
+/wordpredictor/data
