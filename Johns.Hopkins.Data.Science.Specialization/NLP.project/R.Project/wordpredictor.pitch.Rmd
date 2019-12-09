@@ -1,0 +1,31 @@
+---
+title: "WordPredictor Pitch"
+author: "Douglas Thoms"
+date: "December 9, 2019"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Summary
+
+- Goal - create a model that can predict
+- Approach - used stupid back-off algorithm, expanded corpus
+- Result - using benchmark.R, here are figures
+
+## WordPredictor App
+
+Put app in here
+
+## Methodology
+### Problem
+- Bullet 2
+- Bullet 3
+
+### Approach
+
+## Results
+
+
