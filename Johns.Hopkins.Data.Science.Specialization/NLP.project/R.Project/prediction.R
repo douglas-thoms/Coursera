@@ -1,3 +1,17 @@
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
+##
+##  File name:  prediction.R
+##  Date:       09DEC2019
+##
+##  Step 5 in process
+##  Input phrase and outputs prediction
+##  Set up as a function to output predictions and specificially work
+##  with benchmark.R to quantify accuracy
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
+
+#Input is phrase used to predict ouput
 prediction.function <-function(x){
 
         library(data.table)
@@ -9,7 +23,7 @@ prediction.function <-function(x){
         
         entry <- x
         
-        #prep search terms
+        #clean phrase and then recombine
         entry.cleaned <- x %>%
                 tokens(remove_punct = TRUE,
                        remove_numbers = TRUE,
@@ -18,7 +32,6 @@ prediction.function <-function(x){
                        remove_twitter = TRUE
                 ) %>%
                 tokens_tolower()
-        #tokens_select(stopwords('english'),selection='remove')
         entry.cleaned <- paste(entry.cleaned[[1]],collapse=" ")
         print(entry.cleaned)
         
@@ -44,27 +57,25 @@ prediction.function <-function(x){
         
         output <- c(output,NA)
         
-        
+        #search for entries in score table that match phrase
         predictions <- NULL
         for(i in 1:entry.cleaned.length+1){
         
-            df <- final.values[.(output[i]), nomatch = 0L]
+            df <- score.table[.(output[i]), nomatch = 0L]
             predictions <- rbind(predictions,df)
         
         }
         
         
-        #get last word
+        #get last word of entries and add as new column
         predictions <- predictions %>%
                         mutate(new.word = map_chr(name,word, start = -1, sep = "_")) %>%
                         group_by(new.word) %>%
                         summarise(score = sum(score)) %>%
                         ungroup %>%
-                        #remove stop words
-                        #filter(!(new.word %in% stopwords("english"))) %>%
                         arrange(desc(score)) %>%
                         mutate(predicted.sentence = paste(entry,new.word))
-        
+        #return just last word
         return(predictions$new.word)
         
         

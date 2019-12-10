@@ -1,13 +1,11 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 ##
-##  File name:  dfm.supplement.R
+##  File name:  dfm.mini.R
 ##  Date:       14Nov19
 ##
-##  Step 2a in process
-##  Supplemental in process
-##  Input script is download.enter.corpus.R
-##  Create supplemntal ngrams to be combined with swiftkey ngrams
+##  Step 2c in process
+##  Create a small frequency table for easier use when testing model and coding
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 

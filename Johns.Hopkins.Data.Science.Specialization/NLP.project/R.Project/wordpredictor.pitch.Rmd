@@ -5,30 +5,79 @@ date: "December 9, 2019"
 output: ioslides_presentation
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, size= 10}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Summary
 
-- Goal - create a model that can predict
-- Approach - used stupid back-off algorithm, expanded corpus
-- Result - using benchmark.R, here are figures
+### *Goal*
+- An algorithm that predicts the final word in a string of words, providing 3-5 potential 
+predictions  
+- Intended for deployment in cellphones, internet browsers and similar technology
+
+### *Approach*
+- [Stupid Backoff algorithm](https://www.aclweb.org/anthology/D07-1090.pdf) coded in R 
+
+### *Result*
+- The algorithm had an overall top-3 score of 16.11% and a memory size of 83 MB
 
 ## WordPredictor App
+### *Try the app at https://bit.ly/36qU1uz *
+```{r,echo=FALSE,out.width="80%"}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library(png)      # For grabbing the dimensions of png files
 
-![Word Predictor App](appimage.png)  
-  
+img1_path <- "appimage.png"
+img1 <- readPNG(img1_path, native = TRUE, info = TRUE)
+include_graphics(img1_path)
 
--https://dtdataservices.shinyapps.io/WordPredictor/
+```  
 
-## Methodology
-### Problem
-- Bullet 2
-- Bullet 3
+- Put the  phrase in the text box and press spacebar
+- Select the number of predictions from the drop-down box
+- The app will return the top predictions
 
-### Approach
 
-## Results
+## Approach
+### *Stupid Backoff Algorithm*  
+```{r,echo=FALSE, fig.align="center", out.width= "40%"}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library(png)      # For grabbing the dimensions of png files
+
+img2_path <- "stupid.backoff.png"
+img2 <- readPNG(img2_path, native = TRUE, info = TRUE)
+include_graphics(img2_path)
+
+```  
+
+- [A recursive algorithm](https://www.aclweb.org/anthology/D07-1090.pdf) that increases the score of longer phrases to prioritize context over raw frequency of words  
+- The weighting is represented by $\alpha$ - trail and error determined 0.15
+was optimal weighting 
+
+### *Corpus*
+- [The Swiftkey corpus](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip) was further complemented with additional corpi - [Partial collection of Gutenberg Project corpus](https://web.eecs.umich.edu/~lahiri/gutenberg_dataset.html) and [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/). 
+
+## Performance
+- The algorithm performance was quantified using an R-script benchmark.R from [dsci-benchmark](https://github.com/hfoffani/dsci-benchmark) which tested the 
+algorithm against a set of training data
+
+```{r,echo=FALSE, fig.align="center", out.width= "60%"}
+library(knitr)    # For knitting document and include_graphics function
+library(ggplot2)  # For plotting
+library(png)      # For grabbing the dimensions of png files
+
+img3_path <- "results.png"
+img3 <- readPNG(img3_path, native = TRUE, info = TRUE)
+include_graphics(img3_path)
+
+```  
+
+- The app performed similar to other apps built using Swiftkey corpus
+- Different aspects were modified to improve model performance including 
+alpha-weight, minimum frequency of phrases included in the inputted score-table 
+and inclusion/exclusion of stop-words
 
 

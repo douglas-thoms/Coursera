@@ -1,14 +1,14 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
-# https://shiny.rstudio.com/articles/layout-guide.html
 
-#https://shiny.rstudio.com/articles/tabsets.html
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
+##
+##  File name:  
+##  Date:       09DEC2019
+##
+##  Step 6
+##  Shiny app for wordpredictor
+##----------------------------------------------------------------------------
+##----------------------------------------------------------------------------
 
 library(shiny)
 library(shinythemes)
@@ -47,8 +47,8 @@ shinyUI(navbarPage(theme=shinytheme("spacelab"),
                                             .noWS = c("after-begin", "before-end"))),
                              tags$ul(
                                      tags$li(p("Partial collection of Gutenberg Project corpus provided by Shibamouli Lahiri: ",
-                                               a(href = 'https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip', 
-                                                 'https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip', .noWS = "outside"))),
+                                               a(href = 'https://web.eecs.umich.edu/~lahiri/gutenberg_dataset.html', 
+                                                 'https://web.eecs.umich.edu/~lahiri/gutenberg_dataset.html', .noWS = "outside"))),
                                      tags$li(p("Andrew L. Maas, Raymond E. Daly, Peter T. Pham, 
                                              Dan Huang, Andrew Y. Ng, and Christopher Potts. (2011).",
                                        em("Learning Word Vectors for Sentiment Analysis."),"

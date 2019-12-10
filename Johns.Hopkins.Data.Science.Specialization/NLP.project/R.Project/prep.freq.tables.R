@@ -16,6 +16,7 @@
 ## Functions
 ##----------------------------------------------------------------------------
 
+# this function outputs a table measuring the frequency of each ngram phase
 get.frequency <- function(file, ngram){
 
 file <- readtext(file,encoding = "UTF-8")
@@ -32,15 +33,17 @@ toks <- chunk.corpus %>%
         tokens_select(dict.profane, selection = 'remove', valuetype = "fixed") %>%
         tokens_select(dict.english, selection = 'keep', valuetype = "fixed")
 
-#add supplement dfm
 
+#combine tokens into ngrams
 dfm <- dfm(toks, ngrams = ngram)
 
-dfm.trim <- dfm_trim(dfm, min_termfreq = 4)
+#determine minimum frequency of ngrams to keep
+dfm.trim <- dfm_trim(dfm, min_termfreq = 1)
 
+#sum up all frequencies in all different sources of each of 3 corpus
 vector <- sort(colSums(dfm.trim),decreasing = TRUE)
 
-
+#combine different same ngram level of 3 different sources
         if (!exists("frequency.df"))
         {
                 frequency.df <- data.frame(vector,stringsAsFactors = FALSE)
@@ -91,18 +94,17 @@ input <- c("data/final/en_US/en_US.blogs.txt",
 
 rm(frequency.df)
 
+#for all three sources, choose which ngram to calculate using second input
 for(i in 1:3){
-frequency.df <- get.frequency(input[i],5)      #need to do 3,4 still            
+frequency.df <- get.frequency(input[i],1)     
 }
 
+#sum up rows of each ngram across three different sources to create a frequency table
 frequency.df <- data.frame(name = frequency.df$name,
                            frequency = rowSums(frequency.df[, c(2,3,4)]),
                            stringsAsFactors = FALSE)
 
-#frequency.df$ngram.length <- sapply(frequency.df$name,wordcount,sep = "_")
+#save to file for future use
+saveRDS(frequency.df,"data/unigram.rds")
 
-saveRDS(frequency.df,"data/pentagram.rds")
-
-test <- readRDS("data/pentagram.rds")
-
-#keep as separate data frames and access them as necessary, for speed
+test <- readRDS("data/unigram.rds")

@@ -1,16 +1,13 @@
-#NEXT STEPS 
-#-add supplemental files in input files
-#-simplify this with a function
 
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 ##
 ##  File name:  
-##  Date:       04NOV2019
+##  Date:       09DEC2019
 ##
 ##  Step 4 in process
 ##  Input script is create.variables.R
-##  Create ngram variables in Rstudio environment
+##  Output a score table using Stupid Backoff algorithm
 ##
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
@@ -32,40 +29,33 @@ retrieve.candidates <- function(name,ngram.length.predicted){
   
         #load appropriate corpus of ngrams
         if(ngram.length.predicted == 5) {
-                #ngram.df <- pentagram
                 root.df <- quadgram
                 
         }else if(ngram.length.predicted == 4) {
-                #ngram.df <- quadgram
                 root.df <- trigram
                 
         }else if(ngram.length.predicted == 3) {
-                #ngram.df <- trigram
                 root.df <- bigram
         }else if(ngram.length.predicted == 2) {
-                #ngram.df <- bigram
                 root.df <- unigram
         }else {
-                #ngram.df <- unigram
         }
         
-        #replace grepl with subset or filter
-        #rename is fast, so rename to root, then innerjoin or merge
-        #sub pentagram %>% mutate(root.name = sub("_*[a-zA-Z0-9]*$","",name))
-        #need to review innerjoin, merge to see if works as expected
-        #search for ngram candidates on bigrams and up, using stupid backoff recursion
+        #create score tables
         if(ngram.length.predicted >= 2){
                 
                 #create dataframe from input sentences
                 ngram.df <- name
                 
+                #attach root name to frequency table
                 root.df <- root.df %>%
                         rename(root.name = name,
                                root.frequency = frequency)
 
-                
+                #merge in root name frequency
                 result.df <- merge(ngram.df,root.df)
-
+                
+                #calculate scores and only take top 5 scores per rootname
                 result.df <- result.df %>%
                         mutate(coefficient = 0.15^(5-ngram.length.predicted),
                                score = coefficient*(frequency/root.frequency)) %>%
@@ -79,7 +69,8 @@ retrieve.candidates <- function(name,ngram.length.predicted){
                 return(result.df)
                 
         
-        #calculate final recursion level for stupid backoff model
+        #calculate final recursion level for stupid backoff model (different calculation)
+        #only keep top 200 scoring
         } else if(ngram.length.predicted == 1){
                 #get total corpus size
                 corpus.size <- sum(length(unigram$name),
@@ -109,13 +100,14 @@ retrieve.candidates <- function(name,ngram.length.predicted){
 ## Model
 ##----------------------------------------------------------------------------
 
-#take vector of same n-grams in underscore format
-#Create very small test set initially - only a couple of lines
 
+#create list of variables to use in loop below
 ngram.sources <- list(unigram,bigram,trigram,quadgram,pentagram)
 
-final.values <- NULL
+score.table <- NULL
 
+#loop function that calculates score using stupid.backoff algo and
+#root name (n-1gram)
 for(i in 1:5){
         
         ngram.length.predicted <- i
@@ -124,20 +116,20 @@ for(i in 1:5){
              
         #use purr to avoid loop and count ngram.length
         
-        score.table <- ngram.sources[[i]]
+        input.table <- ngram.sources[[i]]
         
-        score.table$root.name <- map_chr(score.table$name,sub,pattern = "_*[a-zA-Z0-9]*$", replacement = "")
+        input.table$root.name <- map_chr(input.table$name,sub,pattern = "_*[a-zA-Z0-9]*$", replacement = "")
         
         
         #output needs to be predicted phrase, frequency, score
-        df <- retrieve.candidates(score.table, ngram.length.predicted = ngram.length.predicted)
-        final.values <- rbind(final.values,df)
+        df <- retrieve.candidates(input.table, ngram.length.predicted = ngram.length.predicted)
+        score.table <- rbind(score.table,df)
 }
 
 
-#set up final.values as data.table
-final.values <- data.table(final.values)
-setkey(final.values, frequency)
-final.values <- final.values[frequency >=12]
-final.values[, `:=` (frequency = NULL,root.frequency = NULL, coefficient = NULL)]
-setkey(final.values, root.name)
+#set up score.table as data.table and sort
+score.table <- data.table(score.table)
+setkey(score.table, frequency)
+score.table <- score.table[frequency >=12]
+score.table[, `:=` (frequency = NULL,root.frequency = NULL, coefficient = NULL)]
+setkey(score.table, root.name)

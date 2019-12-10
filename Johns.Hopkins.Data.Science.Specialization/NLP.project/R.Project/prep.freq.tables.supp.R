@@ -8,6 +8,7 @@
 ##  Supplemental in process
 ##  Input script is download.enter.corpus.R
 ##  Create supplemntal ngrams to be combined with swiftkey ngrams
+##  Output frequency tables
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 

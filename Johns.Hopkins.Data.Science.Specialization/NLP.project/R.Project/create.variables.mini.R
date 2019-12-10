@@ -1,13 +1,13 @@
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 ##
-##  File name:  
-##  Date:       04NOV2019
+##  File name: create.variables.mini.R
+##  Date:       24NOV2019
 ##
-##  Step 3 in process
+##  Step 3c in process
 ##  Input script prep.freq.tables.supp.R and prep.freq.tables.R
-##  Create ngram variables
-##
+##  Create a small set ngram variables for algo.stupid.backoff.score.table.R
+##  Intended for testing
 ##----------------------------------------------------------------------------
 ##----------------------------------------------------------------------------
 
@@ -26,6 +26,7 @@ library(ngram)
 ## Functions
 ##----------------------------------------------------------------------------
 
+#function combining two ngrams, and combining values
 combine.vocab <- function(swiftkey.ngram,other.ngram){
         combined <- rbind(swiftkey.ngram,other.ngram)
         combined <- combined %>%

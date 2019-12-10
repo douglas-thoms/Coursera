@@ -14,6 +14,7 @@
 ## Functions
 ##----------------------------------------------------------------------------
 
+# this file downloads and unzips a file
 download.unzip <- function(file.loc,destination.path){
 #download and unzip file if not present
         if(!file.exists(destination.path)){ 
@@ -24,6 +25,7 @@ download.unzip <- function(file.loc,destination.path){
         }      
 }
 
+# this file downloads and untars a file
 download.untar <- function(file.loc,destination.path){
         #download and unzip file if not present
         if(!file.exists(destination.path)){ 
@@ -54,7 +56,7 @@ data(grady_augmented)
 #for reproducibility, same randomness
 set.seed(3353)
 
-
+#create path for files to download
 home.directory <- getwd()
 data.directory <- paste(home.directory,"data", sep = "/")
 training.data.file.path <- paste(data.directory,"Coursera-SwiftKey.zip",                                                          
@@ -62,9 +64,6 @@ training.data.file.path <- paste(data.directory,"Coursera-SwiftKey.zip",
 
 training.data.file.path.2 <- paste(data.directory,"aclImdb_v1.tar.gz",                                                          
                                  sep = "/")
-
-training.data.file.path.3 <- paste(data.directory,"Gutenberg.zip",                                                          
-                                   sep = "/")
 
 dir.create(data.directory, showWarnings = FALSE)
 
@@ -76,7 +75,6 @@ dir.create(data.directory, showWarnings = FALSE)
 
 training.data.loc <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
 
-#news difficult files - need to learn them, may not be worth it "http://kdd.ics.uci.edu/databases/reuters21578/reuters21578.tar.gz"
 
 #set up on for movie reviews
 training.data.loc.2 <- "http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz"
