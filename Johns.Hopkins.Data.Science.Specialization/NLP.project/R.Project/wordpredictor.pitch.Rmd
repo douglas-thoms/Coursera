@@ -17,8 +17,7 @@ predictions
 - Intended for deployment in cellphones, internet browsers and similar technology
 
 ### *Approach*
-- [Stupid Backoff algorithm](https://www.aclweb.org/anthology/D07-1090.pdf) coded in R 
-- [Source Code](https://github.com/douglas-thoms/Coursera/tree/master/Johns.Hopkins.Data.Science.Specialization/NLP.project/R.Project)
+- [Stupid Backoff algorithm](https://www.aclweb.org/anthology/D07-1090.pdf) coded in R
 
 ### *Result*
 - The algorithm had an overall top-3 score of 16.11% and a memory size of 83 MB
